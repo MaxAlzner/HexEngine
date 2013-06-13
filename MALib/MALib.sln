@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MALib_Console", "MALib_Console.vcxproj", "{B1563B62-07FB-4DBE-90FA-9FE56CC51F63}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MALib_DLL", "MALib_DLL.vcxproj", "{627A1BB5-613F-460A-A24E-27CEB0EDE5DF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MALib_Static", "MALib_Static.vcxproj", "{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1563B62-07FB-4DBE-90FA-9FE56CC51F63}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B1563B62-07FB-4DBE-90FA-9FE56CC51F63}.Debug|Win32.Build.0 = Debug|Win32
+		{B1563B62-07FB-4DBE-90FA-9FE56CC51F63}.Release|Win32.ActiveCfg = Release|Win32
+		{B1563B62-07FB-4DBE-90FA-9FE56CC51F63}.Release|Win32.Build.0 = Release|Win32
+		{627A1BB5-613F-460A-A24E-27CEB0EDE5DF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{627A1BB5-613F-460A-A24E-27CEB0EDE5DF}.Debug|Win32.Build.0 = Debug|Win32
+		{627A1BB5-613F-460A-A24E-27CEB0EDE5DF}.Release|Win32.ActiveCfg = Release|Win32
+		{627A1BB5-613F-460A-A24E-27CEB0EDE5DF}.Release|Win32.Build.0 = Release|Win32
+		{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}.Debug|Win32.Build.0 = Debug|Win32
+		{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}.Release|Win32.ActiveCfg = Release|Win32
+		{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
