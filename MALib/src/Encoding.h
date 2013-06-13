@@ -12,7 +12,6 @@ void ClearBit(void* data, unsigned int bytesize, unsigned int bit);
 void ToggleBit(void* data, unsigned int bytesize, unsigned int bit);
 void SetBit(void* data, unsigned int bytesize, unsigned int bit);
 bool CheckBit(void* data, unsigned int bytesize, unsigned int bit);
-//void DisplayBits(void* data, unsigned int bytesize);
 
 unsigned int GetDigitValue(const char* base, char digit);
 char GetDigitSymbol(const char* base, unsigned int symbol);

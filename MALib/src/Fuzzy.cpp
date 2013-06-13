@@ -1,4 +1,4 @@
-#include "..\main.h"
+#include "..\MALib.h"
 
 float FUZZY::NOT(float x)
 {

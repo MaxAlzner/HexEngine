@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MALib_Console", "MALib_Console.vcxproj", "{B1563B62-07FB-4DBE-90FA-9FE56CC51F63}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3534A07E-8AB6-45F9-935A-0CDFFDFCB460} = {3534A07E-8AB6-45F9-935A-0CDFFDFCB460}
+		{627A1BB5-613F-460A-A24E-27CEB0EDE5DF} = {627A1BB5-613F-460A-A24E-27CEB0EDE5DF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MALib_DLL", "MALib_DLL.vcxproj", "{627A1BB5-613F-460A-A24E-27CEB0EDE5DF}"
 EndProject

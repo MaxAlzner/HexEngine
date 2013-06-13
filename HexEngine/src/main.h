@@ -15,6 +15,8 @@
 #include <GL\glew.h>
 #include <SDL.h>
 
+#include <MALib.h>
+
 void OnFrame();
 void OnTick();
 void OnKey(char code);

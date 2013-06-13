@@ -9,8 +9,6 @@
 #endif*/
 #define MALIB_API __declspec(dllexport)
 
-#include "Array.h"
-#include "List.h"
-#include "HashTable.h"
-
-//#include "Fuzzy.h"
+MALIB_API void test()
+{
+}

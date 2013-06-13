@@ -61,6 +61,10 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -78,11 +82,22 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\dmath\Fuzzy.cpp" />
+    <ClCompile Include="src\log\Log.cpp" />
     <ClCompile Include="src\MALib.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\datastructures\Array.h" />
+    <ClInclude Include="src\datastructures\HashTable.h" />
+    <ClInclude Include="src\datastructures\List.h" />
+    <ClInclude Include="src\dmath\Fuzzy.h" />
+    <ClInclude Include="src\log\Log.h" />
     <ClInclude Include="src\MALib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

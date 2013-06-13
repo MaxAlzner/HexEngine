@@ -35,17 +35,6 @@ bool CheckBit(void* data, unsigned int bytesize, unsigned int bit)
 		return true;
 	return false;
 }
-/*void DisplayBits(void* data, unsigned int bytesize)
-{
-	if (data == NULL) return;
-	for (unsigned i = bytesize; i >= 1; i--)
-	{
-		if (CheckBit(data, bytesize, i - 1)) 
-			cout << '1';
-		else
-			cout << '0';
-	}
-}*/
 
 unsigned int GetDigitValue(const char* base, char digit)
 {

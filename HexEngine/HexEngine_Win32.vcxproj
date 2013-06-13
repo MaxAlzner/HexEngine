@@ -39,17 +39,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>$(SolutionDir)GLSDK\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(SolutionDir)GLSDK\include;$(SolutionDir)GLSDK\include\GL;$(SolutionDir)GLSDK\include\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)GLSDK\lib;$(SolutionDir)GLSDK\lib\Debug;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(SolutionDir)GLSDK\bin;$(SolutionDir)MALib;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(SolutionDir)GLSDK\include;$(SolutionDir)GLSDK\include\GL;$(SolutionDir)GLSDK\include\SDL;$(SolutionDir)MALib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)GLSDK\lib;$(SolutionDir)MALib</LibraryPath>
     <OutDir>bin\</OutDir>
     <IntDir>output\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <ExecutablePath>$(SolutionDir)GLSDK\bin;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(SolutionDir)GLSDK\include;$(SolutionDir)GLSDK\include\GL;$(SolutionDir)GLSDK\include\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)GLSDK\lib;$(SolutionDir)GLSDK\lib\Release;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(SolutionDir)GLSDK\bin;$(SolutionDir)MALib;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(SolutionDir)GLSDK\include;$(SolutionDir)GLSDK\include\GL;$(SolutionDir)GLSDK\include\SDL;$(SolutionDir)MALib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)GLSDK\lib;$(SolutionDir)MALib</LibraryPath>
     <OutDir>bin\</OutDir>
     <IntDir>output\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -64,7 +64,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;glu3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd $(SolutionDir)bin
@@ -87,7 +87,7 @@ xcopy "$(SolutionDir)GLSDK\bin" "$(SolutionDir)bin"</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;glu3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd $(SolutionDir)bin
