@@ -1,5 +1,5 @@
-#ifndef __FUZZY_H_
-#define __FUZZY_H_
+#ifndef _MA_FUZZY_H_
+#define _MA_FUZZY_H_
 
 class FUZZY
 {
@@ -22,7 +22,7 @@ public:
 	static float isItMax(double x, double min, double max);
 	static float isItMin(double x, double min, double max);
 	static float isItHalf(double x, double min, double max);
-	static bool areEqual(float fVal1, float fVal2, float tolerance = 0.1f);
+	static bool areEqual(float fVal1, float fVal2, float tolerance = 0.001f);
 
 	static int defuzzify(float fVal, int min, int max);
 	static float defuzzify(float fVal, float min, float max);

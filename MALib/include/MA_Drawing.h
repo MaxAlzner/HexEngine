@@ -1,5 +1,5 @@
-#ifndef __CORE_DRAWING2D_
-#define __CORE_DRAWING2D_
+#ifndef _MA_DRAWING_H_
+#define _MA_DRAWING_H_
 
 namespace CORE
 {

@@ -1,4 +1,4 @@
-#include "MALib.h"
+#include "..\include\MALib.h"
 
 void __stdcall DllMain()
 {

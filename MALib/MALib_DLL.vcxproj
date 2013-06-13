@@ -88,17 +88,13 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\dmath\Fuzzy.cpp" />
-    <ClCompile Include="src\log\Log.cpp" />
     <ClCompile Include="src\MALib.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\datastructures\Array.h" />
-    <ClInclude Include="src\datastructures\HashTable.h" />
-    <ClInclude Include="src\datastructures\List.h" />
-    <ClInclude Include="src\dmath\Fuzzy.h" />
-    <ClInclude Include="src\log\Log.h" />
-    <ClInclude Include="src\MALib.h" />
+    <ClInclude Include="include\MALib.h" />
+    <ClInclude Include="include\MA_Array.h" />
+    <ClInclude Include="include\MA_HashTable.h" />
+    <ClInclude Include="include\MA_List.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
