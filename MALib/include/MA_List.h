@@ -1,7 +1,7 @@
 #ifndef _MA_LIST_H_
 #define _MA_LIST_H_
 
-template <class T> struct LISTNODE
+template <class T> struct MALIB_API LISTNODE
 {
 	LISTNODE()
 	{
@@ -14,7 +14,7 @@ template <class T> struct LISTNODE
 	LISTNODE* next;
 };
 
-template <class T> class LIST
+template <class T> class MALIB_API LIST
 {
 public:
 	LIST();

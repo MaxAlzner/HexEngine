@@ -3,7 +3,7 @@
 
 #define HASHTABLE_DEFAULT_SIZE 32
 
-template <class K, class T> class HASHTABLE
+template <class K, class T> class MALIB_API HASHTABLE
 {
 public:
 	HASHTABLE();

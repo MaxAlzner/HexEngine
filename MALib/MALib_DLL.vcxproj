@@ -95,6 +95,8 @@
     <ClInclude Include="include\MA_Array.h" />
     <ClInclude Include="include\MA_HashTable.h" />
     <ClInclude Include="include\MA_List.h" />
+    <ClInclude Include="include\MA_Log.h" />
+    <ClInclude Include="include\MA_OBJ.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

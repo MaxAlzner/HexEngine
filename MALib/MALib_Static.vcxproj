@@ -13,9 +13,6 @@
   <ItemGroup>
     <ClInclude Include="include\MALib.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\MALib.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

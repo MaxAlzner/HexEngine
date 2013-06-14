@@ -1,13 +1,14 @@
-#ifndef __COLOR_H_
-#define __COLOR_H_
+#ifndef _MA_COLOR_H_
+#define _MA_COLOR_H_
 
-class COLOR
+class MALIB_API COLOR
 {
 public:
 	COLOR();
 	COLOR(float a, float r, float g, float b);
 	COLOR(float r, float g, float b);
 	COLOR(unsigned int argb);
+	COLOR(const COLOR& c);
 	~COLOR();
 
 	COLOR operator+(const COLOR &c);

@@ -5,7 +5,7 @@
 #include <string.h>
 #endif
 
-template <class T> class ARRAY
+template <class T> class MALIB_API ARRAY
 {
 public:
 	ARRAY();

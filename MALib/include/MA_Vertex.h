@@ -1,202 +1,195 @@
-#ifndef __VERTEX_H_
-#define __VERTEX_H_
+#ifndef _MA_VERTEX_H_
+#define _MA_VERTEX_H_
 
-class VERTEX4;
-class VERTEX3;
-class VERTEX2;
-typedef VERTEX4 VERTEX;
-typedef VERTEX3 VECTOR;
-typedef VERTEX2 UVPOINT;
+class MALIB_API VEC4;
+class MALIB_API VEC3;
+class MALIB_API VEC2;
+typedef VEC4 VERTEX;
+typedef VEC3 VECTOR;
+typedef VEC2 UVPOINT;
 
-class VERTEX4
+class MALIB_API VEC4
 {
 public:
-	VERTEX4();
-	VERTEX4(float x, float y, float z, float w = 1.0);
-	VERTEX4(const VERTEX3 &v, float w = 1.0);
-	VERTEX4(const VERTEX2 &v, float z, float w = 1.0);
-	VERTEX4(float x, const VERTEX2 &v, float w = 1.0);
-	VERTEX4(const VERTEX2 &v1, const VERTEX2 &v2);
-	~VERTEX4();
+	VEC4();
+	VEC4(float x, float y, float z, float w = 1.0);
+	VEC4(const VEC3& v, float w = 1.0);
+	VEC4(const VEC2& v, float z, float w = 1.0);
+	VEC4(float x, const VEC2& v, float w = 1.0);
+	VEC4(const VEC2& v1, const VEC2& v2);
+	VEC4(const VEC4& v);
+	~VEC4();
 
-	VERTEX4 operator+(const VERTEX4 &v);
-	VERTEX4 operator-(const VERTEX4 &v);
-	VERTEX4 operator*(const VERTEX4 &v);
-	VERTEX4 operator/(const VERTEX4 &v);
-	VERTEX4 operator+(const VERTEX3 &v);
-	VERTEX4 operator-(const VERTEX3 &v);
-	VERTEX4 operator*(const VERTEX3 &v);
-	VERTEX4 operator/(const VERTEX3 &v);
-	VERTEX4 operator+(const VERTEX2 &v);
-	VERTEX4 operator-(const VERTEX2 &v);
-	VERTEX4 operator*(const VERTEX2 &v);
-	VERTEX4 operator/(const VERTEX2 &v);
-	VERTEX4 operator+(float scalar);
-	VERTEX4 operator-(float scalar);
-	VERTEX4 operator*(float scalar);
-	VERTEX4 operator/(float scalar);
-	void operator+=(const VERTEX4 &v);
-	void operator-=(const VERTEX4 &v);
-	void operator*=(const VERTEX4 &v);
-	void operator/=(const VERTEX4 &v);
-	void operator+=(const VERTEX3 &v);
-	void operator-=(const VERTEX3 &v);
-	void operator*=(const VERTEX3 &v);
-	void operator/=(const VERTEX3 &v);
-	void operator+=(const VERTEX2 &v);
-	void operator-=(const VERTEX2 &v);
-	void operator*=(const VERTEX2 &v);
-	void operator/=(const VERTEX2 &v);
+	VEC4 operator+(const VEC4& v);
+	VEC4 operator-(const VEC4& v);
+	VEC4 operator*(const VEC4& v);
+	VEC4 operator/(const VEC4& v);
+	VEC4 operator+(const VEC3& v);
+	VEC4 operator-(const VEC3& v);
+	VEC4 operator*(const VEC3& v);
+	VEC4 operator/(const VEC3& v);
+	VEC4 operator+(const VEC2& v);
+	VEC4 operator-(const VEC2& v);
+	VEC4 operator*(const VEC2& v);
+	VEC4 operator/(const VEC2& v);
+	VEC4 operator+(float scalar);
+	VEC4 operator-(float scalar);
+	VEC4 operator*(float scalar);
+	VEC4 operator/(float scalar);
+	void operator+=(const VEC4& v);
+	void operator-=(const VEC4& v);
+	void operator*=(const VEC4& v);
+	void operator/=(const VEC4& v);
+	void operator+=(const VEC3& v);
+	void operator-=(const VEC3& v);
+	void operator*=(const VEC3& v);
+	void operator/=(const VEC3& v);
+	void operator+=(const VEC2& v);
+	void operator-=(const VEC2& v);
+	void operator*=(const VEC2& v);
+	void operator/=(const VEC2& v);
 	void operator+=(float scalar);
 	void operator-=(float scalar);
 	void operator*=(float scalar);
 	void operator/=(float scalar);
-
-	float magnitude();
-	void normalize();
-	void homogenize();
 
 	float x, y, z, w;
 };
-class VERTEX3
+class VEC3
 {
 public:
-	VERTEX3();
-	VERTEX3(float x, float y, float z);
-	VERTEX3(const VERTEX2 &v, float z);
-	VERTEX3(float x, const VERTEX2 &v);
-	VERTEX3(const VERTEX4 &v);
-	~VERTEX3();
+	VEC3();
+	VEC3(float x, float y, float z);
+	VEC3(const VEC2& v, float z);
+	VEC3(float x, const VEC2& v);
+	VEC3(const VEC4& v);
+	~VEC3();
 
-	VERTEX3 operator+(const VERTEX4 &v);
-	VERTEX3 operator-(const VERTEX4 &v);
-	VERTEX3 operator*(const VERTEX4 &v);
-	VERTEX3 operator/(const VERTEX4 &v);
-	VERTEX3 operator+(const VERTEX3 &v);
-	VERTEX3 operator-(const VERTEX3 &v);
-	VERTEX3 operator*(const VERTEX3 &v);
-	VERTEX3 operator/(const VERTEX3 &v);
-	VERTEX3 operator+(const VERTEX2 &v);
-	VERTEX3 operator-(const VERTEX2 &v);
-	VERTEX3 operator*(const VERTEX2 &v);
-	VERTEX3 operator/(const VERTEX2 &v);
-	VERTEX3 operator+(float scalar);
-	VERTEX3 operator-(float scalar);
-	VERTEX3 operator*(float scalar);
-	VERTEX3 operator/(float scalar);
-	void operator+=(const VERTEX4 &v);
-	void operator-=(const VERTEX4 &v);
-	void operator*=(const VERTEX4 &v);
-	void operator/=(const VERTEX4 &v);
-	void operator+=(const VERTEX3 &v);
-	void operator-=(const VERTEX3 &v);
-	void operator*=(const VERTEX3 &v);
-	void operator/=(const VERTEX3 &v);
-	void operator+=(const VERTEX2 &v);
-	void operator-=(const VERTEX2 &v);
-	void operator*=(const VERTEX2 &v);
-	void operator/=(const VERTEX2 &v);
+	VEC3 operator+(const VEC4& v);
+	VEC3 operator-(const VEC4& v);
+	VEC3 operator*(const VEC4& v);
+	VEC3 operator/(const VEC4& v);
+	VEC3 operator+(const VEC3& v);
+	VEC3 operator-(const VEC3& v);
+	VEC3 operator*(const VEC3& v);
+	VEC3 operator/(const VEC3& v);
+	VEC3 operator+(const VEC2& v);
+	VEC3 operator-(const VEC2& v);
+	VEC3 operator*(const VEC2& v);
+	VEC3 operator/(const VEC2& v);
+	VEC3 operator+(float scalar);
+	VEC3 operator-(float scalar);
+	VEC3 operator*(float scalar);
+	VEC3 operator/(float scalar);
+	void operator+=(const VEC4& v);
+	void operator-=(const VEC4& v);
+	void operator*=(const VEC4& v);
+	void operator/=(const VEC4& v);
+	void operator+=(const VEC3& v);
+	void operator-=(const VEC3& v);
+	void operator*=(const VEC3& v);
+	void operator/=(const VEC3& v);
+	void operator+=(const VEC2& v);
+	void operator-=(const VEC2& v);
+	void operator*=(const VEC2& v);
+	void operator/=(const VEC2& v);
 	void operator+=(float scalar);
 	void operator-=(float scalar);
 	void operator*=(float scalar);
 	void operator/=(float scalar);
-
-	float magnitude();
-	void normalize();
 
 	float x, y, z;
 };
-class VERTEX2
+class VEC2
 {
 public:
-	VERTEX2();
-	VERTEX2(float x, float y);
-	VERTEX2(const VERTEX3 &v);
-	VERTEX2(const VERTEX4 &v);
-	~VERTEX2();
+	VEC2();
+	VEC2(float x, float y);
+	VEC2(const VEC3& v);
+	VEC2(const VEC4& v);
+	~VEC2();
 
-	VERTEX2 operator+(const VERTEX4 &v);
-	VERTEX2 operator-(const VERTEX4 &v);
-	VERTEX2 operator*(const VERTEX4 &v);
-	VERTEX2 operator/(const VERTEX4 &v);
-	VERTEX2 operator+(const VERTEX3 &v);
-	VERTEX2 operator-(const VERTEX3 &v);
-	VERTEX2 operator*(const VERTEX3 &v);
-	VERTEX2 operator/(const VERTEX3 &v);
-	VERTEX2 operator+(const VERTEX2 &v);
-	VERTEX2 operator-(const VERTEX2 &v);
-	VERTEX2 operator*(const VERTEX2 &v);
-	VERTEX2 operator/(const VERTEX2 &v);
-	VERTEX2 operator+(float scalar);
-	VERTEX2 operator-(float scalar);
-	VERTEX2 operator*(float scalar);
-	VERTEX2 operator/(float scalar);
-	void operator+=(const VERTEX4 &v);
-	void operator-=(const VERTEX4 &v);
-	void operator*=(const VERTEX4 &v);
-	void operator/=(const VERTEX4 &v);
-	void operator+=(const VERTEX3 &v);
-	void operator-=(const VERTEX3 &v);
-	void operator*=(const VERTEX3 &v);
-	void operator/=(const VERTEX3 &v);
-	void operator+=(const VERTEX2 &v);
-	void operator-=(const VERTEX2 &v);
-	void operator*=(const VERTEX2 &v);
-	void operator/=(const VERTEX2 &v);
+	VEC2 operator+(const VEC4& v);
+	VEC2 operator-(const VEC4& v);
+	VEC2 operator*(const VEC4& v);
+	VEC2 operator/(const VEC4& v);
+	VEC2 operator+(const VEC3& v);
+	VEC2 operator-(const VEC3& v);
+	VEC2 operator*(const VEC3& v);
+	VEC2 operator/(const VEC3& v);
+	VEC2 operator+(const VEC2& v);
+	VEC2 operator-(const VEC2& v);
+	VEC2 operator*(const VEC2& v);
+	VEC2 operator/(const VEC2& v);
+	VEC2 operator+(float scalar);
+	VEC2 operator-(float scalar);
+	VEC2 operator*(float scalar);
+	VEC2 operator/(float scalar);
+	void operator+=(const VEC4& v);
+	void operator-=(const VEC4& v);
+	void operator*=(const VEC4& v);
+	void operator/=(const VEC4& v);
+	void operator+=(const VEC3& v);
+	void operator-=(const VEC3& v);
+	void operator*=(const VEC3& v);
+	void operator/=(const VEC3& v);
+	void operator+=(const VEC2& v);
+	void operator-=(const VEC2& v);
+	void operator*=(const VEC2& v);
+	void operator/=(const VEC2& v);
 	void operator+=(float scalar);
 	void operator-=(float scalar);
 	void operator*=(float scalar);
 	void operator/=(float scalar);
-
-	float magnitude();
-	void normalize();
 
 	float x, y;
 };
 
-VERTEX3 CreateVector(const VERTEX4 &a, const VERTEX4 &b, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX3 &a, const VERTEX3 &b, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX4 &a, const VERTEX3 &b, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX3 &a, const VERTEX4 &b, bool normalize = false);
-VERTEX3 CreateVector(float x1, float y1, float z1, float x2, float y2, float z2, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX4 &a, const VERTEX4 &b, float &outDist, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX3 &a, const VERTEX3 &b, float &outDist, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX4 &a, const VERTEX3 &b, float &outDist, bool normalize = false);
-VERTEX3 CreateVector(const VERTEX3 &a, const VERTEX4 &b, float &outDist, bool normalize = false);
-VERTEX3 CreateVector(float x1, float y1, float z1, float x2, float y2, float z2, float &outDist, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC4& a, const VEC4& b, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC3& a, const VEC3& b, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC4& a, const VEC3& b, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC3& a, const VEC4& b, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC4& a, const VEC4& b, float& outDist, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC3& a, const VEC3& b, float& outDist, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC4& a, const VEC3& b, float& outDist, bool normalize = false);
+MALIB_API VEC3 CreateVector(const VEC3& a, const VEC4& b, float& outDist, bool normalize = false);
 
-float DotProduct(const VERTEX4 &a, const VERTEX4 &b);
-float DotProduct(const VERTEX3 &a, const VERTEX3 &b);
-float DotProduct(const VERTEX4 &a, const VERTEX3 &b);
-float DotProduct(const VERTEX3 &a, const VERTEX4 &b);
-float DotProduct(float x1, float y1, float z1, float x2, float y2, float z2);
-VERTEX3 CrossProduct(const VERTEX4 &a, const VERTEX4 &b);
-VERTEX3 CrossProduct(const VERTEX3 &a, const VERTEX3 &b);
-VERTEX3 CrossProduct(const VERTEX4 &a, const VERTEX3 &b);
-VERTEX3 CrossProduct(const VERTEX3 &a, const VERTEX4 &b);
-VERTEX3 CrossProduct(float x1, float y1, float z1, float x2, float y2, float z2);
-VERTEX3 Reflect(const VERTEX4 &v, const VERTEX3 &normal);
-VERTEX3 Reflect(const VERTEX3 &v, const VERTEX3 &normal);
-VERTEX3 Reflect(float x1, float y1, float z1, float x2, float y2, float z2);
-VERTEX3 Tangent(const VERTEX4 &v, const VERTEX3 &normal);
-VERTEX3 Tangent(const VERTEX3 &v, const VERTEX3 &normal);
-VERTEX3 Tangent(float x1, float y1, float z1, float x2, float y2, float z2);
+MALIB_API float Dot(const VEC4& a, const VEC4& b);
+MALIB_API float Dot(const VEC3& a, const VEC3& b);
+MALIB_API float Dot(const VEC4& a, const VEC3& b);
+MALIB_API float Dot(const VEC3& a, const VEC4& b);
+MALIB_API VEC3 Cross(const VEC4& a, const VEC4& b);
+MALIB_API VEC3 Cross(const VEC3& a, const VEC3& b);
+MALIB_API VEC3 Cross(const VEC4& a, const VEC3& b);
+MALIB_API VEC3 Cross(const VEC3& a, const VEC4& b);
+MALIB_API VEC3 Reflect(const VEC4& vertex, const VEC3& normal);
+MALIB_API VEC3 Reflect(const VEC3& vertex, const VEC3& normal);
+MALIB_API VEC3 Tangent(const VEC4& vertex, const VEC3& normal);
+MALIB_API VEC3 Tangent(const VEC3& vertex, const VEC3& normal);
+MALIB_API float Distance(VEC4& a, VEC4& b);
+MALIB_API float Distance(VEC3& a, VEC3& b);
+MALIB_API float Distance(VEC4& a, VEC3& b);
+MALIB_API float Distance(VEC3& a, VEC4& b);
 
-VERTEX3 CalculateTangent(const VERTEX3 &normal, const VERTEX4 &a, const VERTEX4 &b, const VERTEX4 &c, const VERTEX2 &uv);
+MALIB_API float Magnitude(VEC4& v);
+MALIB_API float Magnitude(VEC3& v);
+MALIB_API float Magnitude(VEC2& v);
+MALIB_API float Normalize(VEC4& v);
+MALIB_API float Normalize(VEC3& v);
+MALIB_API float Normalize(VEC2& v);
+MALIB_API float Homogenize(VEC4& v);
 
-VERTEX4 Clamp(VERTEX4 &v, float min = 0.0, float max = 1.0, bool affectW = false);
-VERTEX4 Module(VERTEX4 &v, float denominator = 1.0, bool affectW = false);
-VERTEX3 Clamp(VERTEX3 &v, float min = 0.0, float max = 1.0);
-VERTEX3 Module(VERTEX3 &v, float denominator = 1.0);
-VERTEX2 Clamp(VERTEX2 &v, float min = 0.0, float max = 1.0);
-VERTEX2 Module(VERTEX2 &v, float denominator = 1.0);
+MALIB_API VEC4 Clamp(VEC4& v, float min = 0.0, float max = 1.0, bool affectW = false);
+MALIB_API VEC3 Clamp(VEC3& v, float min = 0.0, float max = 1.0);
+MALIB_API VEC2 Clamp(VEC2& v, float min = 0.0, float max = 1.0);
+MALIB_API VEC4 Module(VEC4& v, float denominator = 1.0, bool affectW = false);
+MALIB_API VEC3 Module(VEC3& v, float denominator = 1.0);
+MALIB_API VEC2 Module(VEC2& v, float denominator = 1.0);
 
-//float Distance(VERTEX3 &v1, VERTEX3 &v2);
-
-float Clamp(float x, float min = 0.0, float max = 1.0);
-float Module(float x, float denominator = 1.0);
-void Swap(float &x, float &y);
-float Max(float x, float y);
-float Min(float x, float y);
+MALIB_API float Clamp(float x, float min = 0.0, float max = 1.0);
+MALIB_API float Module(float x, float denominator = 1.0);
+MALIB_API void Swap(float& x, float& y);
+MALIB_API float Max(float x, float y);
+MALIB_API float Min(float x, float y);
 
 #endif

@@ -12,3 +12,10 @@
 #include "MA_Array.h"
 #include "MA_List.h"
 #include "MA_HashTable.h"
+
+#include "MA_Log.h"
+#include "MA_Color.h"
+#include "MA_Vertex.h"
+#include "MA_Matrix.h"
+
+#include "MA_OBJ.h"
