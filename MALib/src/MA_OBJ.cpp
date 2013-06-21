@@ -1,159 +1,305 @@
-#include "StdAfx.h"
+#include "..\include\MALib.h"
 
-void ImportOBJFile(const char* filepath, MESHDATA** outMesh)
+#ifdef _MA_OBJ_H_
+_MALIB_BEGIN
+
+bool ImportOBJFile(const char* filepath, OBJ_MESH** outMesh)
 {
-	if (filepath == NULL) return;
-	if (outMesh == NULL) return;
+	if (filepath == NULL || outMesh == NULL) return false;
 
-	vector<VERTEX3> vertices;
-	vector<VERTEX2> uvs;
-	vector<VERTEX3> normals;
-	vector<int> indices;
+	unsigned vertices = 0;
+	unsigned texcoords = 0;
+	unsigned normals = 0;
+	unsigned faces = 0;
 
-	ifstream file(filepath, ifstream::in);
-	if (!file.is_open()) 
-		return;
-	
-	vector<string> lines;
-	char buffer[256];
+	TEXTFILE* file = 0;
+	if (!ImportTextFile(filepath, &file)) 
+		return false;
+	if (file == NULL) 
+		return false;
 
-	while (!file.eof())
+	for (unsigned i = 0; i < file->lines.length(); i++)
 	{
-		file.getline(buffer, 256);
-		lines.push_back(string(buffer));
+		char* line = file->lines[i];
+		if (line == 0) continue;
+		char first = line[0];
+		if (first == '\0') continue;
+		if (first == 'v')
+		{
+			char second = line[1];
+			if (second == '\0') continue;
+			if (second == 'n') normals++;
+			else if (second == 't') texcoords++;
+			else vertices++;
+		}
+		else if (first == 'f') 
+			faces++;
 	}
+	OBJ_MESH* mesh = new OBJ_MESH;
+	mesh->vertices.resize(vertices);
+	mesh->texcoords.resize(texcoords);
+	mesh->normals.resize(normals);
+	mesh->tangents.resize(normals);
+	mesh->binormals.resize(normals);
+	mesh->faces.resize(faces);
 
-	file.close();
-
-	for (unsigned i = 0; i < lines.size(); i++)
+	for (unsigned i = 0; i < file->lines.length(); i++)
 	{
-		string* str = &lines[i];
-		if (str->size() < 2) continue;
-		char first = (*str)[0];
+		char* line = file->lines[i];
+		if (line == 0) continue;
+		char first = line[0];
+		if (first == '\0') continue;
 
 		if (first == 'v')
 		{
-			char second = (*str)[1];
-			if (second == 'n')//        normal
+			char second = line[1];
+			if (second == '\0') continue;
+			if (second == 'n')
 			{
-				float x, y, z = 0.0f;
-				sscanf_s(str->c_str(), "vn %f %f %f", &x, &y, &z);
-				normals.push_back(VERTEX3(x, y, z));
+				OBJ_NORMAL normal;
+				sscanf_s(line, "vn %f %f %f", &normal.x, &normal.y, &normal.z);
+				mesh->normals.add(normal);
 			}
-			else if (second == 't')//   uv point
+			else if (second == 't')
 			{
-				float u, v = 0.0f;
-				sscanf_s(str->c_str(), "vt %f %f", &u, &v);
-				uvs.push_back(VERTEX2(u, v));
+				OBJ_TEXCOORD tex;
+				sscanf_s(line, "vt %f %f", &tex.u, &tex.v);
+				mesh->texcoords.add(tex);
 			}
-			else//                      vertex
+			else
 			{
-				float x, y, z = 0.0f;
-				sscanf_s(str->c_str(), "v %f %f %f", &x, &y, &z);
-				vertices.push_back(VERTEX3(x, y, z));
+				OBJ_VERTEX vert;
+				sscanf_s(line, "v %f %f %f", &vert.x, &vert.y, &vert.z);
+				mesh->vertices.add(vert);
 			}
 		}
-		else if (first == 'f')//        face
+		else if (first == 'f')
 		{
-			int a, auv, an, b, buv, bn, c, cuv, cn;
-			sscanf_s(str->c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &a, &auv, &an, &b, &buv, &bn, &c, &cuv, &cn);
-			indices.push_back(a);
-			indices.push_back(auv);
-			indices.push_back(an);
-			indices.push_back(b);
-			indices.push_back(buv);
-			indices.push_back(bn);
-			indices.push_back(c);
-			indices.push_back(cuv);
-			indices.push_back(cn);
+			OBJ_FACE face;
+			sscanf_s(line, "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.a_vertex, &face.a_texcoord, &face.a_normal, &face.b_vertex, &face.b_texcoord, &face.b_normal, &face.c_vertex, &face.c_texcoord, &face.c_normal);
+			face.a_vertex--;
+			face.b_vertex--;
+			face.c_vertex--;
+			face.a_texcoord--;
+			face.b_texcoord--;
+			face.c_texcoord--;
+			face.a_normal--;
+			face.b_normal--;
+			face.c_normal--;
+			mesh->faces.add(face);
 		}
 	}
-	
-	*outMesh = new MESHDATA(indices.size() / 3, filepath);
 
-	for (unsigned i = 0; i < (*outMesh)->indices; i += 3)
+#if 0
+	ARRAY<VEC3> faceTangents(faces);
+	ARRAY<VEC3> faceBinormals(faces);
+	for (unsigned i = 0; i < faces; i++)
 	{
-		(*outMesh)->indexBuffer[i] = i;
-		(*outMesh)->indexBuffer[i + 1] = i + 1;
-		(*outMesh)->indexBuffer[i + 2] = i + 2;
-		unsigned vertexAIndex = indices[(i * 3) + 0] - 1;
-		unsigned uvAIndex = indices[(i * 3) + 1] - 1;
-		unsigned normalAIndex = indices[(i * 3) + 2] - 1;
-		unsigned vertexBIndex = indices[((i + 1) * 3) + 0] - 1;
-		unsigned uvBIndex = indices[((i + 1) * 3) + 1] - 1;
-		unsigned normalBIndex = indices[((i + 1) * 3) + 2] - 1;
-		unsigned vertexCIndex = indices[((i + 2) * 3) + 0] - 1;
-		unsigned uvCIndex = indices[((i + 2) * 3) + 1] - 1;
-		unsigned normalCIndex = indices[((i + 2) * 3) + 2] - 1;
-		VERTEX3* vertexa = &vertices[vertexAIndex];
-		VERTEX2* uva = &uvs[uvAIndex];
-		VERTEX3* normala = &normals[normalAIndex];
-		VERTEX3* vertexb = &vertices[vertexBIndex];
-		VERTEX2* uvb = &uvs[uvBIndex];
-		VERTEX3* normalb = &normals[normalBIndex];
-		VERTEX3* vertexc = &vertices[vertexCIndex];
-		VERTEX2* uvc = &uvs[uvCIndex];
-		VERTEX3* normalc = &normals[normalCIndex];
-
-		VERTEX3 tangenta = CalculateTangent(*normala, *vertexa, *vertexb, *vertexc, *uva);
-		VERTEX3 tangentb = CalculateTangent(*normalb, *vertexb, *vertexc, *vertexa, *uvb);
-		VERTEX3 tangentc = CalculateTangent(*normalc, *vertexc, *vertexa, *vertexb, *uvc);
-		VERTEX3 binormala = CrossProduct(*normala, tangenta);
-		VERTEX3 binormalb = CrossProduct(*normalb, tangentb);
-		VERTEX3 binormalc = CrossProduct(*normalc, tangentc);
-
-		MESHVERT* mverta = &(*outMesh)->vertBuffer[i];
-		mverta->pos[0] = vertexa->x;
-		mverta->pos[1] = vertexa->y;
-		mverta->pos[2] = vertexa->z;
-		mverta->pos[3] = 1.f;
-		mverta->tex0[0] = uva->x;
-		mverta->tex0[1] = 1.0f - uva->y;
-		mverta->normal[0] = normala->x;
-		mverta->normal[1] = normala->y;
-		mverta->normal[2] = normala->z;
-		mverta->tangent[0] = tangenta.x;
-		mverta->tangent[1] = tangenta.y;
-		mverta->tangent[2] = tangenta.z;
-		mverta->binormal[0] = binormala.x;
-		mverta->binormal[1] = binormala.y;
-		mverta->binormal[2] = binormala.z;
-		MESHVERT* mvertb = &(*outMesh)->vertBuffer[i + 1];
-		mvertb->pos[0] = vertexb->x;
-		mvertb->pos[1] = vertexb->y;
-		mvertb->pos[2] = vertexb->z;
-		mvertb->pos[3] = 1.f;
-		mvertb->tex0[0] = uvb->x;
-		mvertb->tex0[1] = 1.0f - uvb->y;
-		mvertb->normal[0] = normalb->x;
-		mvertb->normal[1] = normalb->y;
-		mvertb->normal[2] = normalb->z;
-		mvertb->tangent[0] = tangentb.x;
-		mvertb->tangent[1] = tangentb.y;
-		mvertb->tangent[2] = tangentb.z;
-		mvertb->binormal[0] = binormalb.x;
-		mvertb->binormal[1] = binormalb.y;
-		mvertb->binormal[2] = binormalb.z;
-		MESHVERT* mvertc = &(*outMesh)->vertBuffer[i + 2];
-		mvertc->pos[0] = vertexc->x;
-		mvertc->pos[1] = vertexc->y;
-		mvertc->pos[2] = vertexc->z;
-		mvertc->pos[3] = 1.f;
-		mvertc->tex0[0] = uvc->x;
-		mvertc->tex0[1] = 1.0f - uvc->y;
-		mvertc->normal[0] = normalc->x;
-		mvertc->normal[1] = normalc->y;
-		mvertc->normal[2] = normalc->z;
-		mvertc->tangent[0] = tangentc.x;
-		mvertc->tangent[1] = tangentc.y;
-		mvertc->tangent[2] = tangentc.z;
-		mvertc->binormal[0] = binormalc.x;
-		mvertc->binormal[1] = binormalc.y;
-		mvertc->binormal[2] = binormalc.z;
+		OBJ_FACE face = mesh->faces[i];
+		OBJ_VERTEX a = mesh->vertices[face.a_vertex];
+		OBJ_VERTEX b = mesh->vertices[face.b_vertex];
+		OBJ_VERTEX c = mesh->vertices[face.c_vertex];
+		OBJ_TEXCOORD at = mesh->texcoords[face.a_texcoord];
+		OBJ_TEXCOORD bt = mesh->texcoords[face.b_texcoord];
+		OBJ_TEXCOORD ct = mesh->texcoords[face.c_texcoord];
+		
+		VEC3 tangent, binormal;
+		CalculateTangent(
+			VEC3(a.x, a.y, a.z), VEC3(b.x, b.y, b.z), VEC3(c.x, c.y, c.z), 
+			VEC2(at.u, at.v), VEC2(bt.u, bt.v), VEC2(ct.u, ct.v), 
+			&tangent, &binormal);
+		faceTangents.add(tangent);
+		faceBinormals.add(binormal);
 	}
+	for (unsigned i = 0; i < normals; i++)
+	{
+		VEC3 tangentSum(0.0f);
+		VEC3 binormalSum(0.0f);
+		float shared = 0.0f;
+		for (unsigned k = 0; k < faces; k++)
+		{
+			OBJ_FACE face = mesh->faces[k];
+			if (face.a_normal == i || face.b_normal == i || face.c_normal == i)
+			{
+				tangentSum += faceTangents[i];
+				binormalSum += faceBinormals[i];
+				shared += 1.0f;
+			}
+			tangentSum /= shared;
+			binormalSum /= shared;
+		}
+		tangentSum = Normalize(tangentSum);
+		binormalSum = Normalize(binormalSum);
+		OBJ_NORMAL tangent;
+		tangent.x = tangentSum.x;
+		tangent.y = tangentSum.y;
+		tangent.z = tangentSum.z;
+		OBJ_NORMAL binormal;
+		binormal.x = binormalSum.x;
+		binormal.y = binormalSum.y;
+		binormal.z = binormalSum.z;
+		mesh->tangents.add(tangent);
+		mesh->binormals.add(binormal);
+	}
+	faceTangents.clear();
+	faceBinormals.clear();
+#endif
 	
-	vertices.clear();
-	uvs.clear();
-	normals.clear();
-	indices.clear();
+	*outMesh = mesh;
+	FreeTextFile(file);
+	return true;
 }
+bool MALIB_API BakeOBJ(OBJ_MESH* mesh, float** outBuffer, unsigned* outCount)
+{
+	if (mesh == NULL || outBuffer == NULL || outCount == NULL) return false;
+
+	unsigned faces = mesh->faces.length();
+	unsigned indices = faces * 3;
+	unsigned stride = 12;
+	unsigned offset = indices * 4;
+	unsigned components = 5;
+	unsigned bufferSize = faces * stride * components;
+	float* buffer = new float[bufferSize];
+	for (unsigned i = 0; i < faces; i++)
+	{
+		OBJ_FACE face = mesh->faces[i];
+		OBJ_VERTEX a = mesh->vertices[face.a_vertex];
+		OBJ_VERTEX b = mesh->vertices[face.b_vertex];
+		OBJ_VERTEX c = mesh->vertices[face.c_vertex];
+		OBJ_TEXCOORD at = mesh->texcoords[face.a_texcoord];
+		OBJ_TEXCOORD bt = mesh->texcoords[face.b_texcoord];
+		OBJ_TEXCOORD ct = mesh->texcoords[face.c_texcoord];
+		OBJ_NORMAL an = mesh->normals[face.a_normal];
+		OBJ_NORMAL bn = mesh->normals[face.b_normal];
+		OBJ_NORMAL cn = mesh->normals[face.c_normal];
+
+		unsigned vertexOffset = i * stride;
+		unsigned texcoordOffset = (i * stride) + offset;
+		unsigned normalOffset = (i * stride) + (offset * 2);
+		unsigned tangentOffset = (i * stride) + (offset * 3);
+		unsigned binormalOffset = (i * stride) + (offset * 4);
+
+		buffer[vertexOffset     ] = a.x;
+		buffer[vertexOffset +  1] = a.y;
+		buffer[vertexOffset +  2] = a.z;
+		buffer[vertexOffset +  3] = 1.0f;
+		buffer[vertexOffset +  4] = b.x;
+		buffer[vertexOffset +  5] = b.y;
+		buffer[vertexOffset +  6] = b.z;
+		buffer[vertexOffset +  7] = 1.0f;
+		buffer[vertexOffset +  8] = c.x;
+		buffer[vertexOffset +  9] = c.y;
+		buffer[vertexOffset + 10] = c.z;
+		buffer[vertexOffset + 11] = 1.0f;
+
+		buffer[texcoordOffset     ] = at.u;
+		buffer[texcoordOffset +  1] = at.v;
+		buffer[texcoordOffset +  2] = 0.0f;
+		buffer[texcoordOffset +  3] = 0.0f;
+		buffer[texcoordOffset +  4] = bt.u;
+		buffer[texcoordOffset +  5] = bt.v;
+		buffer[texcoordOffset +  6] = 0.0f;
+		buffer[texcoordOffset +  7] = 0.0f;
+		buffer[texcoordOffset +  8] = ct.u;
+		buffer[texcoordOffset +  9] = ct.v;
+		buffer[texcoordOffset + 10] = 0.0f;
+		buffer[texcoordOffset + 11] = 0.0f;
+
+		buffer[normalOffset     ] = an.x;
+		buffer[normalOffset +  1] = an.y;
+		buffer[normalOffset +  2] = an.z;
+		buffer[normalOffset +  3] = 0.0f;
+		buffer[normalOffset +  4] = bn.x;
+		buffer[normalOffset +  5] = bn.y;
+		buffer[normalOffset +  6] = bn.z;
+		buffer[normalOffset +  7] = 0.0f;
+		buffer[normalOffset +  8] = cn.x;
+		buffer[normalOffset +  9] = cn.y;
+		buffer[normalOffset + 10] = cn.z;
+		buffer[normalOffset + 11] = 0.0f;
+
+#if 1
+		VEC3 tangent, binormal;
+		CalculateTangent(
+			VEC3(a.x, a.y, a.z), VEC3(b.x, b.y, b.z), VEC3(c.x, c.y, c.z), 
+			VEC2(at.u, at.v), VEC2(bt.u, bt.v), VEC2(ct.u, ct.v), 
+			&tangent, &binormal);
+		/*VEC3 tangentb, binormalb, tangentc, binormalc;
+		CalculateTangent(
+			VEC3(b.x, b.y, b.z), VEC3(c.x, c.y, c.z), VEC3(a.x, a.y, a.z), 
+			VEC2(bt.u, bt.v), VEC2(ct.u, ct.v), VEC2(at.u, at.v), 
+			&tangentb, &binormalb);
+		CalculateTangent(
+			VEC3(c.x, c.y, c.z), VEC3(a.x, a.y, a.z), VEC3(b.x, b.y, b.z), 
+			VEC2(ct.u, ct.v), VEC2(at.u, at.v), VEC2(bt.u, bt.v), 
+			&tangentc, &binormalc);*/
+
+		buffer[tangentOffset     ] = tangent.x;
+		buffer[tangentOffset +  1] = tangent.y;
+		buffer[tangentOffset +  2] = tangent.z;
+		buffer[tangentOffset +  3] = 0.0f;
+		buffer[tangentOffset +  4] = tangent.x;
+		buffer[tangentOffset +  5] = tangent.y;
+		buffer[tangentOffset +  6] = tangent.z;
+		buffer[tangentOffset +  7] = 0.0f;
+		buffer[tangentOffset +  8] = tangent.x;
+		buffer[tangentOffset +  9] = tangent.y;
+		buffer[tangentOffset + 10] = tangent.z;
+		buffer[tangentOffset + 11] = 0.0f;
+
+		buffer[binormalOffset     ] = binormal.x;
+		buffer[binormalOffset +  1] = binormal.y;
+		buffer[binormalOffset +  2] = binormal.z;
+		buffer[binormalOffset +  3] = 0.0f;
+		buffer[binormalOffset +  4] = binormal.x;
+		buffer[binormalOffset +  5] = binormal.y;
+		buffer[binormalOffset +  6] = binormal.z;
+		buffer[binormalOffset +  7] = 0.0f;
+		buffer[binormalOffset +  8] = binormal.x;
+		buffer[binormalOffset +  9] = binormal.y;
+		buffer[binormalOffset + 10] = binormal.z;
+		buffer[binormalOffset + 11] = 0.0f;
+#else
+		OBJ_NORMAL atan = mesh->tangents[face.a_normal];
+		OBJ_NORMAL btan = mesh->tangents[face.b_normal];
+		OBJ_NORMAL ctan = mesh->tangents[face.c_normal];
+		OBJ_NORMAL abi = mesh->binormals[face.a_normal];
+		OBJ_NORMAL bbi = mesh->binormals[face.b_normal];
+		OBJ_NORMAL cbi = mesh->binormals[face.c_normal];
+
+		buffer[tangentOffset     ] = atan.x;
+		buffer[tangentOffset +  1] = atan.y;
+		buffer[tangentOffset +  2] = atan.z;
+		buffer[tangentOffset +  3] = 0.0f;
+		buffer[tangentOffset +  4] = btan.x;
+		buffer[tangentOffset +  5] = btan.y;
+		buffer[tangentOffset +  6] = btan.z;
+		buffer[tangentOffset +  7] = 0.0f;
+		buffer[tangentOffset +  8] = ctan.x;
+		buffer[tangentOffset +  9] = ctan.y;
+		buffer[tangentOffset + 10] = ctan.z;
+		buffer[tangentOffset + 11] = 0.0f;
+
+		buffer[binormalOffset     ] = abi.x;
+		buffer[binormalOffset +  1] = abi.y;
+		buffer[binormalOffset +  2] = abi.z;
+		buffer[binormalOffset +  3] = 0.0f;
+		buffer[binormalOffset +  4] = bbi.x;
+		buffer[binormalOffset +  5] = bbi.y;
+		buffer[binormalOffset +  6] = bbi.z;
+		buffer[binormalOffset +  7] = 0.0f;
+		buffer[binormalOffset +  8] = cbi.x;
+		buffer[binormalOffset +  9] = cbi.y;
+		buffer[binormalOffset + 10] = cbi.z;
+		buffer[binormalOffset + 11] = 0.0f;
+#endif
+	}
+
+	*outBuffer = buffer;
+	*outCount = indices;
+
+	return true;
+}
+
+_MALIB_END
+#endif

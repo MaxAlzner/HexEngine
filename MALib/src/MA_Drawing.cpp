@@ -1,152 +1,257 @@
-#include "StdAfx.h"
+#include "..\include\MALib.h"
 
-void CORE::Drawing::PutPixel(unsigned int *video, int width, int height, int x, int y, unsigned int color)
+#ifdef _MA_DRAWING_H_
+_MALIB_BEGIN
+
+MALIB_API unsigned int PackColor(unsigned int r, unsigned int g, unsigned int b, unsigned int a, PIXELFORMAT format)
 {
-	int index = (y * width) + x;
-	if (ARGB::GetAlpha(color) < 0xFF) video[index] = ARGB::BlendColor(video[index], color);
-	else video[index] = color;
-}
-int CORE::Drawing::GetPixel(unsigned int* video, int width, int height, int x, int y)
-{
-	if (x < 0 || x > width) return 0;
-	if (y < 0 || y > height) return 0;
-	return *(video + (y * width) + x);
-}
-void CORE::Drawing::DrawBitmap(unsigned int *video, int width, int height, int x1, int y1, 
-	unsigned int *image, int nImageWidth, int nImageHeight, int option)
-{
-	int x2 = x1 + nImageWidth - 1;
-	int y2 = y1 + nImageHeight - 1;
-	clipBounds(x1, y1, 0, 0, width, height);
-	clipBounds(x2, y2, 0, 0, width, height);
-	for(int y = 0; y < y2; y++)
+	if (r > 0xFF) r = 0xFF;
+	if (g > 0xFF) g = 0xFF;
+	if (b > 0xFF) b = 0xFF;
+	if (a > 0xFF) a = 0xFF;
+	switch (format)
 	{
-		for(int x = 0; x < x2; x++)
+	case PIXELFORMAT_RGB:
+		return (r << 16) + (g << 8) + (b);
+		break;
+	case PIXELFORMAT_RGBA:
+		return (r << 24) + (g << 16) + (b << 8) + (a);
+		break;
+	case PIXELFORMAT_ARGB:
+		return (a << 24) + (r << 16) + (g << 8) + (b);
+		break;
+		
+	case PIXELFORMAT_BGR:
+		return (b << 16) + (g << 8) + (r);
+		break;
+	case PIXELFORMAT_BGRA:
+		return (b << 24) + (g << 16) + (r << 8) + (a);
+		break;
+	case PIXELFORMAT_ABGR:
+		return (a << 24) + (b << 16) + (g << 8) + (r);
+		break;
+
+	default:
+		break;
+	}
+	return 0;
+}
+MALIB_API void UnpackColor(unsigned int c, unsigned int* r, unsigned int* g, unsigned int* b, unsigned int* a, PIXELFORMAT format)
+{
+	switch (format)
+	{
+	case PIXELFORMAT_RGB:
+		if (r != NULL) *r = (c << 8) >> 24;
+		if (g != NULL) *g = (c << 16) >> 24;
+		if (b != NULL) *b = (c << 24) >> 24;
+		break;
+	case PIXELFORMAT_RGBA:
+		if (r != NULL) *r = c >> 24;
+		if (g != NULL) *g = (c << 8) >> 24;
+		if (b != NULL) *b = (c << 16) >> 24;
+		if (a != NULL) *a = (c << 24) >> 24;
+		break;
+	case PIXELFORMAT_ARGB:
+		if (a != NULL) *a = c >> 24;
+		if (r != NULL) *r = (c << 8) >> 24;
+		if (g != NULL) *g = (c << 16) >> 24;
+		if (b != NULL) *b = (c << 24) >> 24;
+		break;
+		
+	case PIXELFORMAT_BGR:
+		if (b != NULL) *r = (c << 8) >> 24;
+		if (g != NULL) *g = (c << 16) >> 24;
+		if (r != NULL) *b = (c << 24) >> 24;
+		break;
+	case PIXELFORMAT_BGRA:
+		if (r != NULL) *b = c >> 24;
+		if (g != NULL) *g = (c << 8) >> 24;
+		if (b != NULL) *r = (c << 16) >> 24;
+		if (a != NULL) *a = (c << 24) >> 24;
+		break;
+	case PIXELFORMAT_ABGR:
+		if (r != NULL) *a = c >> 24;
+		if (g != NULL) *b = (c << 8) >> 24;
+		if (b != NULL) *g = (c << 16) >> 24;
+		if (a != NULL) *r = (c << 24) >> 24;
+		break;
+
+	default:
+		break;
+	}
+}
+
+MALIB_API unsigned int BlendColor(unsigned int dest, unsigned int src, PIXELFORMAT format)
+{
+	unsigned int a1, r1, g1, b1;
+	UnpackColor(src, &a1, &r1, &g1, &b1, format);
+
+	unsigned int a2, r2, g2, b2;
+	UnpackColor(dest, &a2, &r2, &g2, &b2, format);
+
+	unsigned int a3, r3, g3, b3;
+	a3 = a1;
+	float pixel_alpha = float(a3) / 255.0f;
+			
+	r3 = r2 + (unsigned int)(pixel_alpha * float((int)r1 - (int)r2));
+	g3 = g2 + (unsigned int)(pixel_alpha * float((int)g1 - (int)g2));
+	b3 = b2 + (unsigned int)(pixel_alpha * float((int)b1 - (int)b2));
+
+	return PackColor(r3, g3, b3, a2, format);
+}
+MALIB_API void PutPixel(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int color, PIXELFORMAT format)
+{
+	unsigned index = (y * width) + x;
+	unsigned alpha = 0xFF;
+	UnpackColor(color, NULL, NULL, NULL, NULL, format);
+	if (alpha < 0xFF) 
+		data[index] = BlendColor(data[index], color);
+	else 
+		data[index] = color;
+}
+MALIB_API int GetPixel(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y)
+{
+	if (x > width) return 0;
+	if (y > height) return 0;
+	return *(data + (y * width) + x);
+}
+MALIB_API void DrawBitmap(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int* image, unsigned int imageWidth, unsigned int imageHeight, PIXELFORMAT format, DRAWMODE option)
+{
+	unsigned x1 = x;
+	unsigned y1 = y;
+	unsigned x2 = x + imageWidth - 1;
+	unsigned y2 = y + imageHeight - 1;
+	if (x1 >= width) x1 = width - 1;
+	if (y1 >= height) y1 = height - 1;
+	if (x2 >= width) x2 = width - 1;
+	if (y2 >= height) y2 = height - 1;
+	for(unsigned i = 0; i < y2; i++)
+	{
+		for(unsigned k = 0; k < x2; k++)
 		{
-			unsigned int color = 0;
-			if (option & OPTION_FLIPPED) color = GetPixel(image, nImageWidth, nImageHeight, nImageWidth - x, y);
-			else color = GetPixel(image, nImageWidth, nImageHeight, x, y);
+			unsigned u = k;
+			unsigned v = i;
+			if (option & DRAWMODE_FLIPPEDX) u = imageWidth - k;
+			if (option & DRAWMODE_FLIPPEDY) v = imageHeight - i;
 
-			if (ARGB::GetAlpha(color) == 0x00) continue;
+			unsigned color = GetPixel(image, imageWidth, imageHeight, u, v);
 
-			PutPixel(video, width, height, x + x1, y + y1, color);
+			PutPixel(data, width, height, k + x1, i + y1, color, format);
 		}
 	}
 }
-void CORE::Drawing::DrawBitmapCell(unsigned int *video, int width, int height, int xDest, int yDest, 
-	unsigned int *image, int nCellColumn, int nCellRow, int nCellWidth, int nCellHeight, 
-	int nImageWidth, int nImageHeight, int option) {
+MALIB_API void DrawBitmapCell(unsigned int* data, unsigned int width, unsigned int height, unsigned int xDest, unsigned int yDest, unsigned int* image, unsigned int cellColumn, unsigned int cellRow, unsigned int cellWidth, unsigned int cellHeight, unsigned int imageWidth, unsigned int imageHeight, PIXELFORMAT format, DRAWMODE option)
+{
+	unsigned xSrc = cellWidth * cellColumn;
+	unsigned ySrc = cellHeight * cellRow;
 
-	int src_x = nCellWidth * nCellColumn;
-	int src_y = nCellHeight * nCellRow;
-
-	for(int y = 0; y < nCellHeight; y++)
+	for(unsigned i = 0; i < cellHeight; i++)
 	{
-		for(int x = 0; x < nCellWidth; x++)
+		for(unsigned k = 0; k < cellWidth; k++)
 		{
-			unsigned int color = 0;
-			if (option & OPTION_FLIPPED) color = GetPixel(image, nImageWidth, nImageHeight, src_x + (nCellWidth - x), src_y + y);
-			else color = GetPixel(image, nImageWidth, nImageHeight, src_x + x, src_y + y);
+			unsigned u = xSrc + k;
+			unsigned v = ySrc + i;
+			if (option & DRAWMODE_FLIPPEDX) u = xSrc + (cellWidth - k);
+			if (option & DRAWMODE_FLIPPEDY) v = ySrc + (cellHeight - i);
 
-			if (ARGB::GetAlpha(color) == 0x00) continue;
+			unsigned color = GetPixel(image, imageWidth, imageHeight, u, v);
 
-				PutPixel(video, width, height, xDest + x, yDest + y, color);
+			PutPixel(data, width, height, xDest + k, yDest + i, color, format);
 		}
 	}
 }
-void CORE::Drawing::ClearBitmap(unsigned int *video, int width, int height, unsigned int color)
+MALIB_API void ClearBitmap(unsigned int* data, unsigned int width, unsigned int height, unsigned int color, PIXELFORMAT format)
 {
-	DrawBox(video, width, height, 0, 0, width, height, color);
+	DrawBox(data, width, height, 0, 0, width, height, color, format);
 }
-void CORE::Drawing::DrawCircle(unsigned int *video, int width, int height, int cx, int cy, int radius, unsigned int color)
+MALIB_API void DrawCircle(unsigned int* data, unsigned int width, unsigned int height, unsigned int cx, unsigned int cy, unsigned int r, unsigned int color, PIXELFORMAT format)
 {
-	int x1 = cx - radius;
-	int y1 = cy - radius;
-	int x2 = cx + radius;
-	int y2 = cy + radius;
-	clipBounds(x1, y1, 0, 0, width, height);
-	clipBounds(x2, y2, 0, 0, width, height);
-	int radiusSquared = radius * radius;
-	for(int i = y1; i < y2; i++)
+	unsigned x1 = cx - r;
+	unsigned y1 = cy - r;
+	unsigned x2 = cx + r;
+	unsigned y2 = cy + r;
+	if (cx < r) x1 = 0;
+	else if (x1 >= width) x1 = width - 1;
+	if (cy < r) y1 = 0;
+	else if (y1 >= height) y1 = height - 1;
+	if (cx < r) x2 = 0;
+	else if (x2 >= width) x2 = width - 1;
+	if (cy < r) y2 = 0;
+	else if (y2 >= height) y2 = height - 1;
+	unsigned r2 = r * r;
+	for(unsigned i = y1; i < y2; i++)
 	{
-		for(int k = x1; k < x2; k++)
+		for(unsigned k = x1; k < x2; k++)
 		{
-			int dist2 = ((k - cx) * (k - cx)) + ((i - cy) * (i - cy));
-			if(radiusSquared >= dist2)
+			unsigned dist2 = ((k - cx) * (k - cx)) + ((i - cy) * (i - cy));
+			if(r2 >= dist2)
 			{
-				PutPixel(video, width, height, k, i, color);
+				PutPixel(data, width, height, k, i, color, format);
 			}
 		}
 	}
 }
-void CORE::Drawing::DrawBox(unsigned int *video, int width, int height, int x1, int y1, int x2, int y2, unsigned int color)
+MALIB_API void DrawBox(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color, PIXELFORMAT format)
 {
-	if (x1 > x2) swap(x1, x2);
-	if (y1 > y2) swap(y1, y2);
-	clipBounds(x1, y1, 0, 0, width, height);
-	clipBounds(x2, y2, 0, 0, width, height);
-	for(int i = y1; i < y2; i++)
+	Clip(x1, y1, 0, 0, width - 1, height - 1);
+	Clip(x2, y2, 0, 0, width - 1, height - 1);
+	for(unsigned i = y1; i < y2; i++)
 	{
-		for(int k = x1; k < x2; k++)
+		for(unsigned k = x1; k < x2; k++)
 		{
-			PutPixel(video, width, height, k, i, color);
+			PutPixel(data, width, height, k, i, color, format);
 		}
 	}
 }
-void CORE::Drawing::DrawRectangle(unsigned int *video, int width, int height, int x, int y, int w, int h, unsigned int color)
+MALIB_API void DrawRectangle(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color, PIXELFORMAT format)
 {
-	DrawBox(video, width, height, x, y, x + w, y + h, color);
+	DrawBox(data, width, height, x, y, x + w, y + h, color, format);
 }
-void CORE::Drawing::DrawLine(unsigned int* video, int width, int height, int x1, int y1, int x2, int y2, unsigned int color)
+MALIB_API void DrawLine(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color, PIXELFORMAT format)
 {
-	clipBounds(x1, y1, 0, 0, width, height);
-	clipBounds(x2, y2, 0, 0, width - 1, height - 1);
-	if (x1 == x2 && y1 == y2) {PutPixel(video, width, height, x1, y1, color);return;}
+	Clip(x1, y1, 0, 0, width - 1, height - 1);
+	Clip(x2, y2, 0, 0, width - 1, height - 1);
+	if (x1 == x2 && y1 == y2)
+	{
+		PutPixel(data, width, height, x1, y1, color, format);
+		return;
+	}
 	float slope = float(y2 - y1) / float(x2 - x1);
-	int y = 0;
+	unsigned y = 0;
 	if (x1 < x2)
 	{
-		for (int x = x1; x < x2; x++)
+		for (unsigned x = x1; x < x2; x++)
 		{
-			y = int(slope * float(x - x1)) + y1;
-			PutPixel(video, width, height, x, y, color);
+			y = unsigned(slope * float(x - x1)) + y1;
+			PutPixel(data, width, height, x, y, color, format);
 		}
 	}
 	else if (x1 > x2)
 	{
-		for (int x = x1; x > x2; x--)
+		for (unsigned x = x1; x > x2; x--)
 		{
-			y = int(slope * float(x - x1)) + y1;
-			PutPixel(video, width, height, x, y, color);
+			y = unsigned(slope * float(x - x1)) + y1;
+			PutPixel(data, width, height, x, y, color, format);
 		}
 	}
 	else
 	{
-		if (y1 > y2) swap(y1, y2);
-		DrawBox(video, width, height, x1, y1, x1 + 1, y2, color);
+		if (y1 > y2) Swap(y1, y2);
+		DrawBox(data, width, height, x1, y1, x1 + 1, y2, color, format);
 	}
 }
-void CORE::Drawing::DrawTriangle(unsigned int* video, int width, int height, 
-	int x1, int y1, int x2, int y2, int x3, int y3, unsigned int color)
+MALIB_API void DrawTriangle(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int color, PIXELFORMAT format)
 {
-	int xmin = x1;
-	int ymin = y1;
-	int xmax = x3;
-	int ymax = y3;
-	if (xmin > x2) xmin = x2;
-	if (xmin > x3) xmin = x3;
-	if (ymin > y2) ymin = y2;
-	if (ymin > y3) ymin = y3;
-	if (xmax < x2) xmax = x2;
-	if (xmax < x1) xmax = x1;
-	if (ymax < y2) ymax = y2;
-	if (ymax < y1) ymax = y1;
-	clipBounds(xmin, ymin, 0, 0, width, height);
-	clipBounds(xmax, ymax, 0, 0, width, height);
+	unsigned xmin = Min(x1, x2, x3);
+	unsigned ymin = Min(y1, y2, y3);
+	unsigned xmax = Max(x1, x2, x3);
+	unsigned ymax = Max(y1, y2, y3);
+	Clip(xmin, ymin, 0, 0, width - 1, height - 1);
+	Clip(xmax, ymax, 0, 0, width - 1, height - 1);
 	float alpha, beta, gamma = 0.0;
-	for (int i = ymin; i < ymax; i++)
+	for (unsigned i = ymin; i < ymax; i++)
 	{
-		for (int k = xmin; k < xmax; k++)
+		for (unsigned k = xmin; k < xmax; k++)
 		{
 			alpha = float(((y2 - y3) * k) + ((x3 - x2) * i) + (x2 * y3) - (x3 * y2)) / 
 							float(((y2 - y3) * x1) + ((x3 - x2) * y1) + (x2 * y3) - (x3 * y2));
@@ -154,56 +259,13 @@ void CORE::Drawing::DrawTriangle(unsigned int* video, int width, int height,
 							float(((y3 - y1) * x2) + ((x1 - x3) * y2) + (x3 * y1) - (x1 * y3));
 			gamma = float(((y1 - y2) * k) + ((x2 - x1) * i) + (x1 * y2) - (x2 * y1)) / 
 							float(((y1 - y2) * x3) + ((x2 - x1) * y3) + (x1 * y2) - (x2 * y1));
-			if (alpha >= 0.0 && beta >= 0.0 && gamma >= 0.0)
+			if (alpha >= 0.0f && beta >= 0.0f && gamma >= 0.0f)
 			{
-				PutPixel(video, width, height, k, i, color);
+				PutPixel(data, width, height, k, i, color, format);
 			}
 		}
 	}
 }
-void CORE::Drawing::DrawFace(unsigned int* video, int width, int height, 
-	VERTEX &v1, VERTEX &v2, VERTEX &v3, 
-	COLOR &c1, COLOR &c2, COLOR &c3)
-{
-	int xmin = int(v1.x);
-	int ymin = int(v1.y);
-	int xmax = int(v3.x);
-	int ymax = int(v3.y);
-	if (xmin > v2.x) xmin = int(v2.x);
-	if (xmin > v3.x) xmin = int(v3.x);
-	if (ymin > v2.y) ymin = int(v2.y);
-	if (ymin > v3.y) ymin = int(v3.y);
-	if (xmax < v2.x) xmax = int(v2.x);
-	if (xmax < v1.x) xmax = int(v1.x);
-	if (ymax < v2.y) ymax = int(v2.y);
-	if (ymax < v1.y) ymax = int(v1.y);
-	xmax++;
-	ymax++;
-	clipBounds(xmin, ymin, 0, 0, width, height);
-	clipBounds(xmax, ymax, 0, 0, width, height);
-	float alpha, beta, gamma = 0.f;
-	unsigned int color;
-	for (int i = ymin; i < ymax; i++)
-	{
-		for (int k = xmin; k < xmax; k++)
-		{
-			float x = float(k);
-			float y = float(i);
-			alpha = (((v2.y - v3.y) * k) + ((v3.x - v2.x) * i) + (v2.x * v3.y) - (v3.x * v2.y)) / 
-				(((v2.y - v3.y) * v1.x) + ((v3.x - v2.x) * v1.y) + (v2.x * v3.y) - (v3.x * v2.y));
-			beta = (((v3.y - v1.y) * k) + ((v1.x - v3.x) * i) + (v3.x * v1.y) - (v1.x * v3.y)) / 
-				(((v3.y - v1.y) * v2.x) + ((v1.x - v3.x) * v2.y) + (v3.x * v1.y) - (v1.x * v3.y));
-			gamma = 1.f - (alpha + beta);
-			if (alpha >= 0.f && beta >= 0.f && gamma >= 0.f)
-			{
-				color = ARGB::CreateARGB(
-					0xFF * unsigned int((alpha * c1.a) + (beta * c2.a) + (gamma * c3.a)), 
-					0xFF * unsigned int((alpha * c1.r) + (beta * c2.r) + (gamma * c3.r)), 
-					0xFF * unsigned int((alpha * c1.g) + (beta * c2.g) + (gamma * c3.g)), 
-					0xFF * unsigned int((alpha * c1.b) + (beta * c2.b) + (gamma * c3.b)));
-						
-				PutPixel(video, width, height, k, i, color);
-			}
-		}
-	}
-}
+
+_MALIB_END
+#endif

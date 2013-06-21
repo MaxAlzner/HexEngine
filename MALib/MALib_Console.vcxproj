@@ -39,13 +39,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>output\$(Configuration)\</OutDir>
-    <IntDir>output\$(Configuration)\</IntDir>
+    <OutDir>output\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>output\$(Configuration)\</OutDir>
-    <IntDir>output\$(Configuration)\</IntDir>
+    <OutDir>output\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -78,7 +78,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MALib.cpp" />
     <ClCompile Include="src\MALib_Console.cpp" />
+    <ClCompile Include="src\MA_Color.cpp" />
+    <ClCompile Include="src\MA_Counter.cpp" />
+    <ClCompile Include="src\MA_Drawing.cpp" />
+    <ClCompile Include="src\MA_File.cpp" />
+    <ClCompile Include="src\MA_Image.cpp" />
+    <ClCompile Include="src\MA_Log.cpp" />
+    <ClCompile Include="src\MA_Math.cpp" />
+    <ClCompile Include="src\MA_Matrix.cpp" />
+    <ClCompile Include="src\MA_OBJ.cpp" />
+    <ClCompile Include="src\MA_Random.cpp" />
+    <ClCompile Include="src\MA_Vertex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\MALib.h" />
+    <ClInclude Include="include\MA_Array.h" />
+    <ClInclude Include="include\MA_Color.h" />
+    <ClInclude Include="include\MA_Counter.h" />
+    <ClInclude Include="include\MA_Drawing.h" />
+    <ClInclude Include="include\MA_File.h" />
+    <ClInclude Include="include\MA_HashTable.h" />
+    <ClInclude Include="include\MA_Image.h" />
+    <ClInclude Include="include\MA_List.h" />
+    <ClInclude Include="include\MA_Log.h" />
+    <ClInclude Include="include\MA_Math.h" />
+    <ClInclude Include="include\MA_Matrix.h" />
+    <ClInclude Include="include\MA_OBJ.h" />
+    <ClInclude Include="include\MA_Random.h" />
+    <ClInclude Include="include\MA_Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

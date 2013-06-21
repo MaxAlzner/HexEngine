@@ -1,16 +1,19 @@
-#include "StdAfx.h"
+#include "..\include\MALib.h"
 
-COUNTER::COUNTER()
+#ifdef _MA_COUNTER_H_
+_MALIB_BEGIN
+
+MALIB_API COUNTER::COUNTER()
 {
 	this->count = 0;
 	this->MAX_COUNT = 0;
 }
-COUNTER::COUNTER(int max)
+MALIB_API COUNTER::COUNTER(int max)
 {
 	this->count = 0;
 	this->MAX_COUNT = max;
 }
-bool COUNTER::tick()
+MALIB_API bool COUNTER::tick()
 {
 	this->count++;
 	if (this->count > this->MAX_COUNT)
@@ -20,12 +23,15 @@ bool COUNTER::tick()
 	}
 	return false;
 }
-void COUNTER::reset()
+MALIB_API void COUNTER::reset()
 {
 	this->count = 0;
 }
-void COUNTER::reset(int newMax)
+MALIB_API void COUNTER::reset(int newMax)
 {
 	this->MAX_COUNT = newMax;
 	this->reset();
 }
+
+_MALIB_END
+#endif

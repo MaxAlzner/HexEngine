@@ -12,6 +12,32 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\MALib.h" />
+    <ClInclude Include="include\MA_Array.h" />
+    <ClInclude Include="include\MA_Color.h" />
+    <ClInclude Include="include\MA_Counter.h" />
+    <ClInclude Include="include\MA_Drawing.h" />
+    <ClInclude Include="include\MA_File.h" />
+    <ClInclude Include="include\MA_HashTable.h" />
+    <ClInclude Include="include\MA_Image.h" />
+    <ClInclude Include="include\MA_List.h" />
+    <ClInclude Include="include\MA_Log.h" />
+    <ClInclude Include="include\MA_Math.h" />
+    <ClInclude Include="include\MA_Matrix.h" />
+    <ClInclude Include="include\MA_OBJ.h" />
+    <ClInclude Include="include\MA_Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\MALib.cpp" />
+    <ClCompile Include="src\MA_Color.cpp" />
+    <ClCompile Include="src\MA_Counter.cpp" />
+    <ClCompile Include="src\MA_Drawing.cpp" />
+    <ClCompile Include="src\MA_File.cpp" />
+    <ClCompile Include="src\MA_Image.cpp" />
+    <ClCompile Include="src\MA_Log.cpp" />
+    <ClCompile Include="src\MA_Math.cpp" />
+    <ClCompile Include="src\MA_Matrix.cpp" />
+    <ClCompile Include="src\MA_OBJ.cpp" />
+    <ClCompile Include="src\MA_Vertex.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3534A07E-8AB6-45F9-935A-0CDFFDFCB460}</ProjectGuid>
@@ -44,7 +70,7 @@
     <OutDir>bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>output\$(Configuration)\</IntDir>
+    <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>MALib</TargetName>
@@ -53,7 +79,7 @@
     <OutDir>bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>output\$(Configuration)\</IntDir>
+    <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>MALib</TargetName>
