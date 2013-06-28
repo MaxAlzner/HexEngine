@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HexCore", "HexCore.vcxproj", "{4813CA26-6464-4632-8C89-EA09FDF5F286}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HexEngine", "HexEngine.vcxproj", "{4813CA26-6464-4632-8C89-EA09FDF5F286}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Startup", "Startup.vcxproj", "{620A8671-AA5E-41AC-9FFC-F50189568DA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,10 @@ Global
 		{4813CA26-6464-4632-8C89-EA09FDF5F286}.Debug|Win32.Build.0 = Debug|Win32
 		{4813CA26-6464-4632-8C89-EA09FDF5F286}.Release|Win32.ActiveCfg = Release|Win32
 		{4813CA26-6464-4632-8C89-EA09FDF5F286}.Release|Win32.Build.0 = Release|Win32
+		{620A8671-AA5E-41AC-9FFC-F50189568DA5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{620A8671-AA5E-41AC-9FFC-F50189568DA5}.Debug|Win32.Build.0 = Debug|Win32
+		{620A8671-AA5E-41AC-9FFC-F50189568DA5}.Release|Win32.ActiveCfg = Release|Win32
+		{620A8671-AA5E-41AC-9FFC-F50189568DA5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

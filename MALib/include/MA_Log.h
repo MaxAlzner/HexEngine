@@ -9,7 +9,7 @@ _MALIB_BEGIN
 #include <time.h>
 #endif
 
-MALIB_API void LOG_Initialize();
+MALIB_API void LOG_Initialize(bool cleanFile = false);
 MALIB_API void LOG_Unitialize();
 
 MALIB_API void LOG_Message(const char* str);
@@ -24,6 +24,11 @@ MALIB_API void LOG_Out2i(const char* prefix, int v0, int v1);
 MALIB_API void LOG_Out3i(const char* prefix, int v0, int v1, int v2);
 MALIB_API void LOG_Out4i(const char* prefix, int v0, int v1, int v2, int v3);
 MALIB_API void LOG_Outiv(const char* prefix, int* v, unsigned size);
+MALIB_API void LOG_Out1ch(const char* prefix, char v0);
+MALIB_API void LOG_Out2ch(const char* prefix, char v0, char v1);
+MALIB_API void LOG_Out3ch(const char* prefix, char v0, char v1, char v2);
+MALIB_API void LOG_Out4ch(const char* prefix, char v0, char v1, char v2, char v3);
+MALIB_API void LOG_Outchv(const char* prefix, char* v, unsigned size);
 MALIB_API void LOG_Out1ptr(const char* prefix, void* v0);
 MALIB_API void LOG_Out2ptr(const char* prefix, void* v0, void* v1);
 MALIB_API void LOG_Out3ptr(const char* prefix, void* v0, void* v1, void* v2);

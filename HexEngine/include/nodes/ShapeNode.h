@@ -2,15 +2,16 @@
 #define _SHAPENODE_H_
 HEX_BEGIN
 
-class ShapeNode : public NodeBase
+class HEX_API ShapeNode : public NodeBase
 {
 public:
 
 	ShapeNode();
 	~ShapeNode();
 
-	void initialize(void* data, unsigned count);
-	void unitialize();
+	void build(void* data, unsigned count, unsigned stride, unsigned attributes);
+	void load();
+	void destroy();
 	void batch();
 
 	GLuint vao;

@@ -3,14 +3,18 @@
 #ifdef _SHAPENODE_H_
 HEX_BEGIN
 
-ShapeNode::ShapeNode()
+HEX_API ShapeNode::ShapeNode()
 {
+	this->vao = 0;
+	this->buffer = 0;
+	this->count = 0;
 }
-ShapeNode::~ShapeNode()
+HEX_API ShapeNode::~ShapeNode()
 {
+	this->destroy();
 }
 
-void ShapeNode::initialize(void* data, unsigned count)
+HEX_API void ShapeNode::build(void* data, unsigned count, unsigned stride, unsigned attributes)
 {
 	glGenVertexArrays(1, &this->vao);
 	glBindVertexArray(this->vao);
@@ -24,10 +28,10 @@ void ShapeNode::initialize(void* data, unsigned count)
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(Attributes[0], 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glVertexAttribPointer(Attributes[1], 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(this->count * 4 * sizeof(float)));
-	glVertexAttribPointer(Attributes[2], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(this->count * 8 * sizeof(float)));
-	glVertexAttribPointer(Attributes[3], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(this->count * 12 * sizeof(float)));
-	glVertexAttribPointer(Attributes[4], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(this->count * 16 * sizeof(float)));
+	glVertexAttribPointer(Attributes[1], 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 4 * sizeof(float)));
+	glVertexAttribPointer(Attributes[2], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 8 * sizeof(float)));
+	glVertexAttribPointer(Attributes[3], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 12 * sizeof(float)));
+	glVertexAttribPointer(Attributes[4], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 16 * sizeof(float)));
 	glEnableVertexAttribArray(Attributes[0]);
 	glEnableVertexAttribArray(Attributes[1]);
 	glEnableVertexAttribArray(Attributes[2]);
@@ -38,10 +42,29 @@ void ShapeNode::initialize(void* data, unsigned count)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
-void ShapeNode::unitialize()
+HEX_API void ShapeNode::load()
 {
+	if (this->root == NULL) return;
+	if (this->root->transform == NULL) return;
+
+	glm::vec3 scaled = this->root->transform->scaled;
+	glm::vec3 rotation = this->root->transform->rotation;
+	glm::vec3 translation = this->root->transform->translation;
+	glm::mat4 space = glm::mat4(1.0f);
+	space = glm::translate(space, glm::vec3(translation.x, translation.y, translation.z));
+	space = glm::rotate(space, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	space = glm::rotate(space, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	space = glm::rotate(space, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	space = glm::scale(space, glm::vec3(scaled.x, scaled.y, scaled.z));
+
+	SetUniform(HEX_UNIFORM_OS_TO_WS, glm::value_ptr(space));
 }
-void ShapeNode::batch()
+HEX_API void ShapeNode::destroy()
+{
+	glDeleteVertexArrays(1, &this->vao);
+	glDeleteBuffers(1, &this->buffer);
+}
+HEX_API void ShapeNode::batch()
 {
 	if (this->count == 0) return;
 	

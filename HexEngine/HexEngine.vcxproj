@@ -11,21 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{FD9838B3-9B7C-4BBE-AE3F-5C0E0C61C671}</ProjectGuid>
+    <ProjectGuid>{4813CA26-6464-4632-8C89-EA09FDF5F286}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>HexEngine</RootNamespace>
+    <RootNamespace>alznerMax_MTH261_lab08</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -39,13 +39,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(SolutionDir)libraries\GL\include;$(SolutionDir)libraries\GL\include\GL;$(SolutionDir)libraries\SDL\include;$(SolutionDir)libraries\MALib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\</OutDir>
-    <IntDir>output\$(Configuration)\</IntDir>
+    <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(SolutionDir)libraries\GL\include;$(SolutionDir)libraries\GL\include\GL;$(SolutionDir)libraries\SDL\include;$(SolutionDir)libraries\MALib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\</OutDir>
-    <IntDir>output\$(Configuration)\</IntDir>
+    <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -58,7 +64,12 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -75,18 +86,268 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
+    <ClInclude Include="include\core\HexCore.h" />
+    <ClInclude Include="include\core\HexData.h" />
+    <ClInclude Include="include\core\HexEntity.h" />
+    <ClInclude Include="include\core\HexInput.h" />
+    <ClInclude Include="include\HexMain.h" />
+    <ClInclude Include="include\core\HexShader.h" />
+    <ClInclude Include="include\core\HexTimer.h" />
+    <ClInclude Include="include\nodes\CameraNode.h" />
+    <ClInclude Include="include\nodes\ComponentNode.h" />
+    <ClInclude Include="include\nodes\LightNode.h" />
+    <ClInclude Include="include\nodes\MaterialNode.h" />
+    <ClInclude Include="include\nodes\NodeBase.h" />
+    <ClInclude Include="include\nodes\ShapeNode.h" />
+    <ClInclude Include="include\nodes\TransformNode.h" />
+    <ClInclude Include="libraries\glm\core\func_common.hpp" />
+    <ClInclude Include="libraries\glm\core\func_exponential.hpp" />
+    <ClInclude Include="libraries\glm\core\func_geometric.hpp" />
+    <ClInclude Include="libraries\glm\core\func_integer.hpp" />
+    <ClInclude Include="libraries\glm\core\func_matrix.hpp" />
+    <ClInclude Include="libraries\glm\core\func_noise.hpp" />
+    <ClInclude Include="libraries\glm\core\func_packing.hpp" />
+    <ClInclude Include="libraries\glm\core\func_trigonometric.hpp" />
+    <ClInclude Include="libraries\glm\core\func_vector_relational.hpp" />
+    <ClInclude Include="libraries\glm\core\hint.hpp" />
+    <ClInclude Include="libraries\glm\core\intrinsic_common.hpp" />
+    <ClInclude Include="libraries\glm\core\intrinsic_exponential.hpp" />
+    <ClInclude Include="libraries\glm\core\intrinsic_geometric.hpp" />
+    <ClInclude Include="libraries\glm\core\intrinsic_matrix.hpp" />
+    <ClInclude Include="libraries\glm\core\intrinsic_trigonometric.hpp" />
+    <ClInclude Include="libraries\glm\core\intrinsic_vector_relational.hpp" />
+    <ClInclude Include="libraries\glm\core\setup.hpp" />
+    <ClInclude Include="libraries\glm\core\type.hpp" />
+    <ClInclude Include="libraries\glm\core\type_float.hpp" />
+    <ClInclude Include="libraries\glm\core\type_gentype.hpp" />
+    <ClInclude Include="libraries\glm\core\type_half.hpp" />
+    <ClInclude Include="libraries\glm\core\type_int.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat2x2.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat2x3.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat2x4.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat3x2.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat3x3.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat3x4.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat4x2.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat4x3.hpp" />
+    <ClInclude Include="libraries\glm\core\type_mat4x4.hpp" />
+    <ClInclude Include="libraries\glm\core\type_size.hpp" />
+    <ClInclude Include="libraries\glm\core\type_vec.hpp" />
+    <ClInclude Include="libraries\glm\core\type_vec1.hpp" />
+    <ClInclude Include="libraries\glm\core\type_vec2.hpp" />
+    <ClInclude Include="libraries\glm\core\type_vec3.hpp" />
+    <ClInclude Include="libraries\glm\core\type_vec4.hpp" />
+    <ClInclude Include="libraries\glm\core\_detail.hpp" />
+    <ClInclude Include="libraries\glm\core\_fixes.hpp" />
+    <ClInclude Include="libraries\glm\core\_swizzle.hpp" />
+    <ClInclude Include="libraries\glm\core\_swizzle_func.hpp" />
+    <ClInclude Include="libraries\glm\core\_vectorize.hpp" />
+    <ClInclude Include="libraries\glm\ext.hpp" />
+    <ClInclude Include="libraries\glm\glm.hpp" />
+    <ClInclude Include="libraries\glm\gtc\constants.hpp" />
+    <ClInclude Include="libraries\glm\gtc\epsilon.hpp" />
+    <ClInclude Include="libraries\glm\gtc\half_float.hpp" />
+    <ClInclude Include="libraries\glm\gtc\matrix_access.hpp" />
+    <ClInclude Include="libraries\glm\gtc\matrix_integer.hpp" />
+    <ClInclude Include="libraries\glm\gtc\matrix_inverse.hpp" />
+    <ClInclude Include="libraries\glm\gtc\matrix_transform.hpp" />
+    <ClInclude Include="libraries\glm\gtc\noise.hpp" />
+    <ClInclude Include="libraries\glm\gtc\quaternion.hpp" />
+    <ClInclude Include="libraries\glm\gtc\random.hpp" />
+    <ClInclude Include="libraries\glm\gtc\reciprocal.hpp" />
+    <ClInclude Include="libraries\glm\gtc\swizzle.hpp" />
+    <ClInclude Include="libraries\glm\gtc\type_precision.hpp" />
+    <ClInclude Include="libraries\glm\gtc\type_ptr.hpp" />
+    <ClInclude Include="libraries\glm\gtc\ulp.hpp" />
+    <ClInclude Include="libraries\glm\gtx\associated_min_max.hpp" />
+    <ClInclude Include="libraries\glm\gtx\bit.hpp" />
+    <ClInclude Include="libraries\glm\gtx\closest_point.hpp" />
+    <ClInclude Include="libraries\glm\gtx\color_cast.hpp" />
+    <ClInclude Include="libraries\glm\gtx\color_space.hpp" />
+    <ClInclude Include="libraries\glm\gtx\color_space_YCoCg.hpp" />
+    <ClInclude Include="libraries\glm\gtx\compatibility.hpp" />
+    <ClInclude Include="libraries\glm\gtx\component_wise.hpp" />
+    <ClInclude Include="libraries\glm\gtx\constants.hpp" />
+    <ClInclude Include="libraries\glm\gtx\epsilon.hpp" />
+    <ClInclude Include="libraries\glm\gtx\euler_angles.hpp" />
+    <ClInclude Include="libraries\glm\gtx\extend.hpp" />
+    <ClInclude Include="libraries\glm\gtx\extented_min_max.hpp" />
+    <ClInclude Include="libraries\glm\gtx\fast_exponential.hpp" />
+    <ClInclude Include="libraries\glm\gtx\fast_square_root.hpp" />
+    <ClInclude Include="libraries\glm\gtx\fast_trigonometry.hpp" />
+    <ClInclude Include="libraries\glm\gtx\gradient_paint.hpp" />
+    <ClInclude Include="libraries\glm\gtx\handed_coordinate_space.hpp" />
+    <ClInclude Include="libraries\glm\gtx\inertia.hpp" />
+    <ClInclude Include="libraries\glm\gtx\integer.hpp" />
+    <ClInclude Include="libraries\glm\gtx\intersect.hpp" />
+    <ClInclude Include="libraries\glm\gtx\int_10_10_10_2.hpp" />
+    <ClInclude Include="libraries\glm\gtx\log_base.hpp" />
+    <ClInclude Include="libraries\glm\gtx\matrix_cross_product.hpp" />
+    <ClInclude Include="libraries\glm\gtx\matrix_interpolation.hpp" />
+    <ClInclude Include="libraries\glm\gtx\matrix_major_storage.hpp" />
+    <ClInclude Include="libraries\glm\gtx\matrix_operation.hpp" />
+    <ClInclude Include="libraries\glm\gtx\matrix_query.hpp" />
+    <ClInclude Include="libraries\glm\gtx\mixed_product.hpp" />
+    <ClInclude Include="libraries\glm\gtx\multiple.hpp" />
+    <ClInclude Include="libraries\glm\gtx\noise.hpp" />
+    <ClInclude Include="libraries\glm\gtx\norm.hpp" />
+    <ClInclude Include="libraries\glm\gtx\normal.hpp" />
+    <ClInclude Include="libraries\glm\gtx\normalize_dot.hpp" />
+    <ClInclude Include="libraries\glm\gtx\number_precision.hpp" />
+    <ClInclude Include="libraries\glm\gtx\ocl_type.hpp" />
+    <ClInclude Include="libraries\glm\gtx\optimum_pow.hpp" />
+    <ClInclude Include="libraries\glm\gtx\orthonormalize.hpp" />
+    <ClInclude Include="libraries\glm\gtx\perpendicular.hpp" />
+    <ClInclude Include="libraries\glm\gtx\polar_coordinates.hpp" />
+    <ClInclude Include="libraries\glm\gtx\projection.hpp" />
+    <ClInclude Include="libraries\glm\gtx\quaternion.hpp" />
+    <ClInclude Include="libraries\glm\gtx\random.hpp" />
+    <ClInclude Include="libraries\glm\gtx\raw_data.hpp" />
+    <ClInclude Include="libraries\glm\gtx\reciprocal.hpp" />
+    <ClInclude Include="libraries\glm\gtx\rotate_vector.hpp" />
+    <ClInclude Include="libraries\glm\gtx\simd_mat4.hpp" />
+    <ClInclude Include="libraries\glm\gtx\simd_vec4.hpp" />
+    <ClInclude Include="libraries\glm\gtx\spline.hpp" />
+    <ClInclude Include="libraries\glm\gtx\std_based_type.hpp" />
+    <ClInclude Include="libraries\glm\gtx\string_cast.hpp" />
+    <ClInclude Include="libraries\glm\gtx\transform.hpp" />
+    <ClInclude Include="libraries\glm\gtx\transform2.hpp" />
+    <ClInclude Include="libraries\glm\gtx\ulp.hpp" />
+    <ClInclude Include="libraries\glm\gtx\unsigned_int.hpp" />
+    <ClInclude Include="libraries\glm\gtx\vec1.hpp" />
+    <ClInclude Include="libraries\glm\gtx\vector_access.hpp" />
+    <ClInclude Include="libraries\glm\gtx\vector_angle.hpp" />
+    <ClInclude Include="libraries\glm\gtx\vector_query.hpp" />
+    <ClInclude Include="libraries\glm\gtx\verbose_operator.hpp" />
+    <ClInclude Include="libraries\glm\gtx\wrap.hpp" />
+    <ClInclude Include="libraries\glm\virtrev\xstream.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\main.h" />
+    <ClCompile Include="src\CameraNode.cpp" />
+    <ClCompile Include="src\HexCore.cpp" />
+    <ClCompile Include="src\HexData.cpp" />
+    <ClCompile Include="src\HexEntity.cpp" />
+    <ClCompile Include="src\HexInput.cpp" />
+    <ClCompile Include="src\HexMain.cpp" />
+    <ClCompile Include="src\HexShader.cpp" />
+    <ClCompile Include="src\HexTimer.cpp" />
+    <ClCompile Include="src\LightNode.cpp" />
+    <ClCompile Include="src\MaterialNode.cpp" />
+    <ClCompile Include="src\NodeBase.cpp" />
+    <ClCompile Include="src\ShapeNode.cpp" />
+    <ClCompile Include="src\TransformNode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="HexCore.vcxproj">
-      <Project>{4813ca26-6464-4632-8c89-ea09fdf5f286}</Project>
-    </ProjectReference>
+    <None Include="libraries\glm\core\func_common.inl" />
+    <None Include="libraries\glm\core\func_exponential.inl" />
+    <None Include="libraries\glm\core\func_geometric.inl" />
+    <None Include="libraries\glm\core\func_integer.inl" />
+    <None Include="libraries\glm\core\func_matrix.inl" />
+    <None Include="libraries\glm\core\func_noise.inl" />
+    <None Include="libraries\glm\core\func_packing.inl" />
+    <None Include="libraries\glm\core\func_trigonometric.inl" />
+    <None Include="libraries\glm\core\func_vector_relational.inl" />
+    <None Include="libraries\glm\core\intrinsic_common.inl" />
+    <None Include="libraries\glm\core\intrinsic_exponential.inl" />
+    <None Include="libraries\glm\core\intrinsic_geometric.inl" />
+    <None Include="libraries\glm\core\intrinsic_matrix.inl" />
+    <None Include="libraries\glm\core\intrinsic_trigonometric.inl" />
+    <None Include="libraries\glm\core\intrinsic_vector_relational.inl" />
+    <None Include="libraries\glm\core\type_gentype.inl" />
+    <None Include="libraries\glm\core\type_half.inl" />
+    <None Include="libraries\glm\core\type_mat.inl" />
+    <None Include="libraries\glm\core\type_mat2x2.inl" />
+    <None Include="libraries\glm\core\type_mat2x3.inl" />
+    <None Include="libraries\glm\core\type_mat2x4.inl" />
+    <None Include="libraries\glm\core\type_mat3x2.inl" />
+    <None Include="libraries\glm\core\type_mat3x3.inl" />
+    <None Include="libraries\glm\core\type_mat3x4.inl" />
+    <None Include="libraries\glm\core\type_mat4x2.inl" />
+    <None Include="libraries\glm\core\type_mat4x3.inl" />
+    <None Include="libraries\glm\core\type_mat4x4.inl" />
+    <None Include="libraries\glm\core\type_vec.inl" />
+    <None Include="libraries\glm\core\type_vec1.inl" />
+    <None Include="libraries\glm\core\type_vec2.inl" />
+    <None Include="libraries\glm\core\type_vec3.inl" />
+    <None Include="libraries\glm\core\type_vec4.inl" />
+    <None Include="libraries\glm\gtc\constants.inl" />
+    <None Include="libraries\glm\gtc\epsilon.inl" />
+    <None Include="libraries\glm\gtc\half_float.inl" />
+    <None Include="libraries\glm\gtc\matrix_access.inl" />
+    <None Include="libraries\glm\gtc\matrix_inverse.inl" />
+    <None Include="libraries\glm\gtc\matrix_transform.inl" />
+    <None Include="libraries\glm\gtc\noise.inl" />
+    <None Include="libraries\glm\gtc\quaternion.inl" />
+    <None Include="libraries\glm\gtc\random.inl" />
+    <None Include="libraries\glm\gtc\reciprocal.inl" />
+    <None Include="libraries\glm\gtc\swizzle.inl" />
+    <None Include="libraries\glm\gtc\type_precision.inl" />
+    <None Include="libraries\glm\gtc\type_ptr.inl" />
+    <None Include="libraries\glm\gtc\ulp.inl" />
+    <None Include="libraries\glm\gtx\associated_min_max.inl" />
+    <None Include="libraries\glm\gtx\bit.inl" />
+    <None Include="libraries\glm\gtx\closest_point.inl" />
+    <None Include="libraries\glm\gtx\color_cast.inl" />
+    <None Include="libraries\glm\gtx\color_space.inl" />
+    <None Include="libraries\glm\gtx\color_space_YCoCg.inl" />
+    <None Include="libraries\glm\gtx\compatibility.inl" />
+    <None Include="libraries\glm\gtx\component_wise.inl" />
+    <None Include="libraries\glm\gtx\euler_angles.inl" />
+    <None Include="libraries\glm\gtx\extend.inl" />
+    <None Include="libraries\glm\gtx\extented_min_max.inl" />
+    <None Include="libraries\glm\gtx\fast_exponential.inl" />
+    <None Include="libraries\glm\gtx\fast_square_root.inl" />
+    <None Include="libraries\glm\gtx\fast_trigonometry.inl" />
+    <None Include="libraries\glm\gtx\gradient_paint.inl" />
+    <None Include="libraries\glm\gtx\handed_coordinate_space.inl" />
+    <None Include="libraries\glm\gtx\inertia.inl" />
+    <None Include="libraries\glm\gtx\integer.inl" />
+    <None Include="libraries\glm\gtx\intersect.inl" />
+    <None Include="libraries\glm\gtx\int_10_10_10_2.inl" />
+    <None Include="libraries\glm\gtx\log_base.inl" />
+    <None Include="libraries\glm\gtx\matrix_cross_product.inl" />
+    <None Include="libraries\glm\gtx\matrix_interpolation.inl" />
+    <None Include="libraries\glm\gtx\matrix_major_storage.inl" />
+    <None Include="libraries\glm\gtx\matrix_operation.inl" />
+    <None Include="libraries\glm\gtx\matrix_query.inl" />
+    <None Include="libraries\glm\gtx\mixed_product.inl" />
+    <None Include="libraries\glm\gtx\multiple.inl" />
+    <None Include="libraries\glm\gtx\norm.inl" />
+    <None Include="libraries\glm\gtx\normal.inl" />
+    <None Include="libraries\glm\gtx\normalize_dot.inl" />
+    <None Include="libraries\glm\gtx\number_precision.inl" />
+    <None Include="libraries\glm\gtx\ocl_type.inl" />
+    <None Include="libraries\glm\gtx\optimum_pow.inl" />
+    <None Include="libraries\glm\gtx\orthonormalize.inl" />
+    <None Include="libraries\glm\gtx\perpendicular.inl" />
+    <None Include="libraries\glm\gtx\polar_coordinates.inl" />
+    <None Include="libraries\glm\gtx\projection.inl" />
+    <None Include="libraries\glm\gtx\quaternion.inl" />
+    <None Include="libraries\glm\gtx\raw_data.inl" />
+    <None Include="libraries\glm\gtx\rotate_vector.inl" />
+    <None Include="libraries\glm\gtx\simd_mat4.inl" />
+    <None Include="libraries\glm\gtx\simd_vec4.inl" />
+    <None Include="libraries\glm\gtx\spline.inl" />
+    <None Include="libraries\glm\gtx\std_based_type.inl" />
+    <None Include="libraries\glm\gtx\string_cast.inl" />
+    <None Include="libraries\glm\gtx\transform.inl" />
+    <None Include="libraries\glm\gtx\transform2.inl" />
+    <None Include="libraries\glm\gtx\unsigned_int.inl" />
+    <None Include="libraries\glm\gtx\vec1.inl" />
+    <None Include="libraries\glm\gtx\vector_access.inl" />
+    <None Include="libraries\glm\gtx\vector_angle.inl" />
+    <None Include="libraries\glm\gtx\vector_query.inl" />
+    <None Include="libraries\glm\gtx\verbose_operator.inl" />
+    <None Include="libraries\glm\gtx\wrap.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

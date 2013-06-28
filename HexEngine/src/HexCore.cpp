@@ -2,83 +2,35 @@
 
 #ifdef _HEX_CORE_H_
 HEX_BEGIN
-	
-static const float plane_data[] = 
-{
-	 1.0,  1.0, 0.0, 1.0, 
-	-1.0,  1.0, 0.0, 1.0, 
-	 1.0, -1.0, 0.0, 1.0, 
-	-1.0,  1.0, 0.0, 1.0, 
-	 1.0, -1.0, 0.0, 1.0, 
-	-1.0, -1.0, 0.0, 1.0, 
 
-	1.0, 1.0, 0.0, 0.0, 
-	0.0, 1.0, 0.0, 0.0, 
-	1.0, 0.0, 0.0, 0.0, 
-	0.0, 1.0, 0.0, 0.0, 
-	1.0, 0.0, 0.0, 0.0, 
-	0.0, 0.0, 0.0, 0.0, 
-
-	0.0, 0.0, 1.0, 0.0, 
-	0.0, 0.0, 1.0, 0.0, 
-	0.0, 0.0, 1.0, 0.0, 
-	0.0, 0.0, 1.0, 0.0, 
-	0.0, 0.0, 1.0, 0.0, 
-	0.0, 0.0, 1.0, 0.0, 
-};
-static const unsigned plane_count = 6;
-
-const char* vert_filepath = "data/gl_shader.vert";
-const char* frag_filepath = "data/gl_shader.frag";
-const char* uniform_locations[] = {"os_to_ws", "ws_to_cs", "ws_to_ls", "projection", "directionalLight_ws"};
-const unsigned num_of_uniforms = 5;
-const char* attribute_locations[] = {"vertex", "uv", "normal", "tangent", "binormal"};
-const unsigned num_of_attributes = 5;
-
-bool AppRunning = true;
-
-SDL_Surface* ScreenSurface = NULL;
-
-glm::mat4 persp;
-ShapeNode* shape = NULL;
-
-void OnFrameDraw()
+HEX_API void OnFrameDraw()
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 identity(1.0f);
-	
-	glm::vec3 eye(0.0f, 1.0f, -4.0f);
-	glm::mat4 view = glm::lookAt(eye, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(2.0f, 2.0, 2.0));
-	model = glm::rotate(model, sin(DeltaTime * glm::pi<float>() * 2.0f) * 180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, DeltaTime * 360.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-	glm::vec3 light_dir(0.5f, -0.5f, 0.0f);
-	light_dir = glm::normalize<float>(light_dir);
-	
-	glUniformMatrix4fv(Uniforms[0], 1, false, glm::value_ptr(model));
-	glUniformMatrix4fv(Uniforms[1], 1, false, glm::value_ptr(view));
-	glUniformMatrix4fv(Uniforms[2], 1, false, glm::value_ptr(identity));
-	glUniformMatrix4fv(Uniforms[3], 1, false, glm::value_ptr(persp));
-	glUniform3fv(Uniforms[4], 1, glm::value_ptr(light_dir));
-	shape->batch();
+	for (unsigned i = 0; i < Entities.length(); i++)
+	{
+		Entities[i]->frameUpdate();
+		Entities[i]->render();
+	}
 
 	SDL_GL_SwapBuffers();
 }
-void OnFrameUpdate()
+HEX_API void OnFrameUpdate()
 {
 	DeltaTime += 0.001f;
 	if (DeltaTime > 1.0f) DeltaTime = 0.0f;
+
+	for (unsigned i = 0; i < Entities.length(); i++) 
+		Entities[i]->fixedUpdate();
+	
+	Entities[2]->transform->rotate(0.0f, 1.0f, 0.0f);
 }
-void OnFixedUpdate()
+HEX_API void OnFixedUpdate()
 {
 }
 
-bool Reshape(unsigned width, unsigned height)
+HEX_API bool Reshape(unsigned width, unsigned height)
 {
 	ScreenSurface = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
 	if (ScreenSurface == NULL) 
@@ -86,14 +38,11 @@ bool Reshape(unsigned width, unsigned height)
 	
 	glViewport(0, 0, width, height);
 
-	float aspect = float(width) / float(height);
-	persp = glm::perspective(45.0f, aspect, 0.01f, 100.0f);
-
 	return true;
 }
-bool Initialize(unsigned argc, char **argv)
+HEX_API bool Initialize(unsigned argc, char **argv)
 {
-	MALib::LOG_Initialize();
+	MALib::LOG_Initialize(true);
 	MALib::RANDOM_Initialize();
 
 	for (unsigned i = 0; i < argc; i++)
@@ -112,7 +61,7 @@ bool Initialize(unsigned argc, char **argv)
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-	SDL_WM_SetCaption("FractalDemo", "FractalDemo");
+	SDL_WM_SetCaption("HexDemo", "HexDemo");
 
 	Reshape(800, 600);
 	
@@ -125,45 +74,44 @@ bool Initialize(unsigned argc, char **argv)
 
 	glEnable(GL_DEPTH_TEST);
 	
-	MALib::LOG_Message("GLEW STATUS                ", (char*)glGetString(glewStatus));
 	MALib::LOG_Message("GL VENDOR                  ", (char*)glGetString(GL_VENDOR));
 	MALib::LOG_Message("GL RENDERER                ", (char*)glGetString(GL_RENDERER));
 	MALib::LOG_Message("GL VERSION                 ", (char*)glGetString(GL_VERSION));
 	MALib::LOG_Message("GL SHADING_LANGUAGE_VERSION", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	if (!BuildProgram(vert_filepath, frag_filepath))
+	if (!BuildProgram("data/gl_shader.vert", "data/gl_shader.frag"))
 	{
 		MALib::LOG_Message("Could not build shaders.");
 		return false;
 	}
-	if (!BindUniforms(uniform_locations, num_of_uniforms))
-	{
-		MALib::LOG_Message("Could not bind uniforms.");
-		return false;
-	}
-	if (!BindAttributes(attribute_locations, num_of_attributes))
-	{
-		MALib::LOG_Message("Could not bind attributes.");
-		return false;
-	}
+	InitializeAttributes();
+	InitializeUniforms();
 
-	MALib::LOG_Outiv("UNIFORMS", Uniforms.pointer(), Uniforms.length());
+	MALib::LOG_Outiv("UNIFORMS  ", Uniforms.pointer(), Uniforms.length());
 	MALib::LOG_Outiv("ATTRIBUTES", Attributes.pointer(), Attributes.length());
 
-	MALib::OBJ_MESH* mesh = 0;
-	MALib::ImportOBJFile("data/puzzle.obj", &mesh);
-	float* buffer = 0;
-	unsigned count = 0;
-	MALib::BakeOBJ(mesh, &buffer, &count);
+	InitializeData();
 
-	shape = new ShapeNode();
-	shape->initialize((void*)buffer, count);
+	HexEntity* cam = GenerateEntity(0.0f, 1.0f, -3.0f, 0.0f, 0.0f, 0.0f);
+	GenerateCamera(cam, 45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
+	
+	HexEntity* light = GenerateEntity(0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	GenerateLight(light, HEX_LIGHTMODE_DIRECTIONAL, 1.0f, 0.0f, 0.0f, 0.0f);
+
+	HexEntity* obj1 = GenerateEntity(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	GenerateShape(obj1, Meshes[3]);
+	MaterialNode* obj1mat = GenerateMaterial(obj1);
+	obj1mat->add(Textures[1]);
+
+	HexEntity* obj2 = GenerateEntity(0.0f, -0.2f, 0.0f, -90.0f, 0.0f, 0.0f);
+	GenerateShape(obj2, Meshes[2]);
+	obj2->transform->scale(4.0f, 4.0f, 4.0f);
 
 	return true;
 }
-bool Unitialize()
+HEX_API bool Unitialize()
 {
-	delete shape;
+	//delete shape;
 
 	SDL_Quit();
 	MALib::LOG_Unitialize();

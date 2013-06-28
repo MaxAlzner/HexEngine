@@ -9,11 +9,10 @@ _MALIB_BEGIN
 #include "MA_Drawing.h"
 #endif
 	
-class MALIB_API COLOR;
+struct MALIB_API COLOR;
 
-class MALIB_API COLOR
+struct MALIB_API COLOR
 {
-public:
 	COLOR();
 	COLOR(float a, float r, float g, float b);
 	COLOR(float r, float g, float b);

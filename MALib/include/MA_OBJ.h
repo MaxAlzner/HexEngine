@@ -8,6 +8,9 @@ _MALIB_BEGIN
 #ifndef _MA_ARRAY_H_
 #include "MA_Array.h"
 #endif
+#ifndef _MA_VERTEXBUFFER_H_
+#include "MA_VertexBuffer.h"
+#endif
 
 struct MALIB_API OBJ_VERTEX
 {
@@ -35,6 +38,9 @@ struct MALIB_API OBJ_FACE
 };
 struct MALIB_API OBJ_MESH
 {
+	OBJ_MESH();
+	~OBJ_MESH();
+
 	ARRAY<OBJ_VERTEX> vertices;
 	ARRAY<OBJ_TEXCOORD> texcoords;
 	ARRAY<OBJ_NORMAL> normals;
@@ -44,7 +50,10 @@ struct MALIB_API OBJ_MESH
 };
 
 bool MALIB_API ImportOBJFile(const char* filepath, OBJ_MESH** outMesh);
-bool MALIB_API BakeOBJ(OBJ_MESH* mesh, float** outBuffer, unsigned* outCount);
+
+bool MALIB_API BakeOBJ(OBJ_MESH* mesh, VERTEXBUFFER** outBake);
+
+void MALIB_API FreeOBJMesh(OBJ_MESH** mesh);
 
 _MALIB_END
 #endif

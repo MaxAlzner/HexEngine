@@ -43,6 +43,7 @@ enum DRAWMODE
 	DRAWMODE_FLIPPEDY        = 0x00000004, 
 };
 
+MALIB_API unsigned int ByteCount(PIXELFORMAT format);
 MALIB_API unsigned int PackColor(unsigned int r, unsigned int g, unsigned int b, unsigned int a, PIXELFORMAT format);
 MALIB_API void UnpackColor(unsigned int c, unsigned int* r, unsigned int* g, unsigned int* b, unsigned int* a, PIXELFORMAT format);
 

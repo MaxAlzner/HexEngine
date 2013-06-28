@@ -2,6 +2,22 @@
 
 #ifdef _MA_FILE_H_
 _MALIB_BEGIN
+	
+MALIB_API TEXTFILE::TEXTFILE()
+{
+	this->data = 0;
+	this->size = 0;
+}
+MALIB_API TEXTFILE::TEXTFILE(char* data, unsigned size)
+{
+	this->data = data;
+	this->size = size;
+}
+MALIB_API TEXTFILE::~TEXTFILE()
+{
+	this->lines.zero();
+	if (this->data != 0) delete [] this->data;
+}
 
 bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 {
@@ -56,11 +72,11 @@ bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 
 	return true;
 }
-bool MALIB_API FreeTextFile(TEXTFILE* file)
+
+void MALIB_API FreeTextFile(TEXTFILE** file)
 {
-	if (file == NULL) return false;
-	delete file;
-	return true;
+	delete *file;
+	*file = 0;
 }
 
 _MALIB_END

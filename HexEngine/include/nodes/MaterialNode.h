@@ -1,25 +1,25 @@
 #ifndef _MATERIALNODE_H_
 #define _MATERIALNODE_H_
+HEX_BEGIN
 
-namespace CORE
+class HEX_API MaterialNode : public NodeBase
 {
-	class Material
-	{
-	public:
-		Material();
-		~Material();
+public:
+
+	MaterialNode();
+	~MaterialNode();
 		
-		virtual void initialize();
-		virtual void uninitialize();
-		virtual void update();
-		virtual void load();
-		virtual void remove();
+	void load();
+	void destroy();
 
-		COLOR overlay, specColor;
-		float specIntensity, roughness, refIndex;
-		SpriteAnimation* animation;
-		Entity* root;
-	};
-}
+	void add(MALib::SURFACE* texture);
 
+	GLuint colorMap;
+	MALib::COLOR overlay;
+	MALib::COLOR specular;
+	float roughness;
+	float refIndex;
+};
+
+HEX_END
 #endif

@@ -11,21 +11,9 @@ _MALIB_BEGIN
 
 struct MALIB_API TEXTFILE
 {
-	TEXTFILE()
-	{
-		this->data = 0;
-		this->size = 0;
-	}
-	TEXTFILE(char* data, unsigned size)
-	{
-		this->data = data;
-		this->size = size;
-	}
-	~TEXTFILE()
-	{
-		this->lines.zero();
-		if (this->data != 0) delete [] this->data;
-	}
+	TEXTFILE();
+	TEXTFILE(char* data, unsigned size);
+	~TEXTFILE();
 
 	ARRAY<char*> lines;
 	char* data;
@@ -33,7 +21,8 @@ struct MALIB_API TEXTFILE
 };
 	
 bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile);
-bool MALIB_API FreeTextFile(TEXTFILE* file);
+
+void MALIB_API FreeTextFile(TEXTFILE** file);
 
 _MALIB_END
 #endif

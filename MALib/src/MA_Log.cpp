@@ -5,10 +5,11 @@ _MALIB_BEGIN
 
 MALIB_API FILE* LOG_FILE = NULL;
 
-MALIB_API void LOG_Initialize()
+MALIB_API void LOG_Initialize(bool cleanFile)
 {
 	if (LOG_FILE != NULL) fclose(LOG_FILE);
-	fopen_s(&LOG_FILE, "output.log", "a");
+	if (cleanFile) fopen_s(&LOG_FILE, "output.log", "w");
+	else fopen_s(&LOG_FILE, "output.log", "a");
 	LOG_Message("START");
 }
 MALIB_API void LOG_Unitialize()
@@ -107,6 +108,46 @@ MALIB_API void LOG_Outiv(const char* prefix, int* v, unsigned size)
 	for (unsigned i = 0; i < size; i++)
 	{
 		fprintf(LOG_FILE, " %d", v[i]);
+		if (i < size - 1) fprintf(LOG_FILE, ",");
+	}
+	fprintf(LOG_FILE, "\n");
+}
+MALIB_API void LOG_Out1ch(const char* prefix, char v0)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	fprintf(LOG_FILE, " %c\n", v0);
+}
+MALIB_API void LOG_Out2ch(const char* prefix, char v0, char v1)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	fprintf(LOG_FILE, " %c, %c\n", v0, v1);
+}
+MALIB_API void LOG_Out3ch(const char* prefix, char v0, char v1, char v2)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	fprintf(LOG_FILE, " %c, %c, %c\n", v0, v1, v2);
+}
+MALIB_API void LOG_Out4ch(const char* prefix, char v0, char v1, char v2, char v3)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	fprintf(LOG_FILE, " %c, %c, %c, %c\n", v0, v1, v2, v3);
+}
+MALIB_API void LOG_Outchv(const char* prefix, char* v, unsigned size)
+{
+	if (LOG_FILE == NULL || v == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	for (unsigned i = 0; i < size; i++)
+	{
+		fprintf(LOG_FILE, " %c", v[i]);
 		if (i < size - 1) fprintf(LOG_FILE, ",");
 	}
 	fprintf(LOG_FILE, "\n");

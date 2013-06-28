@@ -84,13 +84,14 @@
     <ClCompile Include="src\MA_Counter.cpp" />
     <ClCompile Include="src\MA_Drawing.cpp" />
     <ClCompile Include="src\MA_File.cpp" />
-    <ClCompile Include="src\MA_Image.cpp" />
     <ClCompile Include="src\MA_Log.cpp" />
     <ClCompile Include="src\MA_Math.cpp" />
     <ClCompile Include="src\MA_Matrix.cpp" />
     <ClCompile Include="src\MA_OBJ.cpp" />
     <ClCompile Include="src\MA_Random.cpp" />
+    <ClCompile Include="src\MA_Surface.cpp" />
     <ClCompile Include="src\MA_Vertex.cpp" />
+    <ClCompile Include="src\MA_VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\MALib.h" />
@@ -100,14 +101,15 @@
     <ClInclude Include="include\MA_Drawing.h" />
     <ClInclude Include="include\MA_File.h" />
     <ClInclude Include="include\MA_HashTable.h" />
-    <ClInclude Include="include\MA_Image.h" />
     <ClInclude Include="include\MA_List.h" />
     <ClInclude Include="include\MA_Log.h" />
     <ClInclude Include="include\MA_Math.h" />
     <ClInclude Include="include\MA_Matrix.h" />
     <ClInclude Include="include\MA_OBJ.h" />
     <ClInclude Include="include\MA_Random.h" />
+    <ClInclude Include="include\MA_Surface.h" />
     <ClInclude Include="include\MA_Vertex.h" />
+    <ClInclude Include="include\MA_VertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,14 +2,16 @@
 
 #include <Windows.h>
 
-#if 0
+#define MALIB_EXPORTS
+
+#if _WIN32
 #ifdef MALIB_EXPORTS
 #define MALIB_API __declspec(dllexport)
 #else
 #define MALIB_API __declspec(dllimport)
 #endif
 #else
-#define MALIB_API __declspec(dllexport)
+#define MALIB_API 
 #endif
 
 #define _MALIB_BEGIN namespace MALib {
@@ -30,5 +32,6 @@
 #include "MA_Vertex.h"
 #include "MA_Matrix.h"
 
-#include "MA_Image.h"
+#include "MA_Surface.h"
+#include "MA_VertexBuffer.h"
 #include "MA_OBJ.h"

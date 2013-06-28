@@ -10,7 +10,10 @@ out vec2 tex_coord;
 out vec3 vertex_ss;
 out vec3 light_ss;
 out vec3 view_ss;
+
 out vec3 n;
+out vec3 t;
+out vec3 b;
 
 uniform mat4 os_to_ws;
 uniform mat4 ws_to_cs;
@@ -26,15 +29,6 @@ void main()
 	mat3 ws_to_cs_normal = mat3(ws_to_cs);
 
 	vec3 normal_cs = normalize(os_to_cs_normal * normal);
-	/*vec3 tangent_cs;
-
-	vec3 c1 = cross(normal_cs, vec3(0., 0., 1.));
-	vec3 c2 = cross(normal_cs, vec3(0., 1., 0.));
-	if (length(c1) > length(c2)) 
-		tangent_cs = c1;
-	else 
-		tangent_cs = c2;
-	vec3 binormal_cs = normalize(cross(normal_cs, tangent_cs));*/
 
 	vec3 tangent_cs = normalize(os_to_cs_normal * tangent);
 	vec3 binormal_cs = normalize(os_to_cs_normal * binormal);
@@ -49,6 +43,10 @@ void main()
 	vertex_ss = vertex_cs.xyz * cs_to_ss;
 	light_ss = -(ws_to_cs_normal * directionalLight_ws) * cs_to_ss;
 	view_ss = vec3(0., 0., 1.) * cs_to_ss;
+
+	n = normal;
+	t = tangent;
+	b = binormal;
 
 	gl_Position = projection * vertex_cs;
 }

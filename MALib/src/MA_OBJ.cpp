@@ -2,8 +2,21 @@
 
 #ifdef _MA_OBJ_H_
 _MALIB_BEGIN
+	
+MALIB_API OBJ_MESH::OBJ_MESH()
+{
+}
+MALIB_API OBJ_MESH::~OBJ_MESH()
+{
+	this->vertices.clear();
+	this->texcoords.clear();
+	this->normals.clear();
+	this->tangents.clear();
+	this->binormals.clear();
+	this->faces.clear();
+}
 
-bool ImportOBJFile(const char* filepath, OBJ_MESH** outMesh)
+bool MALIB_API ImportOBJFile(const char* filepath, OBJ_MESH** outMesh)
 {
 	if (filepath == NULL || outMesh == NULL) return false;
 
@@ -146,12 +159,13 @@ bool ImportOBJFile(const char* filepath, OBJ_MESH** outMesh)
 #endif
 	
 	*outMesh = mesh;
-	FreeTextFile(file);
+	FreeTextFile(&file);
 	return true;
 }
-bool MALIB_API BakeOBJ(OBJ_MESH* mesh, float** outBuffer, unsigned* outCount)
+
+bool MALIB_API BakeOBJ(OBJ_MESH* mesh, VERTEXBUFFER** outBake)
 {
-	if (mesh == NULL || outBuffer == NULL || outCount == NULL) return false;
+	if (mesh == NULL || outBake == NULL) return false;
 
 	unsigned faces = mesh->faces.length();
 	unsigned indices = faces * 3;
@@ -224,15 +238,6 @@ bool MALIB_API BakeOBJ(OBJ_MESH* mesh, float** outBuffer, unsigned* outCount)
 			VEC3(a.x, a.y, a.z), VEC3(b.x, b.y, b.z), VEC3(c.x, c.y, c.z), 
 			VEC2(at.u, at.v), VEC2(bt.u, bt.v), VEC2(ct.u, ct.v), 
 			&tangent, &binormal);
-		/*VEC3 tangentb, binormalb, tangentc, binormalc;
-		CalculateTangent(
-			VEC3(b.x, b.y, b.z), VEC3(c.x, c.y, c.z), VEC3(a.x, a.y, a.z), 
-			VEC2(bt.u, bt.v), VEC2(ct.u, ct.v), VEC2(at.u, at.v), 
-			&tangentb, &binormalb);
-		CalculateTangent(
-			VEC3(c.x, c.y, c.z), VEC3(a.x, a.y, a.z), VEC3(b.x, b.y, b.z), 
-			VEC2(ct.u, ct.v), VEC2(at.u, at.v), VEC2(bt.u, bt.v), 
-			&tangentc, &binormalc);*/
 
 		buffer[tangentOffset     ] = tangent.x;
 		buffer[tangentOffset +  1] = tangent.y;
@@ -295,10 +300,15 @@ bool MALIB_API BakeOBJ(OBJ_MESH* mesh, float** outBuffer, unsigned* outCount)
 #endif
 	}
 
-	*outBuffer = buffer;
-	*outCount = indices;
+	*outBake = CreateVertexBuffer((void*)buffer, bufferSize, 4 * sizeof(float), indices);
 
 	return true;
+}
+
+void MALIB_API FreeOBJMesh(OBJ_MESH** mesh)
+{
+	delete *mesh;
+	*mesh = 0;
 }
 
 _MALIB_END

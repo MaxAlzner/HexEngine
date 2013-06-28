@@ -2,7 +2,36 @@
 
 #ifdef _MA_DRAWING_H_
 _MALIB_BEGIN
+	
+MALIB_API unsigned int ByteCount(PIXELFORMAT format)
+{
+	switch (format)
+	{
+	case PIXELFORMAT_RGB:
+		return 3;
+		break;
+	case PIXELFORMAT_RGBA:
+		return 4;
+		break;
+	case PIXELFORMAT_ARGB:
+		return 4;
+		break;
+		
+	case PIXELFORMAT_BGR:
+		return 3;
+		break;
+	case PIXELFORMAT_BGRA:
+		return 4;
+		break;
+	case PIXELFORMAT_ABGR:
+		return 4;
+		break;
 
+	default:
+		return 0;
+		break;
+	}
+}
 MALIB_API unsigned int PackColor(unsigned int r, unsigned int g, unsigned int b, unsigned int a, PIXELFORMAT format)
 {
 	if (r > 0xFF) r = 0xFF;
