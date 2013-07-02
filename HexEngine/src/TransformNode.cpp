@@ -44,7 +44,6 @@ HEX_API void TransformNode::scale(float x, float y, float z)
 	this->scaled.y *= y;
 	this->scaled.z *= z;
 }
-
 HEX_API void TransformNode::zero()
 {
 	this->translation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -53,6 +52,26 @@ HEX_API void TransformNode::zero()
 	this->right =       glm::vec3(1.0f, 0.0f, 0.0f);
 	this->up =          glm::vec3(0.0f, 1.0f, 0.0f);
 	this->forward =     glm::vec3(0.0f, 0.0f, 1.0f);
+	this->space =       glm::mat4(1.0f);
+	this->spaceNormal = glm::mat3(1.0f);
+}
+
+HEX_API void TransformNode::recalculate()
+{
+	this->space = glm::mat4(1.0f);
+	this->space = glm::rotate(space, this->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	this->space = glm::rotate(space, this->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->space = glm::rotate(space, this->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	this->spaceNormal = glm::mat3(this->space);
+	
+	this->right =   glm::normalize(glm::mul(glm::vec3(1.0f, 0.0f, 0.0f), this->spaceNormal));
+	this->up =      glm::normalize(glm::mul(glm::vec3(0.0f, 1.0f, 0.0f), this->spaceNormal));
+	this->forward = glm::normalize(glm::mul(glm::vec3(0.0f, 0.0f, 1.0f), this->spaceNormal));
+
+	this->transformation = glm::mat4(1.0f);
+	this->transformation = glm::translate(this->transformation, this->translation);
+	this->transformation *= this->space;
+	this->transformation = glm::scale(this->transformation, this->scaled);
 }
 
 HEX_END

@@ -19,7 +19,8 @@ HEX_API void LightNode::load()
 	{
 		glm::vec3 light_dir(0.5f, -0.5f, 0.0f);
 		light_dir = glm::normalize<float>(light_dir);
-		SetUniform(HEX_UNIFORM_DIRECTIONAL_LIGHT, glm::value_ptr(light_dir));
+		SetUniform(UNIFORM_DIRECTIONAL_LIGHT_VECTOR, glm::value_ptr(light_dir));
+		SetUniform(UNIFORM_DIRECTIONAL_LIGHT_COLOR, &this->color);
 	}
 }
 HEX_API void LightNode::destroy()

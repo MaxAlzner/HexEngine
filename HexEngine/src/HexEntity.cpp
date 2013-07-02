@@ -32,6 +32,7 @@ HEX_API void HexEntity::frameUpdate()
 }
 HEX_API void HexEntity::fixedUpdate()
 {
+	if (this->transform != NULL) this->transform->recalculate();
 	for (unsigned i = 0; i < this->components.length(); i++)
 	{
 		ComponentNode* component = this->components[i];

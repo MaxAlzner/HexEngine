@@ -14,7 +14,7 @@ HEX_API ShapeNode::~ShapeNode()
 	this->destroy();
 }
 
-HEX_API void ShapeNode::build(void* data, unsigned count, unsigned stride, unsigned attributes)
+HEX_API void ShapeNode::build(void* data, uint count, uint stride, uint attributes)
 {
 	glGenVertexArrays(1, &this->vao);
 	glBindVertexArray(this->vao);
@@ -47,17 +47,7 @@ HEX_API void ShapeNode::load()
 	if (this->root == NULL) return;
 	if (this->root->transform == NULL) return;
 
-	glm::vec3 scaled = this->root->transform->scaled;
-	glm::vec3 rotation = this->root->transform->rotation;
-	glm::vec3 translation = this->root->transform->translation;
-	glm::mat4 space = glm::mat4(1.0f);
-	space = glm::translate(space, glm::vec3(translation.x, translation.y, translation.z));
-	space = glm::rotate(space, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	space = glm::rotate(space, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	space = glm::rotate(space, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	space = glm::scale(space, glm::vec3(scaled.x, scaled.y, scaled.z));
-
-	SetUniform(HEX_UNIFORM_OS_TO_WS, glm::value_ptr(space));
+	SetUniform(UNIFORM_OS_TO_WS, glm::value_ptr(this->root->transform->transformation));
 }
 HEX_API void ShapeNode::destroy()
 {

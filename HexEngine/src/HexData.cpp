@@ -4,6 +4,8 @@
 HEX_BEGIN
 
 HEX_API bool AppRunning = true;
+HEX_API bool Paused = false;
+HEX_API float AspectRatio = 3.0f / 4.0f;
 HEX_API SDL_Surface* ScreenSurface = NULL;
 	
 HEX_API MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -11,16 +13,6 @@ HEX_API MALib::ARRAY<MALib::SURFACE*> Textures;
 HEX_API MALib::ARRAY<HexEntity*> Entities;
 HEX_API MALib::ARRAY<NodeBase*> Nodes;
 HEX_API CameraNode* MainCamera = NULL;
-
-HEX_API extern bool IsRunning()
-{
-	return AppRunning;
-}
-HEX_API extern bool ToggleRunning()
-{
-	AppRunning = !AppRunning;
-	return AppRunning;
-}
 
 HEX_API void InitializeData()
 {
@@ -39,7 +31,9 @@ HEX_API void InitializeData()
 	RegisterVMP("data/torus.vmp");
 
 	RegisterBMP("data/uv_layout.bmp");
-	RegisterTGA("data/uv_layout.tga");
+	RegisterBMP("data/brick_n.bmp");
+	RegisterBMP("data/grass01_d.bmp");
+	RegisterBMP("data/grass01_n.bmp");
 
 	MALib::LOG_Message("END ASSET LOADING");
 }
@@ -55,7 +49,17 @@ HEX_API void UninitializeData()
 	Nodes.clear();
 }
 
-HEX_API bool RegisterOBJ(const char* filepath)
+HEX_API extern bool IsRunning()
+{
+	return AppRunning;
+}
+HEX_API extern bool ToggleRunning()
+{
+	AppRunning = !AppRunning;
+	return AppRunning;
+}
+
+HEX_API bool RegisterOBJ(const string filepath)
 {
 	MALib::OBJ_MESH* mesh = 0;
 	if (!MALib::ImportOBJFile(filepath, &mesh))
@@ -73,7 +77,7 @@ HEX_API bool RegisterOBJ(const char* filepath)
 	MALib::FreeOBJMesh(&mesh);
 	return true;
 }
-HEX_API bool RegisterVMP(const char* filepath)
+HEX_API bool RegisterVMP(const string filepath)
 {
 	MALib::VERTEXBUFFER* buffer = 0;
 	if (!MALib::ImportVMPFile(filepath, &buffer))
@@ -84,7 +88,7 @@ HEX_API bool RegisterVMP(const char* filepath)
 	Meshes.add(buffer);
 	return true;
 }
-HEX_API bool RegisterBMP(const char* filepath)
+HEX_API bool RegisterBMP(const string filepath)
 {
 	MALib::SURFACE* surface = 0;
 	if (!MALib::ImportBMPFile(filepath, &surface))
@@ -95,7 +99,7 @@ HEX_API bool RegisterBMP(const char* filepath)
 	Textures.add(surface);
 	return true;
 }
-HEX_API bool RegisterTGA(const char* filepath)
+HEX_API bool RegisterTGA(const string filepath)
 {
 	MALib::SURFACE* surface = 0;
 	if (!MALib::ImportTGAFile(filepath, &surface))

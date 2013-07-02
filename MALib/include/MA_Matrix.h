@@ -19,10 +19,10 @@ MALIB_API MAT4x4 RotateX(float x);
 MALIB_API MAT4x4 RotateY(float y);
 MALIB_API MAT4x4 RotateZ(float z);
 MALIB_API MAT4x4 Rotate(float x, float y, float z);
-MALIB_API MAT4x4 RotateAround(const VEC3& v, float x);
 MALIB_API MAT4x4 Scale(float x, float y, float z);
 MALIB_API MAT4x4 Perspective(float fovAngleY, float aspectRatio, float nearZ, float farZ);
 MALIB_API MAT4x4 Orthographic(float width, float height, float nearZ, float farZ);
+MALIB_API MAT4x4 Orthographic(float left, float right, float bottom, float top, float nearZ, float farZ);
 MALIB_API MAT4x4 LookAt(const VEC4& eye, const VEC4& focus);
 
 struct MALIB_API MAT4x4

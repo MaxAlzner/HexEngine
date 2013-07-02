@@ -21,6 +21,11 @@ uniform mat4 ws_to_ls;
 uniform mat4 projection;
 
 uniform vec3 directionalLight_ws;
+uniform vec4 pointLight4_ws[4];
+
+uniform int numOfPointLights;
+
+uniform vec2 uv_repeat;
 
 void main()
 {
@@ -39,7 +44,7 @@ void main()
 
 	vec4 vertex_cs = os_to_cs * vertex;
 
-	tex_coord = uv;
+	tex_coord = uv * uv_repeat;
 	vertex_ss = vertex_cs.xyz * cs_to_ss;
 	light_ss = -(ws_to_cs_normal * directionalLight_ws) * cs_to_ss;
 	view_ss = vec3(0., 0., 1.) * cs_to_ss;

@@ -3,6 +3,20 @@
 #ifdef _HEX_SHADER_H_
 HEX_BEGIN
 	
+HEX_API int UniformLocations_os_to_ws = -1;
+HEX_API int UniformLocations_ws_to_cs = -1;
+HEX_API int UniformLocations_ws_to_ls = -1;
+HEX_API int UniformLocations_projection = -1;
+HEX_API int UniformLocations_directionalLight_ws = -1;
+HEX_API int UniformLocations_directionalLight_color = -1;
+HEX_API int UniformLocations_pointLight4_ws = -1;
+HEX_API int UniformLocations_pointLight4_color = -1;
+HEX_API int UniformLocations_pointLight4_falloff = -1;
+HEX_API int UniformLocations_numOfPointLights = -1;
+HEX_API int UniformLocations_uv_repeat = -1;
+HEX_API int UniformLocations_color_map = -1;
+HEX_API int UniformLocations_normal_map = -1;
+
 HEX_API MALib::ARRAY<GLint> Attributes;
 HEX_API MALib::ARRAY<GLint> Uniforms;
 HEX_API GLuint ShaderProgram = 0;
@@ -19,68 +33,89 @@ HEX_API void InitializeAttributes()
 HEX_API void InitializeUniforms()
 {
 	Uniforms.resize(16);
-	BindUniform("os_to_ws");
-	BindUniform("ws_to_cs");
-	BindUniform("ws_to_ls");
-	BindUniform("projection");
-	BindUniform("directionalLight_ws");
-	BindUniform("color_map");
-	BindUniform("normal_map");
+	UniformLocations_os_to_ws = glGetUniformLocation(ShaderProgram, "os_to_ws");
+	UniformLocations_ws_to_cs = glGetUniformLocation(ShaderProgram, "ws_to_cs");
+	UniformLocations_ws_to_ls = glGetUniformLocation(ShaderProgram, "ws_to_ls");
+	UniformLocations_projection = glGetUniformLocation(ShaderProgram, "projection");
+	UniformLocations_directionalLight_ws = glGetUniformLocation(ShaderProgram, "directionalLight_ws");
+	UniformLocations_directionalLight_color = glGetUniformLocation(ShaderProgram, "directionalLight_color");
+	UniformLocations_pointLight4_ws = glGetUniformLocation(ShaderProgram, "pointLight4_ws");
+	UniformLocations_pointLight4_color = glGetUniformLocation(ShaderProgram, "pointLight4_color");
+	UniformLocations_pointLight4_falloff = glGetUniformLocation(ShaderProgram, "pointLight4_falloff");
+	UniformLocations_numOfPointLights = glGetUniformLocation(ShaderProgram, "numOfPointLights");
+	UniformLocations_color_map = glGetUniformLocation(ShaderProgram, "color_map");
+	UniformLocations_normal_map = glGetUniformLocation(ShaderProgram, "normal_map");
+	UniformLocations_uv_repeat = glGetUniformLocation(ShaderProgram, "uv_repeat");
 }
 
-HEX_API void SetUniform(HEX_UNIFORM uniform, void* data)
+HEX_API void SetUniform(UNIFORM uniform, void* data)
 {
 	if (data == NULL) return;
 
 	switch (uniform)
 	{
-	case HEX_UNIFORM_OS_TO_WS:
-		glUniformMatrix4fv(Uniforms[0], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_OS_TO_WS:
+		glUniformMatrix4fv(UniformLocations_os_to_ws, 1, GL_FALSE, (const GLfloat*)data);
 		break;
-	case HEX_UNIFORM_WS_TO_CS:
-		glUniformMatrix4fv(Uniforms[1], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_WS_TO_CS:
+		glUniformMatrix4fv(UniformLocations_ws_to_cs, 1, GL_FALSE, (const GLfloat*)data);
 		break;
-	case HEX_UNIFORM_WS_TO_LS:
-		glUniformMatrix4fv(Uniforms[2], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_WS_TO_LS:
+		glUniformMatrix4fv(UniformLocations_ws_to_ls, 1, GL_FALSE, (const GLfloat*)data);
 		break;
-	case HEX_UNIFORM_MODELSPACE:
-		glUniformMatrix4fv(Uniforms[0], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_WORLDSPACE:
+		glUniformMatrix4fv(UniformLocations_os_to_ws, 1, GL_FALSE, (const GLfloat*)data);
 		break;
-	case HEX_UNIFORM_WORLDSPACE:
-		glUniformMatrix4fv(Uniforms[1], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_CAMERASPACE:
+		glUniformMatrix4fv(UniformLocations_ws_to_cs, 1, GL_FALSE, (const GLfloat*)data);
 		break;
-	case HEX_UNIFORM_LIGHTSPACE:
-		glUniformMatrix4fv(Uniforms[2], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_LIGHTSPACE:
+		glUniformMatrix4fv(UniformLocations_ws_to_ls, 1, GL_FALSE, (const GLfloat*)data);
 		break;
-	case HEX_UNIFORM_PROJECTION:
-		glUniformMatrix4fv(Uniforms[3], 1, GL_FALSE, (const GLfloat*)data);
+	case UNIFORM_PROJECTION:
+		glUniformMatrix4fv(UniformLocations_projection, 1, GL_FALSE, (const GLfloat*)data);
 		break;
 		
-	case HEX_UNIFORM_DIRECTIONAL_LIGHT:
-		glUniform3fv(Uniforms[4], 1, (const GLfloat*)data);
+	case UNIFORM_DIRECTIONAL_LIGHT_VECTOR:
+		glUniform3fv(UniformLocations_directionalLight_ws, 1, (const GLfloat*)data);
+		break;
+	case UNIFORM_DIRECTIONAL_LIGHT_COLOR:
+		glUniform4fv(UniformLocations_directionalLight_color, 1, (const GLfloat*)data);
+		break;
+		
+	case UNIFORM_POINT_LIGHT_POSITION:
+		glUniform4fv(UniformLocations_pointLight4_ws, 1, (const GLfloat*)data);
+		break;
+	case UNIFORM_POINT_LIGHT_COLOR:
+		glUniform4fv(UniformLocations_pointLight4_color, 1, (const GLfloat*)data);
+		break;
+	case UNIFORM_POINT_LIGHT_FALLOFF:
+		glUniform3fv(UniformLocations_pointLight4_falloff, 1, (const GLfloat*)data);
+		break;
+
+	case UNIFORM_UV_REPEAT:
+		glUniform2fv(UniformLocations_uv_repeat, 1, (const GLfloat*)data);
 		break;
 
 	default:
 		break;
 	}
 }
-HEX_API void SetTextureSlot(HEX_UNIFORM uniform, GLuint texture)
+HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 {
 	if (texture == 0) return;
 
 	switch (uniform)
 	{
-	case HEX_UNIFORM_COLOR_MAP:
-		glUniform1i(Uniforms[5], 0);
+	case UNIFORM_COLOR_MAP:
+		glUniform1i(UniformLocations_color_map, 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		//glBindTexture(GL_TEXTURE_2D, 0);
 		break;
-	case HEX_UNIFORM_NORMAL_MAP:
-		glUniform1i(Uniforms[6], 1);
+	case UNIFORM_NORMAL_MAP:
+		glUniform1i(UniformLocations_normal_map, 1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		//glBindTexture(GL_TEXTURE_2D, 0);
 		break;
 
 	default:
@@ -88,7 +123,7 @@ HEX_API void SetTextureSlot(HEX_UNIFORM uniform, GLuint texture)
 	}
 }
 
-HEX_API bool CompileShader(const char* filepath, GLenum type, GLint* outShader)
+HEX_API bool CompileShader(const string filepath, GLenum type, GLint* outShader)
 {
 	MALib::TEXTFILE* file = NULL;
 	if (!MALib::ImportTextFile(filepath, &file))
@@ -122,7 +157,7 @@ HEX_API bool CompileShader(const char* filepath, GLenum type, GLint* outShader)
 	MALib::FreeTextFile(&file);
 	return true;
 }
-HEX_API bool BuildProgram(const char* vert_filepath, const char* frag_filepath)
+HEX_API bool BuildProgram(const string vert_filepath, const string frag_filepath)
 {
 	if (vert_filepath == NULL || frag_filepath == NULL) return false;
 	
@@ -157,7 +192,7 @@ HEX_API bool BuildProgram(const char* vert_filepath, const char* frag_filepath)
 	glDeleteShader(fs);
 	return true;
 }
-HEX_API bool BindAttribute(const char* attribute_location)
+HEX_API bool BindAttribute(const string attribute_location)
 {
 	GLint a = glGetAttribLocation(ShaderProgram, attribute_location);
 	Attributes.add(a);
@@ -168,7 +203,7 @@ HEX_API bool BindAttribute(const char* attribute_location)
 	}
 	return true;
 }
-HEX_API bool BindUniform(const char* uniform_location)
+HEX_API bool BindUniform(const string uniform_location)
 {
 	GLint u = glGetUniformLocation(ShaderProgram, uniform_location);
 	Uniforms.add(u);

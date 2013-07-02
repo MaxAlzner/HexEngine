@@ -109,6 +109,7 @@ MALIB_API MAT4x4 Translate(float x, float y, float z)
 }
 MALIB_API MAT4x4 RotateX(float x)
 {
+	x = ToRadians(x);
 	return MAT4x4(
 		1.f, 0.f,    0.f,     0.f, 
 		0.f, cos(x), -sin(x), 0.f, 
@@ -118,6 +119,7 @@ MALIB_API MAT4x4 RotateX(float x)
 }
 MALIB_API MAT4x4 RotateY(float y)
 {
+	y = ToRadians(y);
 	return MAT4x4(
 		cos(y),  0.f, sin(y), 0.f, 
 		0.f,     1.f, 0.f,    0.f, 
@@ -127,6 +129,7 @@ MALIB_API MAT4x4 RotateY(float y)
 }
 MALIB_API MAT4x4 RotateZ(float z)
 {
+	z = ToRadians(z);
 	return MAT4x4(
 		cos(z), -sin(z), 0.f, 0.f, 
 		sin(z), cos(z),  0.f, 0.f, 
@@ -138,30 +141,11 @@ MALIB_API MAT4x4 Rotate(float x, float y, float z)
 {
 	MAT4x4 m;
 
-	if (x != 0.0f) m *= MAT4x4(
-		1.f, 0.f,    0.f,     0.f, 
-		0.f, cos(x), -sin(x), 0.f, 
-		0.f, sin(x), cos(x),  0.f, 
-		0.f, 0.f,    0.f,     1.f
-		);
-	if (y != 0.0f) m *= MAT4x4(
-		cos(y),  0.f, sin(y), 0.f, 
-		0.f,     1.f, 0.f,    0.f, 
-		-sin(y), 0.f, cos(y), 0.f, 
-		0.f,     0.f, 0.f,    1.f
-		);
-	if (z != 0.0f) m *= MAT4x4(
-		cos(z), -sin(z), 0.f, 0.f, 
-		sin(z), cos(z),  0.f, 0.f, 
-		0.f,    0.f,     1.f, 0.f, 
-		0.f,    0.f,     0.f, 1.f
-		);
+	if (x != 0.0f) m *= RotateX(x);
+	if (y != 0.0f) m *= RotateY(y);
+	if (z != 0.0f) m *= RotateZ(z);
 
 	return m;
-}
-MALIB_API MAT4x4 RotateAround(const VEC3& v, float x)
-{
-	return MAT4x4();
 }
 MALIB_API MAT4x4 Scale(float x, float y, float z)
 {
@@ -174,6 +158,7 @@ MALIB_API MAT4x4 Scale(float x, float y, float z)
 }
 MALIB_API MAT4x4 Perspective(float fovAngleY, float aspectRatio, float nearZ, float farZ)
 {
+#if 0
 	float cosFov = cos(fovAngleY * 0.5f);
 	float sinFov = sin(fovAngleY * 0.5f);
     float height = cosFov / sinFov;
@@ -185,16 +170,52 @@ MALIB_API MAT4x4 Perspective(float fovAngleY, float aspectRatio, float nearZ, fl
 		0.f,   0.f,    zinterp, -zinterp * nearZ, 
 		0.f,   0.f,    0.f,     1.f
 		);
+#else
+	float r = ToRadians(fovAngleY);
+	float range = tan(r / 2.0f) * nearZ;
+	float left = -range * aspectRatio;
+	float right = -range * aspectRatio;
+	float bottom = -range;
+	float top = range;
+	MAT4x4 result = MAT4x4();
+	result.r0c0 = (nearZ * 2.0f) / (right - left);
+	result.r1c1 = (nearZ * 2.0f) / (top - bottom);
+	result.r2c2 = (farZ + nearZ) / (farZ - nearZ);
+	result.r2c3 = 1.0f;
+	result.r3c2 = (2.0f * farZ * nearZ) / (farZ - nearZ);
+	return result;
+#endif
 }
 MALIB_API MAT4x4 Orthographic(float width, float height, float nearZ, float farZ)
 {
-	float range = 1.f / (farZ- nearZ);
+#if 0
+	float range = 1.0f / (farZ - nearZ);
 	return MAT4x4(
 		2.f / width, 0.f,          0.f,   0.f, 
 		0.f,         2.f / height, 0.f,   0.f, 
 		0.f,         0.f,          range, -range * nearZ, 
 		0.f,         0.f,          0.f,   1.f
 		);
+#else
+	MAT4x4 result = MAT4x4();
+	result.r0c0 = 2.0f / width;
+	result.r1c1 = 2.0f / height;
+	result.r2c2 = (farZ + nearZ) / (farZ - nearZ);
+	result.r2c3 = 1.0f;
+	result.r3c2 = (2.0f * farZ * nearZ) / (farZ - nearZ);
+	return result;
+#endif
+}
+MALIB_API MAT4x4 Orthographic(float left, float right, float bottom, float top, float nearZ, float farZ)
+{
+	MAT4x4 result = MAT4x4();
+	result.r0c0 = 2.0f / (right - left);
+	result.r1c1 = 2.0f / (top - bottom);
+	result.r2c2 = 2.0f / (farZ - nearZ);
+	result.r3c0 = (right + left) / (right - left);
+	result.r3c1 = (top + bottom) / (top - bottom);
+	result.r3c2 = (farZ + nearZ) / (farZ - nearZ);
+	return result;
 }
 MALIB_API MAT4x4 LookAt(const VEC4& eye, const VEC4& focus)
 {
@@ -209,7 +230,7 @@ MALIB_API MAT4x4 LookAt(const VEC4& eye, const VEC4& focus)
 		-f.x, -f.y, -f.z, 0.f, 
 		0.f,  0.f,  0.f,  1.f
 		);
-#else
+#elif 0
 	return MAT4x4(
 		s.x,  s.y,  s.z,  0.f, 
 		t.x,  t.y,  t.z,  0.f, 
@@ -220,6 +241,13 @@ MALIB_API MAT4x4 LookAt(const VEC4& eye, const VEC4& focus)
 		0.f, 1.f, 0.f, -eye.y, 
 		0.f, 0.f, 1.f, -eye.z, 
 		0.f, 0.f, 0.f, 1.f
+		);
+#else
+	return MAT4x4(
+		f.x, s.x, -t.x, -Dot(f, eye), 
+		f.y, s.y, -t.y, -Dot(s, eye), 
+		f.z, s.z, -t.z, Dot(t, eye), 
+		0.f, 0.f,  0.f,  1.f
 		);
 #endif
 }

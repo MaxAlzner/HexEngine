@@ -20,11 +20,12 @@ HEX_API void CameraNode::load()
 	if (this->root->transform == NULL) return;
 	
 	glm::vec3 eye = this->root->transform->translation;
+	glm::vec3 focus = eye + (this->root->transform->forward);
+	glm::mat4 view = glm::lookAt(eye, focus, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 persp = glm::perspective(this->fovAngle, this->aspectRatio, this->nearZ, this->farZ);
-	glm::mat4 view = glm::lookAt(eye, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	SetUniform(HEX_UNIFORM_WS_TO_CS, glm::value_ptr(view));
-	SetUniform(HEX_UNIFORM_PROJECTION, glm::value_ptr(persp));
+	SetUniform(UNIFORM_WS_TO_CS, glm::value_ptr(view));
+	SetUniform(UNIFORM_PROJECTION, glm::value_ptr(persp));
 }
 HEX_API void CameraNode::destroy()
 {

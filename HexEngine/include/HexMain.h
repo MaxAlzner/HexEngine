@@ -11,16 +11,26 @@
 
 #include <Windows.h>
 
-//#include <GL\GLU.h>
+/*#include <ft2build.h>
+#include <freetype.h>
+#include <ftglyph.h>
+#include <ftoutln.h>
+#include <fttrigon.h>*/
+
 #include <glew.h>
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #include <MALib.h>
 
-#include "..\libraries\glm\glm.hpp"
-#include "..\libraries\glm\gtc\matrix_transform.hpp"
-#include "..\libraries\glm\gtc\type_ptr.hpp"
-#include "..\libraries\glm\gtc\constants.hpp"
+#include "..\libraries\glm\ext.hpp"
+
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
+typedef unsigned long ulong;
+typedef unsigned long long ulonglong;
+typedef char* string;
 
 #define HEX_API __declspec(dllexport)
 #define USING_GLM_API 
@@ -43,4 +53,5 @@
 #include "core\HexInput.h"
 #include "core\HexShader.h"
 #include "core\HexData.h"
+#include "core\HexText.h"
 #include "core\HexCore.h"

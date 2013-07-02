@@ -9,7 +9,7 @@ public:
 	ShapeNode();
 	~ShapeNode();
 
-	void build(void* data, unsigned count, unsigned stride, unsigned attributes);
+	void build(void* data, uint count, uint stride, uint attributes);
 	void load();
 	void destroy();
 	void batch();

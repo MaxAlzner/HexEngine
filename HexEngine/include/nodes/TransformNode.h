@@ -15,8 +15,9 @@ public:
 	void translate(float x, float y, float z);
 	void rotate(float x, float y, float z);
 	void scale(float x, float y, float z);
-
 	void zero();
+
+	void recalculate();
 
 	USING_GLM_API glm::vec3 translation;
 	USING_GLM_API glm::vec3 rotation;
@@ -25,6 +26,9 @@ public:
 	USING_GLM_API glm::vec3 right;
 	USING_GLM_API glm::vec3 up;
 	USING_GLM_API glm::vec3 forward;
+	USING_GLM_API glm::mat4 space;
+	USING_GLM_API glm::mat3 spaceNormal;
+	USING_GLM_API glm::mat4 transformation;
 };
 
 HEX_END
