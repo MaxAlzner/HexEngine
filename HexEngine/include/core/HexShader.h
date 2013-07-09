@@ -39,12 +39,6 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_FLAG_POSTPROCESS_GUASSIAN                          = 0x20000002, 
 	UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN                = 0x20000003, 
 };
-HEX_API typedef enum RENDER_FLAG
-{
-	RENDER_FLAG_NONE                                           = 0x00000000, 
-	
-	RENDER_FLAG_SHADOW_RENDER                                  = 0x00000001, 
-};
 
 typedef struct UniformLocations UniformLocations;
 
@@ -63,7 +57,6 @@ HEX_API extern void ResetUniforms();
 	
 HEX_API extern bool CompileShader(const string filepath, GLenum type, GLint* outShader);
 HEX_API extern bool BuildProgram(const string vert_filepath, const string frag_filepath);
-HEX_API extern bool BindAttribute(const string attribute_location);
 	
 HEX_END
 #endif

@@ -1,10 +1,10 @@
 #version 130
 
-layout(location = 0) in vec4 vertex;
-layout(location = 1) in vec2 uv;
-layout(location = 2) in vec3 normal;
-layout(location = 3) in vec3 tangent;
-layout(location = 4) in vec3 binormal;
+in vec4 vertex;
+in vec2 uv;
+in vec3 normal;
+in vec3 tangent;
+in vec3 binormal;
 
 out vec2 tex_coord;
 out vec4 vertex_ls;

@@ -27,6 +27,8 @@ uint ScreenPlaneBO = 0;
 uint ShadowMap = 0;
 uint RenderTex = 0;
 uint RenderDepth = 0;
+uint RenderWidth = 800;
+uint RenderHeight = 600;
 
 uint ShadowFBO = 0;
 uint RenderFBO = 0;
@@ -50,7 +52,7 @@ HEX_API void OnFrameDraw()
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, RenderFBO);
-	glViewport(0, 0, ScreenDimensions[0], ScreenDimensions[1]);
+	glViewport(0, 0, RenderWidth, RenderHeight);
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -67,7 +69,7 @@ HEX_API void OnFrameDraw()
 	
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, RenderFBO);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, ScreenDimensions[0], ScreenDimensions[1], 0, 0, ScreenDimensions[0], ScreenDimensions[1], GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, RenderWidth, RenderHeight, 0, 0, RenderWidth, RenderHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -130,9 +132,11 @@ HEX_API bool Reshape(uint width, uint height)
 	ScreenDimensions[0] = width;
 	ScreenDimensions[1] = height;
 
-	/*if (RenderTex != 0) glDeleteTextures(1, &RenderTex);
+#if 0
+	if (RenderTex != 0) glDeleteTextures(1, &RenderTex);
 	if (RenderDepth != 0) glDeleteTextures(1, &RenderDepth);
-	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);*/
+	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);
+#endif
 
 	return true;
 }
@@ -161,12 +165,12 @@ HEX_API bool Initialize(uint argc, string* argv)
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	SDL_WM_SetCaption("HexDemo", "HexDemo");
 	
-	MALib::LOG_Message("START TTF");
+	/*MALib::LOG_Message("START TTF");
 	if (TTF_Init() < 0)
 	{
 		MALib::LOG_Message("Unable to initialize SDL_TTF.");
 		return false;
-	}
+	}*/
 	
 	MALib::LOG_Message("START RESHAPE");
 	Reshape(ScreenDimensions[0], ScreenDimensions[1]);
@@ -196,15 +200,15 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeAttributes();
 	InitializeUniforms();
 
-	MALib::LOG_Outiv("UNIFORMS  ", (int*)&Uniforms, 17);
-	MALib::LOG_Outiv("ATTRIBUTES", Attributes.pointer(), Attributes.length());
+	MALib::LOG_Outiv("UNIFORMS", (int*)&Uniforms, 17);
+	//MALib::LOG_Outiv("ATTRIBUTES", Attributes.pointer(), Attributes.length());
 	
 	MALib::LOG_Message("START INPUT");
 	InitializeInput();
 	MALib::LOG_Message("START DATA");
 	InitializeData();
-	MALib::LOG_Message("START FONT");
-	InitializeFont();
+	/*MALib::LOG_Message("START FONT");
+	InitializeFont();*/
 	
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	glGenTextures(1, &ShadowMap);
@@ -217,14 +221,14 @@ HEX_API bool Initialize(uint argc, string* argv)
 
 	glGenTextures(1, &RenderTex);
 	glBindTexture(GL_TEXTURE_2D, RenderTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ScreenDimensions[0], ScreenDimensions[1], 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, RenderWidth, RenderHeight, 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	//MALib::LOG_Out1i("RenderTex", RenderTex);
 
 	glGenTextures(1, &RenderDepth);
 	glBindTexture(GL_TEXTURE_2D, RenderDepth);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, ScreenDimensions[0], ScreenDimensions[1], 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, RenderWidth, RenderHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 	//MALib::LOG_Out1i("RenderDepth", RenderDepth);
 
 	glGenFramebuffers(1, &ShadowFBO);
@@ -262,7 +266,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), ScreenPlane, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), NULL);
-	glEnableVertexAttribArray(Attributes[0]);
+	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
 	MALib::LOG_Message("START SCENE");
@@ -312,11 +316,11 @@ HEX_API bool Initialize(uint argc, string* argv)
 }
 HEX_API bool Unitialize()
 {
-	glDeleteTextures(1, &RenderTex);
-	glDeleteTextures(1, &RenderDepth);
-	glDeleteFramebuffers(1, &RenderFBO);
-	glDeleteTextures(1, &ShadowMap);
-	glDeleteFramebuffers(1, &ShadowFBO);
+	if (RenderTex != 0) glDeleteTextures(1, &RenderTex);
+	if (RenderDepth != 0) glDeleteTextures(1, &RenderDepth);
+	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);
+	if (ShadowMap != 0) glDeleteTextures(1, &ShadowMap);
+	if (ShadowFBO != 0) glDeleteFramebuffers(1, &ShadowFBO);
 
 	UninitializeFont();
 	UninitializeData();

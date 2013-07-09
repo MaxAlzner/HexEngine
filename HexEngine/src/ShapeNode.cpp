@@ -27,16 +27,16 @@ void ShapeNode::build(void* data, uint count, uint stride, uint attributes)
 	GLsizeiptr size = this->count * 20 * sizeof(float);
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(Attributes[0], 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glVertexAttribPointer(Attributes[1], 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 4 * sizeof(float)));
-	glVertexAttribPointer(Attributes[2], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 8 * sizeof(float)));
-	glVertexAttribPointer(Attributes[3], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 12 * sizeof(float)));
-	glVertexAttribPointer(Attributes[4], 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 16 * sizeof(float)));
-	glEnableVertexAttribArray(Attributes[0]);
-	glEnableVertexAttribArray(Attributes[1]);
-	glEnableVertexAttribArray(Attributes[2]);
-	glEnableVertexAttribArray(Attributes[3]);
-	glEnableVertexAttribArray(Attributes[4]);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 4 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 8 * sizeof(float)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 12 * sizeof(float)));
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const GLvoid*)(this->count * 16 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
 	
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

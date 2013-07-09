@@ -38,11 +38,11 @@ HEX_API GLuint ShaderProgram = 0;
 HEX_API void InitializeAttributes()
 {
 	Attributes.resize(5);
-	BindAttribute("vertex");
-	BindAttribute("uv");
-	BindAttribute("normal");
-	BindAttribute("tangent");
-	BindAttribute("binormal");
+	Attributes.add(glGetAttribLocation(ShaderProgram, "vertex"));
+	Attributes.add(glGetAttribLocation(ShaderProgram, "uv"));
+	Attributes.add(glGetAttribLocation(ShaderProgram, "normal"));
+	Attributes.add(glGetAttribLocation(ShaderProgram, "tangent"));
+	Attributes.add(glGetAttribLocation(ShaderProgram, "binormal"));
 }
 HEX_API void InitializeUniforms()
 {
@@ -301,10 +301,17 @@ HEX_API bool BuildProgram(const string vert_filepath, const string frag_filepath
 	GLint vs, fs;
 	if (!CompileShader(vert_filepath, GL_VERTEX_SHADER, &vs) || !CompileShader(frag_filepath, GL_FRAGMENT_SHADER, &fs)) 
 		return false;
-	
+
 	ShaderProgram = glCreateProgram();
 	glAttachShader(ShaderProgram, vs);
 	glAttachShader(ShaderProgram, fs);
+	
+	glBindAttribLocation(ShaderProgram, 0, "vertex");
+	glBindAttribLocation(ShaderProgram, 1, "uv");
+	glBindAttribLocation(ShaderProgram, 2, "normal");
+	glBindAttribLocation(ShaderProgram, 3, "tangent");
+	glBindAttribLocation(ShaderProgram, 4, "binormal");
+
 	glLinkProgram(ShaderProgram);
 	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &link_status);
 	if (!link_status)
@@ -325,17 +332,6 @@ HEX_API bool BuildProgram(const string vert_filepath, const string frag_filepath
 
 	glDeleteShader(vs);
 	glDeleteShader(fs);
-	return true;
-}
-HEX_API bool BindAttribute(const string attribute_location)
-{
-	GLint a = glGetAttribLocation(ShaderProgram, attribute_location);
-	Attributes.add(a);
-	if (a < 0)
-	{
-		MALib::LOG_Message("Could not bind attribute.", attribute_location);
-		return false;
-	}
 	return true;
 }
 	

@@ -19,22 +19,12 @@ HexEntity* BoundEntity = NULL;
 
 HEX_API void InitializeData()
 {
-	Meshes.resize(8);
-	Textures.resize(16);
-	Entities.resize(12);
-	Nodes.resize(32);
-
-#if 0
-	MALib::OBJ_MESH* m = 0;
-	MALib::ImportOBJFile("data/skybox.obj", &m);
-	MALib::VERTEXBUFFER* v = 0;
-	MALib::BakeOBJ(m, &v);
-	MALib::ExportVMPFile("data/skybox.vmp", v);
-	MALib::FreeOBJMesh(&m);
-	MALib::FreeVertexBuffer(&v);
-#endif
-
 	MALib::LOG_Message("START ASSET LOADING");
+
+	Meshes.resize(24);
+	Textures.resize(48);
+	Entities.resize(32);
+	Nodes.resize(128);
 
 	RegisterVMP("data/capsule.vmp");
 	RegisterVMP("data/cube.vmp");
