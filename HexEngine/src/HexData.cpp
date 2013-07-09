@@ -3,23 +3,36 @@
 #ifdef _HEX_DATA_H_
 HEX_BEGIN
 
-HEX_API bool AppRunning = true;
-HEX_API bool Paused = false;
-HEX_API float AspectRatio = 3.0f / 4.0f;
-HEX_API SDL_Surface* ScreenSurface = NULL;
+bool AppRunning = true;
+bool Paused = false;
+float DeltaTime = 0.0f;
+float AspectRatio = 3.0f / 4.0f;
+uint ScreenDimensions[2] = {800, 600};
+SDL_Surface* ScreenSurface = NULL;
+CameraNode* MainCamera = NULL;
 	
-HEX_API MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
-HEX_API MALib::ARRAY<MALib::SURFACE*> Textures;
-HEX_API MALib::ARRAY<HexEntity*> Entities;
-HEX_API MALib::ARRAY<NodeBase*> Nodes;
-HEX_API CameraNode* MainCamera = NULL;
+MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
+MALib::ARRAY<MALib::SURFACE*> Textures;
+MALib::ARRAY<HexEntity*> Entities;
+MALib::ARRAY<NodeBase*> Nodes;
+HexEntity* BoundEntity = NULL;
 
 HEX_API void InitializeData()
 {
 	Meshes.resize(8);
 	Textures.resize(16);
-	Entities.resize(8);
-	Nodes.resize(16);
+	Entities.resize(12);
+	Nodes.resize(32);
+
+#if 0
+	MALib::OBJ_MESH* m = 0;
+	MALib::ImportOBJFile("data/skybox.obj", &m);
+	MALib::VERTEXBUFFER* v = 0;
+	MALib::BakeOBJ(m, &v);
+	MALib::ExportVMPFile("data/skybox.vmp", v);
+	MALib::FreeOBJMesh(&m);
+	MALib::FreeVertexBuffer(&v);
+#endif
 
 	MALib::LOG_Message("START ASSET LOADING");
 
@@ -29,11 +42,13 @@ HEX_API void InitializeData()
 	RegisterVMP("data/puzzle.vmp");
 	RegisterVMP("data/sphere.vmp");
 	RegisterVMP("data/torus.vmp");
+	RegisterVMP("data/skybox.vmp");
 
-	RegisterBMP("data/uv_layout.bmp");
-	RegisterBMP("data/brick_n.bmp");
+	RegisterBMP("data/tile01_d.bmp");
+	RegisterBMP("data/tile01_n.bmp");
 	RegisterBMP("data/grass01_d.bmp");
 	RegisterBMP("data/grass01_n.bmp");
+	RegisterBMP("data/sky.bmp");
 
 	MALib::LOG_Message("END ASSET LOADING");
 }
@@ -111,56 +126,84 @@ HEX_API bool RegisterTGA(const string filepath)
 	return true;
 }
 
-HEX_API HexEntity* GenerateEntity(float x, float y, float z, float rx, float ry, float rz)
+HEX_API void GenEntities(uint size, uint* entities)
 {
-	HexEntity* entity = new HexEntity;
-	Entities.add(entity);
-	TransformNode* node = new TransformNode;
-	node->translate(x, y, z);
-	node->rotate(rx, ry, rz);
-	entity->setTransform(node);
-	Nodes.add(node);
-	return entity;
+	for (uint i = 0; i < size; i++)
+	{
+		HexEntity* entity = new HexEntity;
+		Entities.add(entity);
+		TransformNode* node = new TransformNode;
+		entity->setTransform(node);
+		Nodes.add(node);
+		uint n = Entities.length();
+		entities[i] = n;
+	}
 }
-HEX_API CameraNode* GenerateCamera(HexEntity* root, float fovAngle, float aspectRatio, float nearZ, float farZ)
+HEX_API void BindEntity(uint entity)
 {
-	if (root == NULL) return NULL;
+	if (entity == 0) return;
+	BoundEntity = Entities[entity - 1];
+}
+HEX_API void TransformEntity(float x, float y, float z, float rx, float ry, float rz)
+{
+	if (BoundEntity == NULL) return;
+	BoundEntity->transform->translate(x, y, z);
+	BoundEntity->transform->rotate(rx, ry, rz);
+}
+
+HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ)
+{
+	if (BoundEntity == NULL) return;
 	CameraNode* node = new CameraNode;
 	node->fovAngle = fovAngle;
 	node->aspectRatio = aspectRatio;
 	node->nearZ = nearZ;
 	node->farZ = farZ;
-	root->addComponent(node);
+	BoundEntity->addComponent(node);
 	Nodes.add(node);
-	return node;
+	MainCamera = node;
 }
-HEX_API LightNode* GenerateLight(HexEntity* root, HEX_LIGHTMODE mode, float intensity, float rx, float ry, float rz)
+HEX_API void AddLight(HEX_LIGHTMODE mode, float intensity, float rx, float ry, float rz)
 {
-	if (root == NULL) return NULL;
+	if (BoundEntity == NULL) return;
 	LightNode* node = new LightNode;
 	node->mode = mode;
 	node->intensity = intensity;
-	root->transform->rotate(rx, ry, rz);
-	root->addComponent(node);
+	BoundEntity->transform->rotate(rx, ry, rz);
+	BoundEntity->addComponent(node);
 	Nodes.add(node);
-	return node;
 }
-HEX_API ShapeNode* GenerateShape(HexEntity* root, MALib::VERTEXBUFFER* mesh)
+HEX_API void AddController()
 {
-	if (root == NULL || mesh == NULL) return NULL;
+	if (BoundEntity == NULL) return;
+	ControlNode* node = new ControlNode;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+}
+HEX_API void AddSkybox()
+{
+	if (BoundEntity == NULL) return;
+	SkyboxNode* node = new SkyboxNode;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+}
+
+HEX_API void AddShape(MALib::VERTEXBUFFER* mesh)
+{
+	if (BoundEntity == NULL || mesh == NULL) return;
 	ShapeNode* node = new ShapeNode;
 	node->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
-	root->setShape(node);
+	BoundEntity->setShape(node);
 	Nodes.add(node);
-	return node;
 }
-HEX_API MaterialNode* GenerateMaterial(HexEntity* root)
+HEX_API void AddMaterial(MALib::SURFACE* colorMap, MALib::SURFACE* normalMap)
 {
-	if (root == NULL) return NULL;
+	if (BoundEntity == NULL) return;
 	MaterialNode* node = new MaterialNode;
-	root->setMaterial(node);
+	node->setColorMap(colorMap);
+	node->setNormalMap(normalMap);
+	BoundEntity->setMaterial(node);
 	Nodes.add(node);
-	return node;
 }
 
 HEX_END

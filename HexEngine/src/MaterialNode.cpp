@@ -11,7 +11,7 @@ HEX_BEGIN
 	glPixelStorei(GL_PACK_ALIGNMENT, 4);\
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-HEX_API MaterialNode::MaterialNode()
+MaterialNode::MaterialNode()
 {
 	this->colorMap = 0;
 	this->normalMap = 0;
@@ -20,39 +20,45 @@ HEX_API MaterialNode::MaterialNode()
 	this->roughness = 0.8f;
 	this->refIndex = 1.4f;
 	this->uvRepeat = MALib::VEC2(1.0f, 1.0f);
+	this->shadowCaster = false;
 }
-HEX_API MaterialNode::~MaterialNode()
+MaterialNode::~MaterialNode()
 {
 }
 		
-HEX_API void MaterialNode::load()
+void MaterialNode::load()
 {
-	SetTextureSlot(UNIFORM_COLOR_MAP, this->colorMap);
-	SetTextureSlot(UNIFORM_NORMAL_MAP, this->normalMap);
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, this->colorMap);
+	SetTextureSlot(UNIFORM_TEXTURE_NORMAL_MAP, this->normalMap);
 	SetUniform(UNIFORM_UV_REPEAT, &this->uvRepeat);
 }
-HEX_API void MaterialNode::destroy()
+void MaterialNode::unload()
 {
 }
+void MaterialNode::destroy()
+{
+	glDeleteTextures(1, &this->colorMap);
+	glDeleteTextures(1, &this->normalMap);
+}
 
-HEX_API void MaterialNode::setColorMap(MALib::SURFACE* texture)
+void MaterialNode::setColorMap(MALib::SURFACE* texture)
 {
 	MaterialNode::BuildTexture(&this->colorMap, texture);
 }
-HEX_API void MaterialNode::setColorMap(SDL_Surface* texture)
+void MaterialNode::setColorMap(SDL_Surface* texture)
 {
 	MaterialNode::BuildTexture(&this->colorMap, texture);
 }
-HEX_API void MaterialNode::setNormalMap(MALib::SURFACE* texture)
+void MaterialNode::setNormalMap(MALib::SURFACE* texture)
 {
 	MaterialNode::BuildTexture(&this->normalMap, texture);
 }
-HEX_API void MaterialNode::setNormalMap(SDL_Surface* texture)
+void MaterialNode::setNormalMap(SDL_Surface* texture)
 {
 	MaterialNode::BuildTexture(&this->normalMap, texture);
 }
 
-HEX_API void MaterialNode::BuildTexture(GLuint* outID, MALib::SURFACE* texture)
+void MaterialNode::BuildTexture(GLuint* outID, MALib::SURFACE* texture)
 {
 	if (outID == NULL || texture == NULL) return;
 
@@ -75,7 +81,7 @@ HEX_API void MaterialNode::BuildTexture(GLuint* outID, MALib::SURFACE* texture)
 
 	*outID = id;
 }
-HEX_API void MaterialNode::BuildTexture(GLuint* outID, SDL_Surface* texture)
+void MaterialNode::BuildTexture(GLuint* outID, SDL_Surface* texture)
 {
 	if (outID == NULL || texture == NULL) return;
 

@@ -10,7 +10,7 @@ HEX_API typedef enum HEX_LIGHTMODE
 	HEX_LIGHTMODE_SPOT         = 3, 
 };
 
-class HEX_API LightNode : public ComponentNode
+class LightNode : public ComponentNode
 {
 public:
 
@@ -18,14 +18,17 @@ public:
 	~LightNode();
 		
 	void load();
+	void unload();
 	void destroy();
 	
+	void onStart();
 	void onFrameUpdate();
 	void onFixedUpdate();
 
 	HEX_LIGHTMODE mode;
 	float intensity;
 	MALib::COLOR color;
+	MALib::VEC3 falloff;
 };
 
 HEX_END

@@ -3,18 +3,18 @@
 #ifdef _SHAPENODE_H_
 HEX_BEGIN
 
-HEX_API ShapeNode::ShapeNode()
+ShapeNode::ShapeNode()
 {
 	this->vao = 0;
 	this->buffer = 0;
 	this->count = 0;
 }
-HEX_API ShapeNode::~ShapeNode()
+ShapeNode::~ShapeNode()
 {
 	this->destroy();
 }
 
-HEX_API void ShapeNode::build(void* data, uint count, uint stride, uint attributes)
+void ShapeNode::build(void* data, uint count, uint stride, uint attributes)
 {
 	glGenVertexArrays(1, &this->vao);
 	glBindVertexArray(this->vao);
@@ -42,19 +42,22 @@ HEX_API void ShapeNode::build(void* data, uint count, uint stride, uint attribut
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
-HEX_API void ShapeNode::load()
+void ShapeNode::load()
 {
 	if (this->root == NULL) return;
 	if (this->root->transform == NULL) return;
 
 	SetUniform(UNIFORM_OS_TO_WS, glm::value_ptr(this->root->transform->transformation));
 }
-HEX_API void ShapeNode::destroy()
+void ShapeNode::unload()
+{
+}
+void ShapeNode::destroy()
 {
 	glDeleteVertexArrays(1, &this->vao);
 	glDeleteBuffers(1, &this->buffer);
 }
-HEX_API void ShapeNode::batch()
+void ShapeNode::batch()
 {
 	if (this->count == 0) return;
 	

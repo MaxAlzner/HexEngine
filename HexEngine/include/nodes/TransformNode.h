@@ -2,7 +2,7 @@
 #define _TRANSFORMNODE_H_
 HEX_BEGIN
 
-class HEX_API TransformNode : public NodeBase
+class TransformNode : public NodeBase
 {
 public:
 
@@ -10,6 +10,7 @@ public:
 	~TransformNode();
 	
 	void load();
+	void unload();
 	void destroy();
 	
 	void translate(float x, float y, float z);
@@ -19,16 +20,16 @@ public:
 
 	void recalculate();
 
-	USING_GLM_API glm::vec3 translation;
-	USING_GLM_API glm::vec3 rotation;
-	USING_GLM_API glm::vec3 scaled;
+	glm::vec3 translation;
+	glm::vec3 rotation;
+	glm::vec3 scaled;
 
-	USING_GLM_API glm::vec3 right;
-	USING_GLM_API glm::vec3 up;
-	USING_GLM_API glm::vec3 forward;
-	USING_GLM_API glm::mat4 space;
-	USING_GLM_API glm::mat3 spaceNormal;
-	USING_GLM_API glm::mat4 transformation;
+	glm::vec3 right;
+	glm::vec3 up;
+	glm::vec3 forward;
+	glm::mat4 space;
+	glm::mat3 spaceNormal;
+	glm::mat4 transformation;
 };
 
 HEX_END

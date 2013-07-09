@@ -3,34 +3,42 @@
 #ifdef _HEX_ENTITY_H_
 HEX_BEGIN
 
-HEX_API HexEntity::HexEntity()
+HexEntity::HexEntity()
 {
 	this->transform = NULL;
 	this->material = NULL;
 	this->shape = NULL;
 	this->components.resize(8);
 }
-HEX_API HexEntity::~HexEntity()
+HexEntity::~HexEntity()
 {
 	this->components.clear();
 }
 
-HEX_API void HexEntity::frameUpdate()
+void HexEntity::start()
 {
-	if (this->transform != NULL) this->transform->load();
-	if (this->material != NULL) this->material->load();
 	for (unsigned i = 0; i < this->components.length(); i++)
 	{
 		ComponentNode* component = this->components[i];
 		if (component != NULL)
 		{
-			component->load();
+			component->onStart();
+		}
+	}
+}
+void HexEntity::frameUpdate()
+{
+	for (unsigned i = 0; i < this->components.length(); i++)
+	{
+		ComponentNode* component = this->components[i];
+		if (component != NULL)
+		{
 			component->onFrameUpdate();
 		}
 	}
 	if (this->shape != NULL) this->shape->load();
 }
-HEX_API void HexEntity::fixedUpdate()
+void HexEntity::fixedUpdate()
 {
 	if (this->transform != NULL) this->transform->recalculate();
 	for (unsigned i = 0; i < this->components.length(); i++)
@@ -42,27 +50,52 @@ HEX_API void HexEntity::fixedUpdate()
 		}
 	}
 }
-HEX_API void HexEntity::render()
+void HexEntity::render()
 {
-	if (this->shape != NULL) this->shape->batch();
+	if (this->transform != NULL) this->transform->load();
+	if (this->material != NULL) this->material->load();
+	for (unsigned i = 0; i < this->components.length(); i++)
+	{
+		ComponentNode* component = this->components[i];
+		if (component != NULL)
+		{
+			component->load();
+		}
+	}
+	if (this->shape != NULL)
+	{
+		this->shape->load();
+		this->shape->batch();
+		this->shape->unload();
+	}
+	for (unsigned i = 0; i < this->components.length(); i++)
+	{
+		ComponentNode* component = this->components[i];
+		if (component != NULL)
+		{
+			component->unload();
+		}
+	}
+	if (this->material != NULL) this->material->unload();
+	if (this->transform != NULL) this->transform->unload();
 }
 
-HEX_API void HexEntity::setTransform(TransformNode* node)
+void HexEntity::setTransform(TransformNode* node)
 {
 	this->transform = node;
 	node->parentTo(this);
 }
-HEX_API void HexEntity::setMaterial(MaterialNode* node)
+void HexEntity::setMaterial(MaterialNode* node)
 {
 	this->material = node;
 	node->parentTo(this);
 }
-HEX_API void HexEntity::setShape(ShapeNode* node)
+void HexEntity::setShape(ShapeNode* node)
 {
 	this->shape = node;
 	node->parentTo(this);
 }
-HEX_API void HexEntity::addComponent(ComponentNode* node)
+void HexEntity::addComponent(ComponentNode* node)
 {
 	if (this->components.contains(node)) return;
 	this->components.add(node);

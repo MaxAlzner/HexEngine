@@ -6,21 +6,25 @@ int main(int argc, char **argv)
 	if (!HEX::Initialize(argc, argv)) 
 		HEX::ToggleRunning();
 	
-	Uint32 LastPing = SDL_GetTicks();
+	Uint32 FramePing = SDL_GetTicks();
+	Uint32 UpdatePing = SDL_GetTicks();
 	while (HEX::IsRunning())
 	{
 		HEX::PollEvents();
 		
 		Uint32 NewPing = SDL_GetTicks();
-		Uint32 Delta = NewPing - LastPing;
-		if (Delta > 24)
+		if (NewPing - FramePing > 16)
 		{
 			HEX::OnFrameUpdate();
 			HEX::OnFrameDraw();
-			LastPing = NewPing;
+			FramePing = NewPing;
+		}
+		if (NewPing - UpdatePing > 24)
+		{
+			HEX::OnFixedUpdate();
+			UpdatePing = NewPing;
 		}
 	}
-
 	
 	HEX::Unitialize();
 	return 0;

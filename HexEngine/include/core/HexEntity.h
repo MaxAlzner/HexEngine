@@ -2,13 +2,14 @@
 #define _HEX_ENTITY_H_
 HEX_BEGIN
 
-class HEX_API HexEntity
+class HexEntity
 {
 public:
 
 	HexEntity();
 	~HexEntity();
 
+	void start();
 	void frameUpdate();
 	void fixedUpdate();
 	void render();

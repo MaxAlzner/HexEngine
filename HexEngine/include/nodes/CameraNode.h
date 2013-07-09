@@ -2,7 +2,7 @@
 #define _CAMERANODE_H_
 HEX_BEGIN
 
-class HEX_API CameraNode : public ComponentNode
+class CameraNode : public ComponentNode
 {
 public:
 
@@ -10,8 +10,10 @@ public:
 	~CameraNode();
 		
 	void load();
+	void unload();
 	void destroy();
 	
+	void onStart();
 	void onFrameUpdate();
 	void onFixedUpdate();
 
@@ -19,6 +21,9 @@ public:
 	float aspectRatio;
 	float nearZ;
 	float farZ;
+
+	glm::mat4 perspective;
+	glm::mat4 viewSpace;
 };
 
 HEX_END

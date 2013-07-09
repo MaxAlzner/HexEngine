@@ -2,11 +2,12 @@
 #define _NODEBASE_H_
 HEX_BEGIN
 
-class HEX_API NodeBase
+class NodeBase
 {
 public:
 
 	virtual void load() = 0;
+	virtual void unload() = 0;
 	virtual void destroy() = 0;
 
 	virtual void parentTo(HexEntity* obj);

@@ -2,7 +2,7 @@
 #define _MATERIALNODE_H_
 HEX_BEGIN
 
-class HEX_API MaterialNode : public NodeBase
+class MaterialNode : public NodeBase
 {
 public:
 
@@ -10,6 +10,7 @@ public:
 	~MaterialNode();
 		
 	void load();
+	void unload();
 	void destroy();
 
 	void setColorMap(MALib::SURFACE* texture);
@@ -24,6 +25,7 @@ public:
 	float roughness;
 	float refIndex;
 	MALib::VEC2 uvRepeat;
+	bool shadowCaster;
 
 	static void BuildTexture(GLuint* outID, MALib::SURFACE* texture);
 	static void BuildTexture(GLuint* outID, SDL_Surface* texture);

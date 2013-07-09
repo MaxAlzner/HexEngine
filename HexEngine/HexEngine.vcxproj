@@ -98,16 +98,18 @@
     <ClInclude Include="include\core\HexData.h" />
     <ClInclude Include="include\core\HexEntity.h" />
     <ClInclude Include="include\core\HexInput.h" />
+    <ClInclude Include="include\core\HexInputDef.h" />
     <ClInclude Include="include\core\HexText.h" />
     <ClInclude Include="include\HexMain.h" />
     <ClInclude Include="include\core\HexShader.h" />
-    <ClInclude Include="include\core\HexTimer.h" />
     <ClInclude Include="include\nodes\CameraNode.h" />
     <ClInclude Include="include\nodes\ComponentNode.h" />
+    <ClInclude Include="include\nodes\ControlNode.h" />
     <ClInclude Include="include\nodes\LightNode.h" />
     <ClInclude Include="include\nodes\MaterialNode.h" />
     <ClInclude Include="include\nodes\NodeBase.h" />
     <ClInclude Include="include\nodes\ShapeNode.h" />
+    <ClInclude Include="include\nodes\SkyboxNode.h" />
     <ClInclude Include="include\nodes\TransformNode.h" />
     <ClInclude Include="libraries\glm\core\func_common.hpp" />
     <ClInclude Include="libraries\glm\core\func_exponential.hpp" />
@@ -234,6 +236,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CameraNode.cpp" />
+    <ClCompile Include="src\ControlNode.cpp" />
     <ClCompile Include="src\HexCore.cpp" />
     <ClCompile Include="src\HexData.cpp" />
     <ClCompile Include="src\HexEntity.cpp" />
@@ -241,14 +244,16 @@
     <ClCompile Include="src\HexMain.cpp" />
     <ClCompile Include="src\HexShader.cpp" />
     <ClCompile Include="src\HexText.cpp" />
-    <ClCompile Include="src\HexTimer.cpp" />
     <ClCompile Include="src\LightNode.cpp" />
     <ClCompile Include="src\MaterialNode.cpp" />
     <ClCompile Include="src\NodeBase.cpp" />
     <ClCompile Include="src\ShapeNode.cpp" />
+    <ClCompile Include="src\SkyboxNode.cpp" />
     <ClCompile Include="src\TransformNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\gl_shader.frag" />
+    <None Include="data\gl_shader.vert" />
     <None Include="libraries\glm\core\func_common.inl" />
     <None Include="libraries\glm\core\func_exponential.inl" />
     <None Include="libraries\glm\core\func_geometric.inl" />

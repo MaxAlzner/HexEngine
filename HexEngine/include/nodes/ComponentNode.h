@@ -2,10 +2,11 @@
 #define _COMPONENTNODE_H_
 HEX_BEGIN
 
-class HEX_API ComponentNode : public NodeBase
+class ComponentNode : public NodeBase
 {
 public:
-
+	
+	virtual void onStart() = 0;
 	virtual void onFrameUpdate() = 0;
 	virtual void onFixedUpdate() = 0;
 };

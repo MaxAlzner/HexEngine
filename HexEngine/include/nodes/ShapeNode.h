@@ -2,7 +2,7 @@
 #define _SHAPENODE_H_
 HEX_BEGIN
 
-class HEX_API ShapeNode : public NodeBase
+class ShapeNode : public NodeBase
 {
 public:
 
@@ -11,6 +11,7 @@ public:
 
 	void build(void* data, uint count, uint stride, uint attributes);
 	void load();
+	void unload();
 	void destroy();
 	void batch();
 

@@ -40,6 +40,8 @@ typedef char* string;
 		class HexEntity;
 #define HEX_END }
 
+#include "core\HexInputDef.h"
+
 #include "nodes\NodeBase.h"
 #include "nodes\TransformNode.h"
 #include "nodes\MaterialNode.h"
@@ -47,9 +49,11 @@ typedef char* string;
 #include "nodes\ShapeNode.h"
 #include "nodes\CameraNode.h"
 #include "nodes\LightNode.h"
+#include "nodes\ControlNode.h"
+#include "nodes\SkyboxNode.h"
 
 #include "core\HexEntity.h"
-#include "core\HexTimer.h"
+//#include "core\HexTimer.h"
 #include "core\HexInput.h"
 #include "core\HexShader.h"
 #include "core\HexData.h"
