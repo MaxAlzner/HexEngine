@@ -22,12 +22,12 @@ void LightNode::load()
 		glm::vec3 focus = eye + (this->root->transform->forward);
 
 		glm::mat4 view = glm::mat4(1.0f);
-		view *= glm::translate(glm::vec3(0.5f, 0.5f, 0.5f));
-		view *= glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-		view *= MainCamera->perspective;
+		//view *= glm::translate(glm::vec3(0.5f, 0.5f, 0.5f));
+		//view *= glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+		//view *= MainCamera->perspective;
 
-		//view *= glm::lookAt(glm::vec3(3.0f, 3.0f, -4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		view *= glm::lookAt(eye, focus, this->root->transform->up);
+		view *= glm::lookAt(this->root->transform->translation, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//view *= glm::lookAt(eye, focus, this->root->transform->up);
 		//view *= this->root->transform->transformation;
 
 		SetUniform(UNIFORM_DIRECTIONAL_LIGHT_VECTOR, glm::value_ptr(this->root->transform->forward));

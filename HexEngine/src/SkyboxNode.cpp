@@ -25,7 +25,7 @@ void SkyboxNode::load()
 void SkyboxNode::unload()
 {
 	glEnable(GL_DEPTH_TEST);
-	SetUniform(UNIFORM_FLAG_NONE);
+	SetUniform(UNIFORM_FLAG_NORMAL);
 }
 void SkyboxNode::destroy()
 {

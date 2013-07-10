@@ -39,16 +39,16 @@ void main()
 	
 	tex_coord = (uv * uv_repeat) + uv_offset;
 
-	mat4 os_to_cs = ws_to_cs * os_to_ws;
-	mat4 os_to_ls = ws_to_ls * os_to_ws;
+	vec4 vertex_ws = os_to_ws * vertex;
 
-	vec4 vertex_cs = os_to_cs * vertex;
+	vec4 vertex_cs = ws_to_cs * vertex_ws;
 	gl_Position = projection * vertex_cs;
 	
-	vertex_ls = os_to_ls * vertex;
+	vertex_ls = ws_to_ls * vertex_ws;
 
 	if (flag == 1 || flag == 2) return;
-
+	
+	mat4 os_to_cs = ws_to_cs * os_to_ws;
 	vec3 normal_cs = normalize((os_to_cs * vec4(normal, 0.)).xyz);
 	vec3 tangent_cs = normalize((os_to_cs * vec4(tangent, 0.)).xyz);
 	vec3 binormal_cs = normalize((os_to_cs * vec4(binormal, 0.)).xyz);

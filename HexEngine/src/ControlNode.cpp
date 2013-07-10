@@ -51,10 +51,18 @@ void ControlNode::onFixedUpdate()
 		if (Input::IsKeyDown(KEY_RIGHT) || Input::IsKeyDown(KEY_D)) side -= 1.0f;
 		f = this->root->transform->forward * forward * DeltaTime;
 		r = this->root->transform->right * side * DeltaTime;
+
+		rx = ((Input::mouse.scalarY * 2.0f) - 1.0f) * -1.0f * DeltaTime;
 		ry = ((Input::mouse.scalarX * 2.0f) - 1.0f) * DeltaTime;
-		rx = ((Input::mouse.scalarY * 2.0f) - 1.0f) * DeltaTime;
-		if (Input::mouse.scalarX < 0.75f && Input::mouse.scalarX > 0.25f) ry = 0.0f;
-		if (Input::mouse.scalarY < 0.75f && Input::mouse.scalarY > 0.25f) rx = 0.0f;
+		//if (Input::mouse.scalarX < 0.75f && Input::mouse.scalarX > 0.25f) ry = 0.0f;
+		//if (Input::mouse.scalarY < 0.75f && Input::mouse.scalarY > 0.25f) rx = 0.0f;
+#if 0
+		glm::vec3 ray(((Input::mouse.scalarX * 2.0f) - 1.0f), ((Input::mouse.scalarY * 2.0f) - 1.0f), 1.0f);
+		ray = glm::normalize(ray);
+		ray *= glm::normalize(glm::mul(ray, this->root->transform->spaceNormal));
+		rx = ray.x * DeltaTime;
+		ry = ray.y * DeltaTime;
+#endif
 	}
 
 	/*f.y = 0.0f;

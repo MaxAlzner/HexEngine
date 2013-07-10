@@ -92,7 +92,7 @@ vec4 gaussian_blur()
 float shadow_intensity()
 {
 	vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
-	tex_shadow.z -= 0.02;
+	//tex_shadow.z -= 0.02;
 	return texture(shadow_map, tex_shadow);
 	float s = 1.0;
 	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.y * 0.71));
@@ -176,7 +176,7 @@ vec4 main_render()
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, pointLight4_ss[2], pointLight4_color[2].rgb, pointLight4_falloff[2]);
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, pointLight4_ss[3], pointLight4_color[3].rgb, pointLight4_falloff[3]);
 
-	//return vec4(shadow_intensity());
+	return vec4(shadow_intensity());
 	//return vec4(abs(directionalLight_ss), 1.);
 	return vec4(color * albedo, 1.);
 }
