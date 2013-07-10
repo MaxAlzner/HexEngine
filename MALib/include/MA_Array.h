@@ -146,7 +146,6 @@ template <class T> void ARRAY<T>::resize(unsigned int length)
 	else
 	{
 		T* clean = new T[this->size];
-		this->zero();
 		if (this->items > this->size) this->items = this->size;
 		for (unsigned i = 0; i < this->items; i++) 
 			clean[i] = this->data[i];

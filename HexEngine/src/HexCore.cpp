@@ -200,7 +200,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeAttributes();
 	InitializeUniforms();
 
-	MALib::LOG_Outiv("UNIFORMS", (int*)&Uniforms, 17);
+	MALib::LOG_Outiv("UNIFORMS", (int*)&Uniforms, 19);
 	//MALib::LOG_Outiv("ATTRIBUTES", Attributes.pointer(), Attributes.length());
 	
 	MALib::LOG_Message("START INPUT");
@@ -301,7 +301,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	
 	BindEntity(entities[i]);i++;
 	TransformEntity(2.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddShape(Meshes[4]);
+	AddShape(Meshes[0]);
 	AddMaterial(Textures[0], Textures[1]);
 	
 	BindEntity(entities[i]);i++;
@@ -318,11 +318,11 @@ HEX_API bool Unitialize()
 {
 	if (RenderTex != 0) glDeleteTextures(1, &RenderTex);
 	if (RenderDepth != 0) glDeleteTextures(1, &RenderDepth);
-	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);
 	if (ShadowMap != 0) glDeleteTextures(1, &ShadowMap);
+	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);
 	if (ShadowFBO != 0) glDeleteFramebuffers(1, &ShadowFBO);
 
-	UninitializeFont();
+	//UninitializeFont();
 	UninitializeData();
 	UninitializeInput();
 	SDL_Quit();

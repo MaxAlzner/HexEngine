@@ -25,6 +25,7 @@ public:
 	float roughness;
 	float refIndex;
 	MALib::VEC2 uvRepeat;
+	MALib::VEC2 uvOffset;
 	bool shadowCaster;
 
 	static void BuildTexture(GLuint* outID, MALib::SURFACE* texture);

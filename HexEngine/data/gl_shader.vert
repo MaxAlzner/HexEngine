@@ -24,6 +24,7 @@ uniform vec4 pointLight4_ws[4];
 uniform int numOfPointLights;
 
 uniform vec2 uv_repeat;
+uniform vec2 uv_offset;
 
 uniform int flag;
 
@@ -36,7 +37,7 @@ void main()
 		return;
 	}
 	
-	tex_coord = uv * uv_repeat;
+	tex_coord = (uv * uv_repeat) + uv_offset;
 
 	mat4 os_to_cs = ws_to_cs * os_to_ws;
 	mat4 os_to_ls = ws_to_ls * os_to_ws;

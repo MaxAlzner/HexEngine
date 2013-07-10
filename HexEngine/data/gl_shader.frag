@@ -21,7 +21,7 @@ uniform vec4 pointLight4_color[4];
 uniform vec3 pointLight4_falloff[4];
 uniform int numOfPointLights;
 
-uniform vec2 shadow_size;
+uniform float shadow_size;
 uniform vec2[36] random_filter;
 
 uniform int flag;
@@ -55,7 +55,7 @@ do {\
 	float b = gaussian_weights[w] * gr(p, v);\
 	k += b;\
 	g += textureOffset(color_map, tex_coord, ivec2(x, y)) * b;\
-} while (0)
+} while (false)
 vec4 gaussian_blur()
 {
 	float p = average(texture(depth_map, tex_coord).rgb);
@@ -96,7 +96,7 @@ float shadow_intensity()
 	return texture(shadow_map, tex_shadow);
 	float s = 1.0;
 	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.y * 0.71));
-	vec2 incr = vec2(r / shadow_size.x, r / shadow_size.y);
+	vec2 incr = vec2(r / shadow_size);
 	float sum = 0.;
 	for (int i = 0; i < random_filter.length(); i++)
 	{

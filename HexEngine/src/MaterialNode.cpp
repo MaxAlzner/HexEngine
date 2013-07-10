@@ -20,6 +20,7 @@ MaterialNode::MaterialNode()
 	this->roughness = 0.8f;
 	this->refIndex = 1.4f;
 	this->uvRepeat = MALib::VEC2(1.0f, 1.0f);
+	this->uvOffset = MALib::VEC2(0.0f, 0.0f);
 	this->shadowCaster = false;
 }
 MaterialNode::~MaterialNode()
@@ -31,6 +32,7 @@ void MaterialNode::load()
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, this->colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_NORMAL_MAP, this->normalMap);
 	SetUniform(UNIFORM_UV_REPEAT, &this->uvRepeat);
+	SetUniform(UNIFORM_UV_OFFSET, &this->uvOffset);
 }
 void MaterialNode::unload()
 {

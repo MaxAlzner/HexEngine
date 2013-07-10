@@ -16,6 +16,7 @@ struct UniformLocations
 	int pointLight4_falloff;
 	int numOfPointLights;
 	int uv_repeat;
+	int uv_offset;
 	int shadow_size;
 	int random_filter;
 	int color_map;
@@ -57,6 +58,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.pointLight4_falloff = glGetUniformLocation(ShaderProgram, "pointLight4_falloff");
 	Uniforms.numOfPointLights = glGetUniformLocation(ShaderProgram, "numOfPointLights");
 	Uniforms.uv_repeat = glGetUniformLocation(ShaderProgram, "uv_repeat");
+	Uniforms.uv_offset = glGetUniformLocation(ShaderProgram, "uv_offset");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
 	Uniforms.color_map = glGetUniformLocation(ShaderProgram, "color_map");
@@ -148,9 +150,12 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 	case UNIFORM_UV_REPEAT:
 		glUniform2fv(Uniforms.uv_repeat, 1, (const GLfloat*)data);
 		break;
+	case UNIFORM_UV_OFFSET:
+		glUniform2fv(Uniforms.uv_offset, 1, (const GLfloat*)data);
+		break;
 		
 	case UNIFORM_SHADOW_MAP_SIZE:
-		glUniform2fv(Uniforms.shadow_size, 1, (const GLfloat*)data);
+		glUniform1fv(Uniforms.shadow_size, 1, (const GLfloat*)data);
 		break;
 
 	default:
@@ -185,7 +190,7 @@ HEX_API void SetUniform(UNIFORM uniform)
 		glUniform1i(Uniforms.numOfPointLights, numOfPointLights);
 		break;
 		
-	case UNIFORM_FLAG_NONE:
+	case UNIFORM_FLAG_NORMAL:
 		glUniform1i(Uniforms.flag, 0);
 		break;
 	case UNIFORM_FLAG_SHADOW_RENDER:
@@ -280,11 +285,11 @@ HEX_API bool CompileShader(const string filepath, GLenum type, GLint* outShader)
 	if (!compile_status)
 	{
 		//MALib::LOG_Message(file->data);
-		GLint length = 0;
+		/*GLint length = 0;
 		char* buffer = new char[1024];
 		glGetShaderSource(shader, 1024, &length, buffer);
 		MALib::LOG_Message(buffer);
-		delete [] buffer;
+		delete [] buffer;*/
 		return false;
 	}
 
