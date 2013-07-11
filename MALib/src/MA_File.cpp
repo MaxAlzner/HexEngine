@@ -46,10 +46,12 @@ bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 	fread((void*)buffer, 1, size, bufferFile);
 	fclose(bufferFile);
 
+	LOG_Message(buffer);
+
 	unsigned lines = 0;
 	for (unsigned i = 0; i < size; i++)
 	{
-		char ch= *(buffer + i);
+		char ch = buffer[i];
 		if (ch == '\0') break;
 		if (ch == '\n') lines++;
 	}

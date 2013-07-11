@@ -6,7 +6,7 @@ int main()
 	MALib::LOG_Initialize(true);
 	MALib::RANDOM_Initialize();
 
-	MALib::LOG_Message("IMPORTING OBJ");
+	/*MALib::LOG_Message("IMPORTING OBJ");
 	MALib::OBJ_MESH* mesh = 0;
 	MALib::ImportOBJFile("puzzle.obj", &mesh);
 
@@ -31,7 +31,11 @@ int main()
 	
 	MALib::LOG_Message("FREEING OBJ AND BAKE");
 	MALib::FreeOBJMesh(&mesh);
-	MALib::FreeVertexBuffer(&bake);
+	MALib::FreeVertexBuffer(&bake);*/
+
+	MALib::TEXTFILE* shaderFile = 0;
+	MALib::ImportTextFile("gl_shader.frag", &shaderFile);
+	MALib::FreeTextFile(&shaderFile);
 
 	MALib::LOG_Unitialize();
 	return 0;

@@ -60,7 +60,7 @@ MALIB_API void LOG_Out4f(const char* prefix, float v0, float v1, float v2, float
 	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
 	fprintf(LOG_FILE, " %f, %f, %f, %f\n", v0, v1, v2, v3);
 }
-MALIB_API void LOG_Outfv(const char* prefix, float* v, unsigned size)
+MALIB_API void LOG_Outvf(const char* prefix, float* v, unsigned size)
 {
 	if (LOG_FILE == NULL || v == NULL) return;
 	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
@@ -100,7 +100,7 @@ MALIB_API void LOG_Out4i(const char* prefix, int v0, int v1, int v2, int v3)
 	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
 	fprintf(LOG_FILE, " %d, %d, %d, %d\n", v0, v1, v2, v3);
 }
-MALIB_API void LOG_Outiv(const char* prefix, int* v, unsigned size)
+MALIB_API void LOG_Outvi(const char* prefix, int* v, unsigned size)
 {
 	if (LOG_FILE == NULL || v == NULL) return;
 	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
@@ -140,7 +140,7 @@ MALIB_API void LOG_Out4ch(const char* prefix, char v0, char v1, char v2, char v3
 	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
 	fprintf(LOG_FILE, " %c, %c, %c, %c\n", v0, v1, v2, v3);
 }
-MALIB_API void LOG_Outchv(const char* prefix, char* v, unsigned size)
+MALIB_API void LOG_Outvch(const char* prefix, char* v, unsigned size)
 {
 	if (LOG_FILE == NULL || v == NULL) return;
 	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
@@ -180,13 +180,74 @@ MALIB_API void LOG_Out4ptr(const char* prefix, void* v0, void* v1, void* v2, voi
 	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
 	fprintf(LOG_FILE, " %p, %p, %p, %p\n", v0, v1, v2, v3);
 }
-MALIB_API void LOG_OutBool(const char* prefix, bool v)
+MALIB_API void LOG_Outvptr(const char* prefix, void** v, unsigned size)
+{
+	if (LOG_FILE == NULL || v == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	for (unsigned i = 0; i < size; i++)
+	{
+		fprintf(LOG_FILE, " %p", v[i]);
+		if (i < size - 1) fprintf(LOG_FILE, ",");
+	}
+	fprintf(LOG_FILE, "\n");
+}
+MALIB_API void LOG_Out1Bool(const char* prefix, bool v0)
 {
 	if (LOG_FILE == NULL) return;
 	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
 	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
-	if (v) fprintf(LOG_FILE, " true\n");
+	if (v0) fprintf(LOG_FILE, " true\n");
 	else fprintf(LOG_FILE, " false\n");
+}
+MALIB_API void LOG_Out2Bool(const char* prefix, bool v0, bool v1)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	if (v0) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+	if (v1) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+}
+MALIB_API void LOG_Out3Bool(const char* prefix, bool v0, bool v1, bool v2)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	if (v0) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+	if (v1) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+	if (v2) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+}
+MALIB_API void LOG_Out4Bool(const char* prefix, bool v0, bool v1, bool v2, bool v3)
+{
+	if (LOG_FILE == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	if (v0) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+	if (v1) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+	if (v2) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+	if (v3) fprintf(LOG_FILE, " true\n");
+	else fprintf(LOG_FILE, " false\n");
+}
+MALIB_API void LOG_OutvBool(const char* prefix, bool* v, unsigned size)
+{
+	if (LOG_FILE == NULL || v == NULL) return;
+	fprintf(LOG_FILE, "[%8u]", (unsigned)clock());
+	if (prefix != NULL) fprintf(LOG_FILE, " %s", prefix);
+	for (unsigned i = 0; i < size; i++)
+	{
+		if (v[i]) fprintf(LOG_FILE, " true\n");
+		else fprintf(LOG_FILE, " false\n");
+		if (i < size - 1) fprintf(LOG_FILE, ",");
+	}
+	fprintf(LOG_FILE, "\n");
 }
 
 _MALIB_END

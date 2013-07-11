@@ -268,7 +268,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	InitializePostProcess();
-	MainRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
+	//MainRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
 	ShadowRender.build(1024, 1024, false, true);
 	LeftEyeRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
 	RightEyeRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
