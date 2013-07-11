@@ -19,10 +19,14 @@ public:
 	void setShape(ShapeNode* node);
 	void addComponent(ComponentNode* node);
 
+	void parentTo(HexEntity* entity);
+
 	TransformNode* transform;
 	MaterialNode* material;
 	ShapeNode* shape;
 	MALib::ARRAY<ComponentNode*> components;
+	HexEntity* parent;
+	MALib::ARRAY<HexEntity*> children;
 };
 
 HEX_END

@@ -26,12 +26,18 @@ HEX_API typedef enum UNIFORM
 	
 	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000200, 
 	UNIFORM_RANDOM_FILTER                                      = 0x00000210, 
+	UNIFORM_EYE_BRIDGE                                         = 0x00000211, 
+	UNIFORM_GAMMA                                              = 0x00000212, 
+	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000221, 
+	UNIFORM_RIGHT_EYE_COLOR                                    = 0x00000222, 
 	
 	UNIFORM_TEXTURE_COLOR_MAP                                  = 0x00010000, 
 	UNIFORM_TEXTURE_NORMAL_MAP                                 = 0x00020000, 
 	UNIFORM_TEXTURE_SPECULAR_MAP                               = 0x00030000, 
 	UNIFORM_TEXTURE_DEPTH_MAP                                  = 0x00011000, 
 	UNIFORM_TEXTURE_SHADOW_MAP                                 = 0x00012000, 
+	UNIFORM_TEXTURE_LEFT_EYE_MAP                               = 0x00010100, 
+	UNIFORM_TEXTURE_RIGHT_EYE_MAP                              = 0x00010200, 
 	
 	UNIFORM_FLAG_NORMAL                                        = 0x10000000, 
 	UNIFORM_FLAG_SHADOW_RENDER                                 = 0x10000001, 
@@ -39,6 +45,7 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION                  = 0x20000001, 
 	UNIFORM_FLAG_POSTPROCESS_GUASSIAN                          = 0x20000002, 
 	UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN                = 0x20000003, 
+	UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D                     = 0x20000004, 
 };
 
 typedef struct UniformLocations UniformLocations;

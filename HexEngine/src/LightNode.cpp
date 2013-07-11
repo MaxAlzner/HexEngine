@@ -5,7 +5,7 @@ HEX_BEGIN
 
 LightNode::LightNode()
 {
-	this->mode = HEX_LIGHTMODE_NONE;
+	this->mode = LIGHTMODE_NONE;
 	this->intensity = 1.0f;
 	this->color = MALib::COLOR();
 	this->falloff = MALib::VEC3(1.0f, 1.0f, 1.0f);
@@ -16,9 +16,9 @@ LightNode::~LightNode()
 		
 void LightNode::load()
 {
-	if (this->mode == HEX_LIGHTMODE_DIRECTIONAL)
+	if (this->mode == LIGHTMODE_DIRECTIONAL)
 	{
-		glm::vec3 eye = this->root->transform->translation;
+		glm::vec3 eye = this->root->transform->position;
 		glm::vec3 focus = eye + (this->root->transform->forward);
 
 		glm::mat4 view = glm::mat4(1.0f);
@@ -35,7 +35,7 @@ void LightNode::load()
 		SetUniform(UNIFORM_WS_TO_LS, glm::value_ptr(view));
 		//SetUniform(UNIFORM_WS_TO_LS, glm::value_ptr(this->root->transform->space));
 	}
-	else if (this->mode == HEX_LIGHTMODE_POINT)
+	else if (this->mode == LIGHTMODE_POINT)
 	{
 		SetUniform(UNIFORM_ADD_POINT_LIGHT);
 		SetUniform(UNIFORM_POINT_LIGHT_POSITION, glm::value_ptr(this->root->transform->translation));

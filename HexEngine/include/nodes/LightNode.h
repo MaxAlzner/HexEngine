@@ -4,10 +4,10 @@ HEX_BEGIN
 
 HEX_API typedef enum HEX_LIGHTMODE
 {
-	HEX_LIGHTMODE_NONE         = 0, 
-	HEX_LIGHTMODE_DIRECTIONAL  = 1, 
-	HEX_LIGHTMODE_POINT        = 2, 
-	HEX_LIGHTMODE_SPOT         = 3, 
+	LIGHTMODE_NONE         = 0, 
+	LIGHTMODE_DIRECTIONAL  = 1, 
+	LIGHTMODE_POINT        = 2, 
+	LIGHTMODE_SPOT         = 3, 
 };
 
 class LightNode : public ComponentNode

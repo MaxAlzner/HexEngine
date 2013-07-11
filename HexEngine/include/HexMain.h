@@ -56,6 +56,7 @@ typedef char* string;
 //#include "core\HexTimer.h"
 #include "core\HexInput.h"
 #include "core\HexShader.h"
+#include "core\HexRender.h"
 #include "core\HexData.h"
 #include "core\HexText.h"
 #include "core\HexCore.h"

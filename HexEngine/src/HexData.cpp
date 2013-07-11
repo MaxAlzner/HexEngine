@@ -9,6 +9,11 @@ float DeltaTime = 0.0f;
 float AspectRatio = 3.0f / 4.0f;
 uint ScreenDimensions[2] = {800, 600};
 SDL_Surface* ScreenSurface = NULL;
+
+MALib::ARRAY<HexEntity*> Cameras;
+MALib::ARRAY<HexEntity*> Lights;
+MALib::ARRAY<HexEntity*> Skyboxes;
+MALib::ARRAY<HexEntity*> Renderable;
 CameraNode* MainCamera = NULL;
 	
 MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -20,6 +25,11 @@ HexEntity* BoundEntity = NULL;
 HEX_API void InitializeData()
 {
 	MALib::LOG_Message("START ASSET LOADING");
+	
+	Cameras.resize(8);
+	Lights.resize(8);
+	Skyboxes.resize(8);
+	Renderable.resize(32);
 
 	Meshes.resize(24);
 	Textures.resize(48);
@@ -48,17 +58,21 @@ HEX_API void UninitializeData()
 	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);
 	for (unsigned i = 0; i < Entities.length(); i++) delete Entities[i];
 	for (unsigned i = 0; i < Nodes.length(); i++) delete Nodes[i];
+	Cameras.clear();
+	Lights.clear();
+	Skyboxes.clear();
+	Renderable.clear();
 	Meshes.clear();
 	Textures.clear();
 	Entities.clear();
 	Nodes.clear();
 }
 
-HEX_API extern bool IsRunning()
+HEX_API bool IsRunning()
 {
 	return AppRunning;
 }
-HEX_API extern bool ToggleRunning()
+HEX_API bool ToggleRunning()
 {
 	AppRunning = !AppRunning;
 	return AppRunning;
@@ -140,6 +154,13 @@ HEX_API void TransformEntity(float x, float y, float z, float rx, float ry, floa
 	BoundEntity->transform->translate(x, y, z);
 	BoundEntity->transform->rotate(rx, ry, rz);
 }
+HEX_API void ParentEntity(uint parent, uint child)
+{
+	if (parent == 0 || child == 0) return;
+	HexEntity* p = Entities[parent - 1];
+	HexEntity* c = Entities[child - 1];
+	c->parentTo(p);
+}
 
 HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ)
 {
@@ -151,6 +172,7 @@ HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float far
 	node->farZ = farZ;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
+	Cameras.add(BoundEntity);
 	MainCamera = node;
 }
 HEX_API void AddLight(HEX_LIGHTMODE mode, float intensity, float rx, float ry, float rz)
@@ -162,6 +184,7 @@ HEX_API void AddLight(HEX_LIGHTMODE mode, float intensity, float rx, float ry, f
 	BoundEntity->transform->rotate(rx, ry, rz);
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
+	Lights.add(BoundEntity);
 }
 HEX_API void AddController()
 {
@@ -176,6 +199,12 @@ HEX_API void AddSkybox()
 	SkyboxNode* node = new SkyboxNode;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
+	ShapeNode* box = new ShapeNode;
+	MALib::VERTEXBUFFER* mesh = Meshes[6];
+	box->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
+	BoundEntity->setShape(box);
+	Nodes.add(box);
+	Skyboxes.add(BoundEntity);
 }
 
 HEX_API void AddShape(MALib::VERTEXBUFFER* mesh)
@@ -185,6 +214,7 @@ HEX_API void AddShape(MALib::VERTEXBUFFER* mesh)
 	node->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
 	BoundEntity->setShape(node);
 	Nodes.add(node);
+	Renderable.add(BoundEntity);
 }
 HEX_API void AddMaterial(MALib::SURFACE* colorMap, MALib::SURFACE* normalMap)
 {

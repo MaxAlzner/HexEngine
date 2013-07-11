@@ -34,8 +34,11 @@ bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 	fseek(bufferFile, 0, SEEK_END);
 	size = ftell(bufferFile);
 	rewind(bufferFile);
-	if (size < 1) 
+	if (size < 1)
+	{
+		fclose(bufferFile);
 		return false;
+	}
 
 	buffer = new char[size];
 	memset((void*)buffer, 0, sizeof(char) * size);

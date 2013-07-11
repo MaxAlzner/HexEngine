@@ -16,6 +16,9 @@ uniform sampler2D specular_map;
 uniform sampler2D depth_map;
 uniform sampler2DShadow shadow_map;
 
+uniform sampler2D leftEye_map;
+uniform sampler2D rightEye_map;
+
 uniform vec4 directionalLight_color;
 uniform vec4 pointLight4_color[4];
 uniform vec3 pointLight4_falloff[4];
@@ -23,6 +26,10 @@ uniform int numOfPointLights;
 
 uniform float shadow_size;
 uniform vec2[36] random_filter;
+uniform float eye_bridge;
+uniform float gamma;
+uniform vec4 leftEye_color;
+uniform vec4 rightEye_color;
 
 uniform int flag;
 
@@ -44,11 +51,52 @@ float average(vec3 color)
 {
 	return (color.r + color.g + color.b) / 3.;
 }
+float luminance(vec3 color)
+{
+	return (0.2126 * pow(color.r, gamma)) + (0.7152 * pow(color.g, gamma)) + (0.0722  * pow(color.b, gamma));
+}
 float gr(float a, float b)
 {
 	return exp(1. - abs(a - b));
 }
 
+vec4 anaglyphic_3d()
+{
+	vec4 g = vec4(0.);
+	g += vec4(average(texture(leftEye_map, tex_coord).rgb)) * 0.5;
+	g += vec4(average(texture(rightEye_map, tex_coord).rgb)) * 0.5;
+	return g;
+}
+vec4 gaussian_blur()
+{
+	vec4 g = vec4(0.);
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -2)) * gaussian_weights[ 0];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -2)) * gaussian_weights[ 1];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -2)) * gaussian_weights[ 2];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -2)) * gaussian_weights[ 3];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -2)) * gaussian_weights[ 4];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -1)) * gaussian_weights[ 5];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -1)) * gaussian_weights[ 6];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -1)) * gaussian_weights[ 7];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -1)) * gaussian_weights[ 8];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -1)) * gaussian_weights[ 9];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  0)) * gaussian_weights[10];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  0)) * gaussian_weights[11];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  0)) * gaussian_weights[12];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  0)) * gaussian_weights[13];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  0)) * gaussian_weights[14];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  1)) * gaussian_weights[15];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  1)) * gaussian_weights[16];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  1)) * gaussian_weights[17];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  1)) * gaussian_weights[18];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  1)) * gaussian_weights[19];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  2)) * gaussian_weights[20];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  2)) * gaussian_weights[21];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  2)) * gaussian_weights[22];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  2)) * gaussian_weights[23];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  2)) * gaussian_weights[24];
+	return g;
+}
 #define S(x, y, w) \
 do {\
 	float v = average(textureOffset(depth_map, tex_coord, ivec2(x, y)).rgb);\
@@ -56,7 +104,7 @@ do {\
 	k += b;\
 	g += textureOffset(color_map, tex_coord, ivec2(x, y)) * b;\
 } while (false)
-vec4 gaussian_blur()
+vec4 bilateral_gaussian_blur()
 {
 	float p = average(texture(depth_map, tex_coord).rgb);
 	vec4 g = vec4(0.);
@@ -94,6 +142,7 @@ float shadow_intensity()
 	vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
 	//tex_shadow.z -= 0.02;
 	return texture(shadow_map, tex_shadow);
+#if 0
 	float s = 1.0;
 	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.y * 0.71));
 	vec2 incr = vec2(r / shadow_size);
@@ -112,6 +161,7 @@ float shadow_intensity()
 	}
 	float sample_shadow = sum / float(random_filter.length());
 	return clamp(sample_shadow, 0., 1.);
+#endif
 }
 void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in vec3 light_position, in vec3 light_color, in vec3 light_falloff)
 {
@@ -160,8 +210,6 @@ vec4 main_render()
 	vec4 sample_color = texture(color_map, tex_coord);
 	vec3 color = sample_color.rgb;
 
-	if (flag == 2) return vec4(color, 1.);
-	
 	vec4 sample_normal = texture(normal_map, tex_coord);
 	vec3 n = normalize((sample_normal.rgb * 2.) - 1.);
 	vec3 v = normalize(view_ss);
@@ -176,19 +224,33 @@ vec4 main_render()
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, pointLight4_ss[2], pointLight4_color[2].rgb, pointLight4_falloff[2]);
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, pointLight4_ss[3], pointLight4_color[3].rgb, pointLight4_falloff[3]);
 
-	return vec4(shadow_intensity());
+	//return vec4(shadow_intensity());
 	//return vec4(abs(directionalLight_ss), 1.);
 	return vec4(color * albedo, 1.);
 }
 
 void main()
 {
-	if (flag == 1) return;
-	else if (flag > 2)
+	switch (flag)
 	{
-		//outColor = vec4(tex_coord, 0., 1.);
+		case 1:
+		// rendering shadow map
+		return;
+		case 2:
+		outColor = texture(color_map, tex_coord);
+		return;
+		case 4:
 		outColor = gaussian_blur();
 		return;
+		case 5:
+		outColor = bilateral_gaussian_blur();
+		return;
+		case 6:
+		outColor = anaglyphic_3d();
+		return;
+
+		default:
+		outColor = main_render();
+		return;
 	}
-	else outColor = main_render();
 }

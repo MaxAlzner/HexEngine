@@ -12,80 +12,141 @@ void UpdateDeltaTime()
 	Ping = NewPing;
 }
 
-float ScreenPlane[24] = 
-{
-	1.0f, 1.0f, 0.0f, 1.0f, 
-	0.0f, 1.0f, 0.0f, 1.0f, 
-	1.0f, 0.0f, 0.0f, 1.0f, 
-	0.0f, 1.0f, 0.0f, 1.0f, 
-	0.0f, 0.0f, 0.0f, 1.0f, 
-	1.0f, 0.0f, 0.0f, 1.0f, 
-};
-uint ScreenPlaneVAO = 0;
-uint ScreenPlaneBO = 0;
-
-uint ShadowMap = 0;
-uint RenderTex = 0;
-uint RenderDepth = 0;
-uint RenderWidth = 800;
-uint RenderHeight = 600;
-
-uint ShadowFBO = 0;
-uint RenderFBO = 0;
+HexRender MainRender;
+HexRender ShadowRender;
+HexRender LeftEyeRender;
+HexRender RightEyeRender;
 
 HexEntity* torus = 0;
 bool toggle = false;
+
+void BuildScene()
+{
+	uint entities[12];
+	uint i = 0;
+	GenEntities(9, entities);
+
+	BindEntity(entities[i]);i++;
+	AddMaterial(Textures[4]);
+	AddSkybox();
+	
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.0f, 1.0f, -4.0f, 0.0f, 0.0f, 0.0f);
+	AddController();
+
+	BindEntity(entities[i]);i++;
+	TransformEntity(-0.1f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
+	ParentEntity(i - 1, i);
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.1f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
+	ParentEntity(i - 2, i);
+	
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.0f, 1.0f, 0.0f, -50.0f, 60.0f, 0.0f);
+	AddLight(LIGHTMODE_DIRECTIONAL, 1.0f, 0.0f, 0.0f, 0.0f);
+	
+	BindEntity(entities[i]);i++;
+	TransformEntity(2.0f, 2.0f, -3.0f, 0.0f, 0.0f, 0.0f);
+	AddLight(LIGHTMODE_POINT, 1.0f);
+	
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 60.0f);
+	AddShape(Meshes[5]);
+	AddMaterial(Textures[0], Textures[1]);
+	BoundEntity->material->uvRepeat *= MALib::VEC2(8.0f, 4.0f);
+	torus = BoundEntity;
+	
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f);
+	AddShape(Meshes[0]);
+	AddMaterial(Textures[0], Textures[1]);
+	ParentEntity(i - 1, i);
+	
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f);
+	AddShape(Meshes[2]);
+	AddMaterial(Textures[2], Textures[3]);
+	BoundEntity->material->uvRepeat *= MALib::VEC2(4.0f, 4.0f);
+	BoundEntity->transform->scale(8.0f, 8.0f, 8.0f);
+}
 
 HEX_API void OnFrameDraw()
 {
 	if (Paused) return;
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, ShadowFBO);
-	glViewport(0, 0, 1024, 1024);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ResetUniforms();
+#if 0
+	ShadowRender.load();
 
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
-	for (unsigned i = 0; i < Entities.length(); i++)
-	{
-		Entities[i]->render();
-	}
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, RenderFBO);
-	glViewport(0, 0, RenderWidth, RenderHeight);
-	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	ResetUniforms();
-	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap);
-	float ShadowMapSize[2] = {1024.0f, 1024.0f};
-	SetUniform(UNIFORM_SHADOW_MAP_SIZE, ShadowMapSize);
-	for (unsigned i = 0; i < Entities.length(); i++)
-	{
-		Entities[i]->render();
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, RenderFBO);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, RenderWidth, RenderHeight, 0, 0, RenderWidth, RenderHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	
-#if 1
-	if (toggle)
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		SetUniform(UNIFORM_FLAG_POSTPROCESS_GUASSIAN);
-		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, RenderTex);
-		SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, RenderDepth);
-		glBindVertexArray(ScreenPlaneVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
-	}
+	ShadowRender.unload();
 #endif
+	float ShadowMapSize = 1024.0f;
+	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
+	SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
+#if 0
+	MainRender.load();
+
+	SetUniform(UNIFORM_FLAG_NORMAL);
+	float ShadowMapSize = 1024.0f;
+	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
+	SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
+
+	uint rendering = Renderable.length();
+
+	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+	Cameras[0]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	MainRender.unload();
+#endif
+	LeftEyeRender.load();
+
+	SetUniform(UNIFORM_FLAG_NORMAL);
+	
+	Cameras[0]->render();
+	//for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	LeftEyeRender.unload();
+	RightEyeRender.load();
+
+	SetUniform(UNIFORM_FLAG_NORMAL);
+
+	Cameras[1]->render();
+	//for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	RightEyeRender.unload();
+	
+	/*if (toggle)
+	{*/
+		SetTextureSlot(UNIFORM_TEXTURE_LEFT_EYE_MAP, LeftEyeRender.colorMap);
+		SetTextureSlot(UNIFORM_TEXTURE_RIGHT_EYE_MAP, RightEyeRender.colorMap);
+
+		float eyeBridge = 8.0f;
+		float gamma = 2.2f;
+		float leftEye[] = {1.0f, 0.0f, 0.0f, 1.0f};
+		float rightEye[] = {0.0f, 1.0f, 1.0f, 1.0f};
+		SetUniform(UNIFORM_EYE_BRIDGE, &eyeBridge);
+		SetUniform(UNIFORM_GAMMA, &gamma);
+		SetUniform(UNIFORM_LEFT_EYE_COLOR, &leftEye);
+		SetUniform(UNIFORM_RIGHT_EYE_COLOR, &rightEye);
+		
+		PostProcess(UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D);
+	/*}
+	else
+	{
+		MainRender.blit();
+	}*/
 
 	SDL_GL_SwapBuffers();
 }
@@ -128,15 +189,10 @@ HEX_API bool Reshape(uint width, uint height)
 	SDL_WM_SetIcon(icon, 0);
 	SDL_FreeSurface(icon);
 	
-	glViewport(0, 0, width, height);
+	//glViewport(0, 0, width, height);
 	ScreenDimensions[0] = width;
 	ScreenDimensions[1] = height;
-
-#if 0
-	if (RenderTex != 0) glDeleteTextures(1, &RenderTex);
-	if (RenderDepth != 0) glDeleteTextures(1, &RenderDepth);
-	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);
-#endif
+	OnMouseMove(width / 2, height / 2);
 
 	return true;
 }
@@ -211,117 +267,21 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeFont();*/
 	
 	MALib::LOG_Message("START FRAMEBUFFERS");
-	glGenTextures(1, &ShadowMap);
-	glBindTexture(GL_TEXTURE_2D, ShadowMap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	//glTexParameteri( GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-	//MALib::LOG_Out1i("ShadowMap", ShadowMap);
-
-	glGenTextures(1, &RenderTex);
-	glBindTexture(GL_TEXTURE_2D, RenderTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, RenderWidth, RenderHeight, 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	//MALib::LOG_Out1i("RenderTex", RenderTex);
-
-	glGenTextures(1, &RenderDepth);
-	glBindTexture(GL_TEXTURE_2D, RenderDepth);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, RenderWidth, RenderHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-	//MALib::LOG_Out1i("RenderDepth", RenderDepth);
-
-	glGenFramebuffers(1, &ShadowFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, ShadowFBO);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, ShadowMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		MALib::LOG_Message("Shadow map framebuffer not complete.");
-		return false;
-	}
-	//MALib::LOG_Out1i("ShadowFBO", ShadowFBO);
-	
-	glGenFramebuffers(1, &RenderFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, RenderFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, RenderTex, 0);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, RenderDepth, 0);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		MALib::LOG_Message("Render framebuffer not complete.");
-		return false;
-	}
-	//MALib::LOG_Out1i("RenderFBO", RenderFBO);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glGenVertexArrays(1, &ScreenPlaneVAO);
-	glBindVertexArray(ScreenPlaneVAO);
-	glGenBuffers(1, &ScreenPlaneBO);
-	glBindBuffer(GL_ARRAY_BUFFER, ScreenPlaneBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ScreenPlaneBO);
-
-	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), ScreenPlane, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), NULL);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
+	InitializePostProcess();
+	MainRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
+	ShadowRender.build(1024, 1024, false, true);
+	LeftEyeRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
+	RightEyeRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
 	
 	MALib::LOG_Message("START SCENE");
-	uint entities[8];
-	uint i = 0;
-	GenEntities(7, entities);
-
-	BindEntity(entities[i]);i++;
-	AddShape(Meshes[6]);
-	AddMaterial(Textures[4]);
-	AddSkybox();
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 1.0f, -4.0f, 0.0f, 0.0f, 0.0f);
-	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
-	AddController();
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 1.0f, 0.0f, -50.0f, 60.0f, 0.0f);
-	AddLight(HEX_LIGHTMODE_DIRECTIONAL, 1.0f, 0.0f, 0.0f, 0.0f);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(2.0f, 2.0f, -3.0f, 0.0f, 0.0f, 0.0f);
-	AddLight(HEX_LIGHTMODE_POINT, 1.0f);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 60.0f);
-	AddShape(Meshes[5]);
-	AddMaterial(Textures[0], Textures[1]);
-	BoundEntity->material->uvRepeat *= MALib::VEC2(8.0f, 4.0f);
-	torus = BoundEntity;
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(2.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddShape(Meshes[0]);
-	AddMaterial(Textures[0], Textures[1]);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f);
-	AddShape(Meshes[2]);
-	AddMaterial(Textures[2], Textures[3]);
-	BoundEntity->material->uvRepeat *= MALib::VEC2(4.0f, 4.0f);
-	BoundEntity->transform->scale(8.0f, 8.0f, 8.0f);
+	BuildScene();
 	
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;
 }
 HEX_API bool Unitialize()
 {
-	if (RenderTex != 0) glDeleteTextures(1, &RenderTex);
-	if (RenderDepth != 0) glDeleteTextures(1, &RenderDepth);
-	if (ShadowMap != 0) glDeleteTextures(1, &ShadowMap);
-	if (RenderFBO != 0) glDeleteFramebuffers(1, &RenderFBO);
-	if (ShadowFBO != 0) glDeleteFramebuffers(1, &ShadowFBO);
-
+	UninitializePostProcess();
 	//UninitializeFont();
 	UninitializeData();
 	UninitializeInput();

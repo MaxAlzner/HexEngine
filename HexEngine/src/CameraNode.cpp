@@ -21,7 +21,7 @@ void CameraNode::load()
 	if (this->root == NULL) return;
 	if (this->root->transform == NULL) return;
 	
-	glm::vec3 eye = this->root->transform->translation;
+	glm::vec3 eye = this->root->transform->position;
 	glm::vec3 focus = eye + (this->root->transform->forward);
 	this->viewSpace = glm::lookAt(eye, focus, this->root->transform->up);
 	this->perspective = glm::perspective(this->fovAngle, this->aspectRatio, this->nearZ, this->farZ);

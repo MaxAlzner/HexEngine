@@ -62,18 +62,39 @@ void TransformNode::zero()
 void TransformNode::recalculate()
 {
 	this->space = glm::mat4(1.0f);
-	this->space = glm::rotate(space, this->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	this->space = glm::rotate(space, this->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	this->space = glm::rotate(space, this->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	if (this->root->parent != NULL)
+	{
+		this->space *= glm::rotate(this->root->parent->transform->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		this->space *= glm::rotate(this->root->parent->transform->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		this->space *= glm::rotate(this->root->parent->transform->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	}
+	this->space *= glm::rotate(this->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	this->space *= glm::rotate(this->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->space *= glm::rotate(this->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 	this->spaceNormal = glm::mat3(this->space);
+
+	this->position = this->translation;
+	if (this->root->parent != NULL)
+	{
+		this->position += this->root->parent->transform->translation;
+	}
 	
 	this->right =   glm::normalize(glm::mul(glm::vec3(1.0f, 0.0f, 0.0f), this->spaceNormal));
 	this->up =      glm::normalize(glm::mul(glm::vec3(0.0f, 1.0f, 0.0f), this->spaceNormal));
 	this->forward = glm::normalize(glm::mul(glm::vec3(0.0f, 0.0f, 1.0f), this->spaceNormal));
 
 	this->transformation = glm::mat4(1.0f);
+	if (this->root->parent != NULL)
+	{
+		this->transformation *= glm::translate(this->root->parent->transform->translation);
+		this->transformation *= glm::rotate(this->root->parent->transform->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		this->transformation *= glm::rotate(this->root->parent->transform->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		this->transformation *= glm::rotate(this->root->parent->transform->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	}
 	this->transformation *= glm::translate(this->translation);
-	this->transformation *= this->space;
+	this->transformation *= glm::rotate(this->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	this->transformation *= glm::rotate(this->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->transformation *= glm::rotate(this->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 	this->transformation *= glm::scale(this->scaled);
 }
 

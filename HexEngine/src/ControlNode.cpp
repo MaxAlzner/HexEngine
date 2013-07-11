@@ -54,8 +54,8 @@ void ControlNode::onFixedUpdate()
 
 		rx = ((Input::mouse.scalarY * 2.0f) - 1.0f) * -1.0f * DeltaTime;
 		ry = ((Input::mouse.scalarX * 2.0f) - 1.0f) * DeltaTime;
-		//if (Input::mouse.scalarX < 0.75f && Input::mouse.scalarX > 0.25f) ry = 0.0f;
-		//if (Input::mouse.scalarY < 0.75f && Input::mouse.scalarY > 0.25f) rx = 0.0f;
+		if (Input::mouse.scalarX < 0.75f && Input::mouse.scalarX > 0.25f) ry = 0.0f;
+		if (Input::mouse.scalarY < 0.75f && Input::mouse.scalarY > 0.25f) rx = 0.0f;
 #if 0
 		glm::vec3 ray(((Input::mouse.scalarX * 2.0f) - 1.0f), ((Input::mouse.scalarY * 2.0f) - 1.0f), 1.0f);
 		ray = glm::normalize(ray);

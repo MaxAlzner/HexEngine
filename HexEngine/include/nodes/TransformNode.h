@@ -23,6 +23,7 @@ public:
 	glm::vec3 translation;
 	glm::vec3 rotation;
 	glm::vec3 scaled;
+	glm::vec3 position;
 
 	glm::vec3 right;
 	glm::vec3 up;

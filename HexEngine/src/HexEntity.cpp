@@ -9,10 +9,13 @@ HexEntity::HexEntity()
 	this->material = NULL;
 	this->shape = NULL;
 	this->components.resize(8);
+	this->parent = NULL;
+	this->children.resize(8);
 }
 HexEntity::~HexEntity()
 {
 	this->components.clear();
+	this->children.clear();
 }
 
 void HexEntity::start()
@@ -100,6 +103,14 @@ void HexEntity::addComponent(ComponentNode* node)
 	if (this->components.contains(node)) return;
 	this->components.add(node);
 	node->parentTo(this);
+}
+
+void HexEntity::parentTo(HexEntity* entity)
+{
+	if (entity == NULL) return;
+	if (this == entity) return;
+	this->parent = entity;
+	entity->children.add(this);
 }
 
 HEX_END
