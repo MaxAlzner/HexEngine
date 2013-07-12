@@ -25,6 +25,8 @@ _MALIB_BEGIN
 #define MA_RGBA_VIOLET         0x8800FFFF
 #define MA_RGBA_MAGENTA        0xFF00FFFF
 
+typedef struct SURFACE;
+
 enum PIXELFORMAT
 {
 	PIXELFORMAT_NONE         = 0x00000000, 
@@ -46,18 +48,18 @@ enum DRAWMODE
 MALIB_API unsigned int ByteCount(PIXELFORMAT format);
 MALIB_API unsigned int PackColor(unsigned int r, unsigned int g, unsigned int b, unsigned int a, PIXELFORMAT format);
 MALIB_API void UnpackColor(unsigned int c, unsigned int* r, unsigned int* g, unsigned int* b, unsigned int* a, PIXELFORMAT format);
-
 MALIB_API unsigned int BlendColor(unsigned int dest, unsigned int src, PIXELFORMAT format = PIXELFORMAT_NONE);
-MALIB_API void PutPixel(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int color, PIXELFORMAT format);
-MALIB_API int GetPixel(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y);
-MALIB_API void DrawBitmap(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int* image, unsigned int imageWidth, unsigned int imageHeight, PIXELFORMAT format, DRAWMODE option = DRAWMODE_NORMAL);
-MALIB_API void DrawBitmapCell(unsigned int* data, unsigned int width, unsigned int height, unsigned int xDest, unsigned int yDest, unsigned int* image, unsigned int cellColumn, unsigned int cellRow, unsigned int cellWidth, unsigned int cellHeight, unsigned int imageWidth, unsigned int imageHeight, PIXELFORMAT format, DRAWMODE option = DRAWMODE_NORMAL);
-MALIB_API void ClearBitmap(unsigned int* data, unsigned int width, unsigned int height, unsigned int color, PIXELFORMAT format);
-MALIB_API void DrawCircle(unsigned int* data, unsigned int width, unsigned int height, unsigned int cx, unsigned int cy, unsigned int r, unsigned int color, PIXELFORMAT format);
-MALIB_API void DrawBox(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color, PIXELFORMAT format);
-MALIB_API void DrawRectangle(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color, PIXELFORMAT format);
-MALIB_API void DrawLine(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color, PIXELFORMAT format);
-MALIB_API void DrawTriangle(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int color, PIXELFORMAT format);
+
+MALIB_API void PutPixel(SURFACE* surface, unsigned int x, unsigned int y, unsigned int color);
+MALIB_API unsigned int GetPixel(SURFACE* surface, unsigned int x, unsigned int y);
+MALIB_API void DrawBitmap(SURFACE* dest, SURFACE* src, unsigned int x, unsigned int y, DRAWMODE option = DRAWMODE_NORMAL);
+MALIB_API void DrawBitmapCell(SURFACE* dest, SURFACE* src, unsigned int x, unsigned int y, unsigned int cellColumn, unsigned int cellRow, unsigned int cellWidth, unsigned int cellHeight, DRAWMODE option = DRAWMODE_NORMAL);
+MALIB_API void ClearBitmap(SURFACE* surface, unsigned int color);
+MALIB_API void DrawCircle(SURFACE* surface, unsigned int cx, unsigned int cy, unsigned int r, unsigned int color);
+MALIB_API void DrawBox(SURFACE* surface, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color);
+MALIB_API void DrawRectangle(SURFACE* surface, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color);
+MALIB_API void DrawLine(SURFACE* surface, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color);
+MALIB_API void DrawTriangle(SURFACE* surface, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int color);
 
 
 _MALIB_END

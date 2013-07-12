@@ -109,7 +109,6 @@ MALIB_API void UnpackColor(unsigned int c, unsigned int* r, unsigned int* g, uns
 		break;
 	}
 }
-
 MALIB_API unsigned int BlendColor(unsigned int dest, unsigned int src, PIXELFORMAT format)
 {
 	unsigned int a1, r1, g1, b1;
@@ -128,23 +127,31 @@ MALIB_API unsigned int BlendColor(unsigned int dest, unsigned int src, PIXELFORM
 
 	return PackColor(r3, g3, b3, a2, format);
 }
-MALIB_API void PutPixel(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int color, PIXELFORMAT format)
+
+MALIB_API void PutPixel(SURFACE* surface, unsigned int x, unsigned int y, unsigned int color)
 {
-	unsigned index = (y * width) + x;
-	unsigned alpha = 0xFF;
-	UnpackColor(color, NULL, NULL, NULL, NULL, format);
+	if (surface == NULL) return;
+	unsigned index = (y * surface->width) + (x * surface->byteCount);
+	unsigned alpha = 0x00;
+	unsigned red = 0x00;
+	unsigned green = 0x00;
+	unsigned blue = 0x00;
+	UnpackColor(color, &red, &green, &blue, &alpha, surface->format);
+	unsigned pixel = PackColor(red, green, blue, alpha, surface->format);
+	char* dest = (char*)surface->data + index;
 	if (alpha < 0xFF) 
-		data[index] = BlendColor(data[index], color);
+		*((unsigned*)dest) = BlendColor(*((unsigned*)dest), pixel);
 	else 
-		data[index] = color;
+		*((unsigned*)dest) = pixel;
 }
-MALIB_API int GetPixel(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y)
+MALIB_API unsigned int GetPixel(SURFACE* surface, unsigned int x, unsigned int y)
 {
-	if (x > width) return 0;
-	if (y > height) return 0;
-	return *(data + (y * width) + x);
+	if (surface == NULL) return;
+	if (x > surface->width) return 0;
+	if (y > surface->height) return 0;
+	return *((unsigned*)(surface->data + ((y * surface->width) + (x * surface->byteCount))));
 }
-MALIB_API void DrawBitmap(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int* image, unsigned int imageWidth, unsigned int imageHeight, PIXELFORMAT format, DRAWMODE option)
+MALIB_API void DrawBitmap(SURFACE* dest, SURFACE* src, unsigned int x, unsigned int y, DRAWMODE option)
 {
 	unsigned x1 = x;
 	unsigned y1 = y;
@@ -169,7 +176,7 @@ MALIB_API void DrawBitmap(unsigned int* data, unsigned int width, unsigned int h
 		}
 	}
 }
-MALIB_API void DrawBitmapCell(unsigned int* data, unsigned int width, unsigned int height, unsigned int xDest, unsigned int yDest, unsigned int* image, unsigned int cellColumn, unsigned int cellRow, unsigned int cellWidth, unsigned int cellHeight, unsigned int imageWidth, unsigned int imageHeight, PIXELFORMAT format, DRAWMODE option)
+MALIB_API void DrawBitmapCell(SURFACE* dest, SURFACE* src, unsigned int x, unsigned int y, unsigned int cellColumn, unsigned int cellRow, unsigned int cellWidth, unsigned int cellHeight, DRAWMODE option)
 {
 	unsigned xSrc = cellWidth * cellColumn;
 	unsigned ySrc = cellHeight * cellRow;
@@ -189,11 +196,11 @@ MALIB_API void DrawBitmapCell(unsigned int* data, unsigned int width, unsigned i
 		}
 	}
 }
-MALIB_API void ClearBitmap(unsigned int* data, unsigned int width, unsigned int height, unsigned int color, PIXELFORMAT format)
+MALIB_API void ClearBitmap(SURFACE* surface, unsigned int color)
 {
 	DrawBox(data, width, height, 0, 0, width, height, color, format);
 }
-MALIB_API void DrawCircle(unsigned int* data, unsigned int width, unsigned int height, unsigned int cx, unsigned int cy, unsigned int r, unsigned int color, PIXELFORMAT format)
+MALIB_API void DrawCircle(SURFACE* surface, unsigned int cx, unsigned int cy, unsigned int r, unsigned int color)
 {
 	unsigned x1 = cx - r;
 	unsigned y1 = cy - r;
@@ -220,7 +227,7 @@ MALIB_API void DrawCircle(unsigned int* data, unsigned int width, unsigned int h
 		}
 	}
 }
-MALIB_API void DrawBox(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color, PIXELFORMAT format)
+MALIB_API void DrawBox(SURFACE* surface, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color)
 {
 	Clip(x1, y1, 0, 0, width - 1, height - 1);
 	Clip(x2, y2, 0, 0, width - 1, height - 1);
@@ -232,11 +239,11 @@ MALIB_API void DrawBox(unsigned int* data, unsigned int width, unsigned int heig
 		}
 	}
 }
-MALIB_API void DrawRectangle(unsigned int* data, unsigned int width, unsigned int height, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color, PIXELFORMAT format)
+MALIB_API void DrawRectangle(SURFACE* surface, unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned int color)
 {
 	DrawBox(data, width, height, x, y, x + w, y + h, color, format);
 }
-MALIB_API void DrawLine(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color, PIXELFORMAT format)
+MALIB_API void DrawLine(SURFACE* surface, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int color)
 {
 	Clip(x1, y1, 0, 0, width - 1, height - 1);
 	Clip(x2, y2, 0, 0, width - 1, height - 1);
@@ -269,7 +276,7 @@ MALIB_API void DrawLine(unsigned int* data, unsigned int width, unsigned int hei
 		DrawBox(data, width, height, x1, y1, x1 + 1, y2, color, format);
 	}
 }
-MALIB_API void DrawTriangle(unsigned int* data, unsigned int width, unsigned int height, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int color, PIXELFORMAT format)
+MALIB_API void DrawTriangle(SURFACE* surface, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2, unsigned int x3, unsigned int y3, unsigned int color)
 {
 	unsigned xmin = Min(x1, x2, x3);
 	unsigned ymin = Min(y1, y2, y3);

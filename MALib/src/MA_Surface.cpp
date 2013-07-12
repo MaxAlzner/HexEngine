@@ -128,6 +128,70 @@ bool MALIB_API ImportTGAFile(const char* filepath, SURFACE** outSurface)
 	return true;
 }
 
+bool MALIB_API ExportBMPFile(const char* filepath, SURFACE* surface)
+{
+	if (filepath == NULL || surface == NULL) return false;
+
+	FILE* file = 0;
+
+	unsigned char info[54];
+	memset(info, 0, sizeof(unsigned char) * 54);
+	
+	fopen_s(&file, filepath, "wb");
+	if (file == 0) 
+		return false;
+	
+	unsigned bufferSize = surface->width * surface->height * surface->byteCount;
+	
+	info[0] = 'B';
+	info[1] = 'M';
+	*(int*)(&info[2]) = 54 + bufferSize;// file size
+	*(int*)(&info[10]) = 54;
+	*(int*)(&info[14]) = 40;
+	*(int*)(&info[18]) = surface->width;
+	*(int*)(&info[22]) = surface->height;
+	*(int*)(&info[26]) = 1;
+	*(int*)(&info[28]) = surface->byteCount * 8;
+	*(int*)(&info[34]) = bufferSize;
+
+	fwrite(info, sizeof(unsigned char), 54, file);
+	fwrite(surface->data, sizeof(unsigned char), bufferSize, file);
+	fclose(file);
+
+	return true;
+}
+bool MALIB_API ExportTGAFile(const char* filepath, SURFACE* surface)
+{
+	if (filepath == NULL || surface == NULL) return false;
+
+	FILE* file = 0;
+
+	unsigned char type[4];
+	unsigned char info[6];
+	memset(type, 0, sizeof(unsigned char) * 4);
+	memset(info, 0, sizeof(unsigned char) * 6);
+
+	unsigned bufferSize = surface->width * surface->height * surface->byteCount;
+
+	fopen_s(&file, filepath, "wb");
+	if (file == 0) 
+		return false;
+
+	type[2] = 2;
+	*(int*)(&info[0]) = surface->width;
+	*(int*)(&info[2]) = surface->height;
+	info[4] = surface->byteCount * 8;
+	
+	fwrite(&type, sizeof(unsigned char), 3, file);
+	fseek(file, 12, SEEK_SET);
+	fwrite(&info, sizeof(unsigned char), 6, file);
+
+	fwrite(surface->data, sizeof(unsigned char), bufferSize, file);
+	fclose(file);
+
+	return true;
+}
+
 void MALIB_API FreeSurface(SURFACE** surface)
 {
 	delete *surface;

@@ -12,17 +12,23 @@ int main()
 
 	MALib::LOG_Message("BAKING OBJ");
 	MALib::VERTEXBUFFER* bake = 0;
-	MALib::BakeOBJ(mesh, &bake);
+	MALib::BakeOBJ(mesh, &bake);*/
 	
 	MALib::LOG_Message("IMPORTING TGA");
 	MALib::SURFACE* tgaTest = 0;
 	MALib::ImportTGAFile("uv_layout.tga", &tgaTest);
+	//MALib::LOG_Message("EXPORTING TGA");
+	//MALib::ExportTGAFile("uv_layout.tga", tgaTest);
 	
 	MALib::LOG_Message("IMPORTING BMP");
 	MALib::SURFACE* bmpTest = 0;
 	MALib::ImportBMPFile("uv_layout.bmp", &bmpTest);
+	MALib::LOG_Message("EXPORTING BMP");
+	MALib::ExportBMPFile("uv_layout_out.bmp", bmpTest);
+	MALib::LOG_Message("EXPORTING TGA");
+	MALib::ExportTGAFile("uv_layout_out.tga", bmpTest);
 	
-	MALib::LOG_Message("EXPORTING VMP");
+	/*MALib::LOG_Message("EXPORTING VMP");
 	MALib::ExportVMPFile("puzzle.vmp", bake);
 	
 	MALib::LOG_Message("IMPORTING VMP");

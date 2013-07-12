@@ -30,6 +30,9 @@ struct MALIB_API SURFACE
 bool MALIB_API ImportBMPFile(const char* filepath, SURFACE** outSurface);
 bool MALIB_API ImportTGAFile(const char* filepath, SURFACE** outSurface);
 
+bool MALIB_API ExportBMPFile(const char* filepath, SURFACE* surface);
+bool MALIB_API ExportTGAFile(const char* filepath, SURFACE* surface);
+
 void MALIB_API FreeSurface(SURFACE** surface);
 
 _MALIB_END
