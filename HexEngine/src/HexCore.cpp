@@ -18,7 +18,8 @@ HexRender LeftEyeRender;
 HexRender RightEyeRender;
 
 HexEntity* torus = 0;
-bool toggle = false;
+bool toggle = true;
+float gamma = 0.8f;
 
 void BuildScene()
 {
@@ -29,17 +30,19 @@ void BuildScene()
 	BindEntity(entities[i]);i++;
 	AddMaterial(Textures[4]);
 	AddSkybox();
+	BoundEntity->transform->scale(64.0f, 64.0f, 64.0f);
 	
 	BindEntity(entities[i]);i++;
 	TransformEntity(0.0f, 1.0f, -4.0f, 0.0f, 0.0f, 0.0f);
 	AddController();
 
 	BindEntity(entities[i]);i++;
-	TransformEntity(-0.1f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	TransformEntity(-0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
 	ParentEntity(i - 1, i);
+
 	BindEntity(entities[i]);i++;
-	TransformEntity(0.1f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	TransformEntity(0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
 	ParentEntity(i - 2, i);
 	
@@ -111,8 +114,8 @@ HEX_API void OnFrameDraw()
 	SetUniform(UNIFORM_FLAG_NORMAL);
 	
 	Cameras[0]->render();
-	//for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 	LeftEyeRender.unload();
@@ -121,32 +124,29 @@ HEX_API void OnFrameDraw()
 	SetUniform(UNIFORM_FLAG_NORMAL);
 
 	Cameras[1]->render();
-	//for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 	RightEyeRender.unload();
 	
-	/*if (toggle)
-	{*/
+	if (toggle)
+	{
 		SetTextureSlot(UNIFORM_TEXTURE_LEFT_EYE_MAP, LeftEyeRender.colorMap);
 		SetTextureSlot(UNIFORM_TEXTURE_RIGHT_EYE_MAP, RightEyeRender.colorMap);
 
-		float eyeBridge = 8.0f;
-		float gamma = 2.2f;
-		float leftEye[] = {1.0f, 0.0f, 0.0f, 1.0f};
-		float rightEye[] = {0.0f, 1.0f, 1.0f, 1.0f};
-		SetUniform(UNIFORM_EYE_BRIDGE, &eyeBridge);
+		float leftEye[] = {1.0f, 0.0f, 1.0f, 1.0f};
+		float rightEye[] = {0.0f, 1.0f, 0.0f, 1.0f};
 		SetUniform(UNIFORM_GAMMA, &gamma);
 		SetUniform(UNIFORM_LEFT_EYE_COLOR, &leftEye);
 		SetUniform(UNIFORM_RIGHT_EYE_COLOR, &rightEye);
 		
 		PostProcess(UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D);
-	/*}
+	}
 	else
 	{
-		MainRender.blit();
-	}*/
+		LeftEyeRender.blit();
+	}
 
 	SDL_GL_SwapBuffers();
 }
@@ -173,6 +173,8 @@ HEX_API void OnFixedUpdate()
 	
 	torus->transform->rotate(0.0f, 24.0f * DeltaTime, 0.0f);
 	if (Input::GetKey(KEY_SPACE, true)) toggle = !toggle;
+	if (Input::GetKey(KEY_NUMPAD_7)) gamma += 0.01f;
+	if (Input::GetKey(KEY_NUMPAD_4)) gamma -= 0.01f;
 
 	PollControllers();
 }
@@ -256,8 +258,8 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeAttributes();
 	InitializeUniforms();
 
-	MALib::LOG_Outiv("UNIFORMS", (int*)&Uniforms, 19);
-	//MALib::LOG_Outiv("ATTRIBUTES", Attributes.pointer(), Attributes.length());
+	MALib::LOG_Outvi("UNIFORMS", (int*)&Uniforms, 19);
+	MALib::LOG_Outvi("ATTRIBUTES", Attributes.pointer(), Attributes.length());
 	
 	MALib::LOG_Message("START INPUT");
 	InitializeInput();

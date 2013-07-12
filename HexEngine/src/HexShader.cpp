@@ -8,6 +8,7 @@ struct UniformLocations
 	int os_to_ws;
 	int ws_to_cs;
 	int ws_to_ls;
+	int billboard;
 	int projection;
 	int directionalLight_ws;
 	int directionalLight_color;
@@ -19,7 +20,6 @@ struct UniformLocations
 	int uv_offset;
 	int shadow_size;
 	int random_filter;
-	int eye_bridge;
 	int gamma;
 	int leftEye_color;
 	int rightEye_color;
@@ -37,10 +37,12 @@ float pointLight4position_buffer[16];
 float pointLight4color_buffer[16];
 float pointLight4falloff_buffer[16];
 uint numOfPointLights = 0;
+UNIFORM LastFlag = UNIFORM_FLAG_NORMAL;
+UNIFORM CurrentFlag = UNIFORM_FLAG_NORMAL;
 
-HEX_API MALib::ARRAY<GLint> Attributes;
-HEX_API UniformLocations Uniforms;
-HEX_API GLuint ShaderProgram = 0;
+MALib::ARRAY<GLint> Attributes;
+UniformLocations Uniforms;
+GLuint ShaderProgram = 0;
 	
 HEX_API void InitializeAttributes()
 {
@@ -56,6 +58,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.os_to_ws = glGetUniformLocation(ShaderProgram, "os_to_ws");
 	Uniforms.ws_to_cs = glGetUniformLocation(ShaderProgram, "ws_to_cs");
 	Uniforms.ws_to_ls = glGetUniformLocation(ShaderProgram, "ws_to_ls");
+	Uniforms.billboard = glGetUniformLocation(ShaderProgram, "bollboard");
 	Uniforms.projection = glGetUniformLocation(ShaderProgram, "projection");
 	Uniforms.directionalLight_ws = glGetUniformLocation(ShaderProgram, "directionalLight_ws");
 	Uniforms.directionalLight_color = glGetUniformLocation(ShaderProgram, "directionalLight_color");
@@ -67,7 +70,6 @@ HEX_API void InitializeUniforms()
 	Uniforms.uv_offset = glGetUniformLocation(ShaderProgram, "uv_offset");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
-	Uniforms.eye_bridge = glGetUniformLocation(ShaderProgram, "eye_bridge");
 	Uniforms.gamma = glGetUniformLocation(ShaderProgram, "gamma");
 	Uniforms.leftEye_color = glGetUniformLocation(ShaderProgram, "leftEye_color");
 	Uniforms.rightEye_color = glGetUniformLocation(ShaderProgram, "rightEye_color");
@@ -93,6 +95,8 @@ HEX_API void InitializeUniforms()
 	}
 	SetUniform(UNIFORM_RANDOM_FILTER, filter_size / 2, randoms);
 	delete [] randoms;
+
+	CurrentFlag = UNIFORM_FLAG_NORMAL;
 }
 
 HEX_API void SetUniform(UNIFORM uniform, void* data)
@@ -119,6 +123,9 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		break;
 	case UNIFORM_LIGHTSPACE:
 		glUniformMatrix4fv(Uniforms.ws_to_ls, 1, GL_FALSE, (const GLfloat*)data);
+		break;
+	case UNIFORM_BILLBOARD:
+		glUniformMatrix4fv(Uniforms.billboard, 1, GL_FALSE, (const GLfloat*)data);
 		break;
 	case UNIFORM_PROJECTION:
 		glUniformMatrix4fv(Uniforms.projection, 1, GL_FALSE, (const GLfloat*)data);
@@ -169,9 +176,6 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 	case UNIFORM_SHADOW_MAP_SIZE:
 		glUniform1fv(Uniforms.shadow_size, 1, (const GLfloat*)data);
 		break;
-	case UNIFORM_EYE_BRIDGE:
-		glUniform1fv(Uniforms.eye_bridge, 1, (const GLfloat*)data);
-		break;
 	case UNIFORM_GAMMA:
 		glUniform1fv(Uniforms.gamma, 1, (const GLfloat*)data);
 		break;
@@ -200,6 +204,18 @@ HEX_API void SetUniform(UNIFORM uniform, uint stackSize, void* data)
 		break;
 	}
 }
+HEX_API void SetUniform(UNIFORM uniform, bool value)
+{
+	switch (uniform)
+	{
+	case UNIFORM_BILLBOARD:
+		glUniform1i(0, value);
+		break;
+
+	default:
+		break;
+	}
+}
 HEX_API void SetUniform(UNIFORM uniform)
 {
 	switch (uniform)
@@ -216,24 +232,41 @@ HEX_API void SetUniform(UNIFORM uniform)
 		
 	case UNIFORM_FLAG_NORMAL:
 		glUniform1i(Uniforms.flag, 0);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_NORMAL;
 		break;
 	case UNIFORM_FLAG_SHADOW_RENDER:
 		glUniform1i(Uniforms.flag, 1);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_SHADOW_RENDER;
 		break;
 	case UNIFORM_FLAG_BASECOLOR_RENDER:
 		glUniform1i(Uniforms.flag, 2);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_BASECOLOR_RENDER;
 		break;
 	case UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION:
 		glUniform1i(Uniforms.flag, 3);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION;
 		break;
 	case UNIFORM_FLAG_POSTPROCESS_GUASSIAN:
 		glUniform1i(Uniforms.flag, 4);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_GUASSIAN;
 		break;
 	case UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN:
 		glUniform1i(Uniforms.flag, 5);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN;
 		break;
 	case UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D:
 		glUniform1i(Uniforms.flag, 6);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D;
+		break;
+	case UNIFORM_FLAG_PREVIOUS:
+		SetUniform(LastFlag);
 		break;
 
 	default:
@@ -321,8 +354,6 @@ HEX_API bool CompileShader(const string filepath, GLenum type, GLint* outShader)
 
 	if (!compile_status)
 	{
-		MALib::LOG_Message(file->data);
-
 		return false;
 	}
 

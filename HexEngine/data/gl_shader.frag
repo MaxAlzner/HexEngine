@@ -26,7 +26,6 @@ uniform int numOfPointLights;
 
 uniform float shadow_size;
 uniform vec2[36] random_filter;
-uniform float eye_bridge;
 uniform float gamma;
 uniform vec4 leftEye_color;
 uniform vec4 rightEye_color;
@@ -49,6 +48,7 @@ const float r = 5.2;
 
 float average(vec3 color)
 {
+	return (pow(color.r, gamma)) + (pow(color.g, gamma)) + (pow(color.b, gamma));
 	return (color.r + color.g + color.b) / 3.;
 }
 float luminance(vec3 color)
@@ -62,9 +62,13 @@ float gr(float a, float b)
 
 vec4 anaglyphic_3d()
 {
+	float leftEye_value = average(texture(leftEye_map, tex_coord).rgb);
+	float rightEye_value = average(texture(rightEye_map, tex_coord).rgb);
+	vec4 leftChannel = leftEye_color * leftEye_value;
+	vec4 rightChannel = rightEye_color * rightEye_value;
 	vec4 g = vec4(0.);
-	g += vec4(average(texture(leftEye_map, tex_coord).rgb)) * 0.5;
-	g += vec4(average(texture(rightEye_map, tex_coord).rgb)) * 0.5;
+	g += leftChannel * 0.5;
+	g += rightChannel * 0.5;
 	return g;
 }
 vec4 gaussian_blur()

@@ -25,8 +25,14 @@ void CameraNode::load()
 	glm::vec3 focus = eye + (this->root->transform->forward);
 	this->viewSpace = glm::lookAt(eye, focus, this->root->transform->up);
 	this->perspective = glm::perspective(this->fovAngle, this->aspectRatio, this->nearZ, this->farZ);
+	
+	glm::mat4 billboard = glm::mat4(1.0f);
+	billboard *= glm::rotate(-this->root->transform->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	billboard *= glm::rotate(this->root->transform->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	billboard *= glm::rotate(this->root->transform->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
 	SetUniform(UNIFORM_WS_TO_CS, glm::value_ptr(this->viewSpace));
+	SetUniform(UNIFORM_BILLBOARD, glm::value_ptr(billboard));
 	SetUniform(UNIFORM_PROJECTION, glm::value_ptr(this->perspective));
 }
 void CameraNode::unload()

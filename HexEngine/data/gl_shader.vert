@@ -17,6 +17,7 @@ out vec3 pointLight4_ss[4];
 uniform mat4 os_to_ws;
 uniform mat4 ws_to_cs;
 uniform mat4 ws_to_ls;
+uniform mat4 billboard;
 uniform mat4 projection;
 
 uniform vec3 directionalLight_ws;
@@ -25,6 +26,7 @@ uniform int numOfPointLights;
 
 uniform vec2 uv_repeat;
 uniform vec2 uv_offset;
+uniform bool isBillboard;
 
 uniform int flag;
 

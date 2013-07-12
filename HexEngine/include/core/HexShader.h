@@ -12,7 +12,8 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_WORLDSPACE                                         = 0x00000004, 
 	UNIFORM_CAMERASPACE                                        = 0x00000005, 
 	UNIFORM_LIGHTSPACE                                         = 0x00000006, 
-	UNIFORM_PROJECTION                                         = 0x00000007, 
+	UNIFORM_BILLBOARD                                          = 0x00000007, 
+	UNIFORM_PROJECTION                                         = 0x00000008, 
 	
 	UNIFORM_DIRECTIONAL_LIGHT_VECTOR                           = 0x00000010, 
 	UNIFORM_DIRECTIONAL_LIGHT_COLOR                            = 0x00000011, 
@@ -26,8 +27,7 @@ HEX_API typedef enum UNIFORM
 	
 	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000200, 
 	UNIFORM_RANDOM_FILTER                                      = 0x00000210, 
-	UNIFORM_EYE_BRIDGE                                         = 0x00000211, 
-	UNIFORM_GAMMA                                              = 0x00000212, 
+	UNIFORM_GAMMA                                              = 0x00000211, 
 	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000221, 
 	UNIFORM_RIGHT_EYE_COLOR                                    = 0x00000222, 
 	
@@ -46,19 +46,21 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_FLAG_POSTPROCESS_GUASSIAN                          = 0x20000002, 
 	UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN                = 0x20000003, 
 	UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D                     = 0x20000004, 
+	UNIFORM_FLAG_PREVIOUS                                      = 0x11000000, 
 };
 
 typedef struct UniformLocations UniformLocations;
 
-HEX_API extern MALib::ARRAY<GLint> Attributes;
-HEX_API extern UniformLocations Uniforms;
-HEX_API extern GLuint ShaderProgram;
+extern MALib::ARRAY<GLint> Attributes;
+extern UniformLocations Uniforms;
+extern GLuint ShaderProgram;
 
 HEX_API extern void InitializeAttributes();
 HEX_API extern void InitializeUniforms();
 
 HEX_API extern void SetUniform(UNIFORM uniform, void* data);
 HEX_API extern void SetUniform(UNIFORM uniform, uint stackSize, void* data);
+HEX_API extern void SetUniform(UNIFORM uniform, bool value);
 HEX_API extern void SetUniform(UNIFORM uniform);
 HEX_API extern void SetTextureSlot(UNIFORM uniform, GLuint texture);
 HEX_API extern void ResetUniforms();

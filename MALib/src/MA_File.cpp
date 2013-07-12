@@ -31,20 +31,26 @@ bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 		return false;
 
 	rewind(bufferFile);
-	fseek(bufferFile, 0, SEEK_END);
-	size = ftell(bufferFile);
-	rewind(bufferFile);
+	//fseek(bufferFile, 0, SEEK_END);
+	//size = ftell(bufferFile);
+	while (fgetc(bufferFile) != EOF)
+	{
+		size++;
+		if (feof(bufferFile) != 0) break;
+	}
 	if (size < 1)
 	{
 		fclose(bufferFile);
 		return false;
 	}
+	rewind(bufferFile);
 
-	buffer = new char[size];
+	buffer = new char[size + 1];
 	memset((void*)buffer, 0, sizeof(char) * size);
 
 	fread((void*)buffer, 1, size, bufferFile);
 	fclose(bufferFile);
+	buffer[size] = '\0';
 
 	LOG_Message(buffer);
 

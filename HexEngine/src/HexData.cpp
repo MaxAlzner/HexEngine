@@ -49,6 +49,7 @@ HEX_API void InitializeData()
 	RegisterBMP("data/grass01_d.bmp");
 	RegisterBMP("data/grass01_n.bmp");
 	RegisterBMP("data/sky.bmp");
+	RegisterBMP("data/skybox_test.bmp");
 
 	MALib::LOG_Message("END ASSET LOADING");
 }
