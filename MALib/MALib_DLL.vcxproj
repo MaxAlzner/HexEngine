@@ -101,6 +101,7 @@
     <ClCompile Include="src\MA_Counter.cpp" />
     <ClCompile Include="src\MA_Drawing.cpp" />
     <ClCompile Include="src\MA_File.cpp" />
+    <ClCompile Include="src\MA_Rect.cpp" />
     <ClCompile Include="src\MA_Surface.cpp" />
     <ClCompile Include="src\MA_Log.cpp" />
     <ClCompile Include="src\MA_Math.cpp" />
@@ -123,6 +124,7 @@
     <ClInclude Include="include\MA_Math.h" />
     <ClInclude Include="include\MA_Matrix.h" />
     <ClInclude Include="include\MA_OBJ.h" />
+    <ClInclude Include="include\MA_Rect.h" />
     <ClInclude Include="include\MA_Surface.h" />
     <ClInclude Include="include\MA_Random.h" />
     <ClInclude Include="include\MA_Vertex.h" />

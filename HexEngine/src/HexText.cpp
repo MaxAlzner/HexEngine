@@ -39,9 +39,9 @@ HEX_API void DrawString(const char* str, float x, float y)
 	//SDL_FillRect(ScreenSurface, 0, 0x221122);
 	SDL_Surface* text = TTF_RenderText_Solid(font, str, color);
 	SDL_Rect textRect = text->clip_rect;
-	int result = SDL_BlitSurface(text, 0, ScreenSurface, 0);
+	int result = SDL_BlitSurface(text, 0, RenderSurface, 0);
 	SDL_FreeSurface(text);
-	SDL_Flip(ScreenSurface);
+	SDL_Flip(RenderSurface);
 }
 	
 HEX_END

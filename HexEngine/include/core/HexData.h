@@ -6,8 +6,9 @@ extern bool AppRunning;
 extern bool Paused;
 extern float DeltaTime;
 extern float AspectRatio;
-extern uint ScreenDimensions[2];
-extern SDL_Surface* ScreenSurface;
+extern MALib::RECT RenderRect;
+extern MALib::RECT ScreenRect;
+extern SDL_Surface* RenderSurface;
 
 extern MALib::ARRAY<HexEntity*> Cameras;
 extern MALib::ARRAY<HexEntity*> Lights;

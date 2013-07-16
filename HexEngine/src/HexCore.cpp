@@ -34,7 +34,7 @@ void BuildScene()
 	
 	BindEntity(entities[i]);i++;
 	TransformEntity(0.0f, 1.0f, -4.0f, 0.0f, 0.0f, 0.0f);
-	AddController();
+	//AddController();
 
 	BindEntity(entities[i]);i++;
 	TransformEntity(-0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -145,8 +145,7 @@ HEX_API void OnFrameDraw()
 	}
 	else
 	{
-		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, LeftEyeRender.colorMap);
-		PostProcess(UNIFORM_FLAG_BLIT_RENDER);
+		LeftEyeRender.blit();
 	}
 
 	SDL_GL_SwapBuffers();
@@ -182,8 +181,8 @@ HEX_API void OnFixedUpdate()
 
 HEX_API bool Reshape(uint width, uint height)
 {
-	ScreenSurface = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE);
-	if (ScreenSurface == NULL) 
+	RenderSurface = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE);
+	if (RenderSurface == NULL) 
 		return false;
 	
 	SDL_Surface* icon = SDL_LoadBMP("data/icon.bmp");
@@ -193,8 +192,8 @@ HEX_API bool Reshape(uint width, uint height)
 	SDL_FreeSurface(icon);
 	
 	//glViewport(0, 0, width, height);
-	ScreenDimensions[0] = width;
-	ScreenDimensions[1] = height;
+	ScreenRect = MALib::RECT(width, height);
+	RenderRect = ScreenRect;
 	OnMouseMove(width / 2, height / 2);
 
 	return true;
@@ -232,7 +231,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	}*/
 	
 	MALib::LOG_Message("START RESHAPE");
-	Reshape(ScreenDimensions[0], ScreenDimensions[1]);
+	Reshape(ScreenRect.width, ScreenRect.height);
 	
 	MALib::LOG_Message("START GLEW");
 	GLenum glewStatus = glewInit();
@@ -271,10 +270,10 @@ HEX_API bool Initialize(uint argc, string* argv)
 	
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	InitializePostProcess();
-	//MainRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
+	MainRender.build(ScreenRect.width, ScreenRect.height, true, true);
 	ShadowRender.build(1024, 1024, false, true);
-	LeftEyeRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
-	RightEyeRender.build(ScreenDimensions[0], ScreenDimensions[1], true, true);
+	LeftEyeRender.build(ScreenRect.width, ScreenRect.height, true, true);
+	RightEyeRender.build(ScreenRect.width, ScreenRect.height, true, true);
 	
 	MALib::LOG_Message("START SCENE");
 	BuildScene();

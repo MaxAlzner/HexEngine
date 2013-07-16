@@ -21,6 +21,7 @@ public:
 	uint framebuffer;
 	uint colorMap;
 	uint depthMap;
+	MALib::COLOR clear;
 };
 
 extern uint ScreenVAO;

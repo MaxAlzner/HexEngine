@@ -29,6 +29,7 @@ typedef char* string;
 #include "MA_HashTable.h"
 
 #include "MA_Math.h"
+#include "MA_Rect.h"
 #include "MA_Random.h"
 #include "MA_Drawing.h"
 

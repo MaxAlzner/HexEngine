@@ -48,12 +48,13 @@ const float r = 5.2;
 
 float average(vec3 color)
 {
-	return min(pow(color.r, gamma) + pow(color.g, gamma) + pow(color.b, gamma), 1.);
+	return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722  * color.b);
+	return (color.r + color.g + color.b) / 3.;
 	return pow(color.r, gamma) + pow(color.g, gamma) + pow(color.b, gamma);
 }
 float luminance(vec3 color)
 {
-	return min((0.2126 * pow(color.r, gamma)) + (0.7152 * pow(color.g, gamma)) + (0.0722  * pow(color.b, gamma)), 1.);
+	return clamp((0.2126 * pow(color.r, gamma)) + (0.7152 * pow(color.g, gamma)) + (0.0722  * pow(color.b, gamma)), 0., 1.);
 }
 float gr(float a, float b)
 {

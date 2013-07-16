@@ -10,6 +10,7 @@ HexRender::HexRender()
 	this->framebuffer = 0;
 	this->colorMap = 0;
 	this->depthMap = 0;
+	this->clear = MALib::COLOR(0.0f, 0.0f, 0.0f, 1.0f);
 }
 HexRender::~HexRender()
 {
@@ -76,8 +77,8 @@ void HexRender::blit()
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->framebuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	if (this->colorMap != 0) glBlitFramebuffer(0, 0, ScreenDimensions[0], ScreenDimensions[1], 0, 0, this->width, this->height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	if (this->depthMap != 0) glBlitFramebuffer(0, 0, ScreenDimensions[0], ScreenDimensions[1], 0, 0, this->width, this->height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	if (this->colorMap != 0) glBlitFramebuffer(0, 0, this->width, this->height, 0, 0, ScreenRect.width, ScreenRect.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	if (this->depthMap != 0) glBlitFramebuffer(0, 0, this->width, this->height, 0, 0, ScreenRect.width, ScreenRect.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
@@ -116,7 +117,7 @@ void UninitializePostProcess()
 
 void PostProcess(UNIFORM flag)
 {
-	glViewport(0, 0, ScreenDimensions[0], ScreenDimensions[1]);
+	glViewport(0, 0, ScreenRect.width, ScreenRect.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	SetUniform(flag);
 

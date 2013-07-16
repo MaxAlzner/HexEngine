@@ -153,7 +153,7 @@ HEX_API void PollEvents()
 			break;
 			
 		case SDL_ACTIVEEVENT:
-			Paused = !(event.active.gain != 0);
+			//Paused = !(event.active.gain != 0);
 			break;
 		case SDL_QUIT:
 			AppRunning = false;
@@ -189,10 +189,10 @@ HEX_API void OnMouseMove(uint x, uint y)
 	Input::mouse.deltaY = Input::mouse.y - y;
 	Input::mouse.x = x;
 	Input::mouse.y = y;
-	Input::mouse.scalarX = float(Input::mouse.x) / float(ScreenDimensions[0]);
-	Input::mouse.scalarY = float(Input::mouse.y) / float(ScreenDimensions[1]);
-	Input::mouse.scalarDeltaX = float(Input::mouse.deltaX) / float(ScreenDimensions[0]);
-	Input::mouse.scalarDeltaY = float(Input::mouse.deltaY) / float(ScreenDimensions[1]);
+	Input::mouse.scalarX = float(Input::mouse.x) / float(ScreenRect.width);
+	Input::mouse.scalarY = float(Input::mouse.y) / float(ScreenRect.height);
+	Input::mouse.scalarDeltaX = float(Input::mouse.deltaX) / float(ScreenRect.width);
+	Input::mouse.scalarDeltaY = float(Input::mouse.deltaY) / float(ScreenRect.height);
 }
 HEX_API void OnMouseButtonDown(uchar button)
 {
