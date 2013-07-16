@@ -192,6 +192,10 @@ bool MALIB_API ExportTGAFile(const char* filepath, SURFACE* surface)
 	return true;
 }
 
+void MALIB_API CreateSurface(SURFACE** surface, const char* name, unsigned width, unsigned height, PIXELFORMAT format)
+{
+	*surface = new SURFACE(name, width, height, format);
+}
 void MALIB_API FreeSurface(SURFACE** surface)
 {
 	delete *surface;

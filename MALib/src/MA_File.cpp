@@ -31,8 +31,6 @@ bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 		return false;
 
 	rewind(bufferFile);
-	//fseek(bufferFile, 0, SEEK_END);
-	//size = ftell(bufferFile);
 	while (fgetc(bufferFile) != EOF)
 	{
 		size++;
@@ -51,8 +49,6 @@ bool MALIB_API ImportTextFile(const char* filepath, TEXTFILE** outFile)
 	fread((void*)buffer, 1, size, bufferFile);
 	fclose(bufferFile);
 	buffer[size] = '\0';
-
-	LOG_Message(buffer);
 
 	unsigned lines = 0;
 	for (unsigned i = 0; i < size; i++)

@@ -14,7 +14,7 @@ struct MALIB_API COLOR;
 struct MALIB_API COLOR
 {
 	COLOR();
-	COLOR(float a, float r, float g, float b);
+	COLOR(float r, float g, float b, float a);
 	COLOR(float r, float g, float b);
 	COLOR(unsigned int c, PIXELFORMAT format);
 	COLOR(const COLOR& c);
@@ -38,7 +38,7 @@ struct MALIB_API COLOR
 	void operator/=(float scalar);
 	void operator=(const COLOR& c);
 	
-	float a, r, g, b;
+	float r, g, b, a;
 };
 
 _MALIB_END

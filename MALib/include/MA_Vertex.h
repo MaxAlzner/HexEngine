@@ -44,6 +44,7 @@ MALIB_API VEC3 Normalize(VEC3& v);
 MALIB_API VEC2 Normalize(VEC2& v);
 MALIB_API VEC4 Homogenize(VEC4& v);
 
+MALIB_API void CalculateNormal(const VEC4& a, const VEC4& b, const VEC4& c, VEC3* outNormal);
 MALIB_API void CalculateTangent(const VEC3& av, const VEC3& bv, const VEC3& cv, const VEC2& at, const VEC2& bt, const VEC2& ct, VEC3* outTangent, VEC3* outBinormal);
 
 MALIB_API VEC4 Clamp(VEC4& v, float min = 0.0, float max = 1.0, bool affectW = false);

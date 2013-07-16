@@ -25,13 +25,6 @@
 
 #include "..\libraries\glm\ext.hpp"
 
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned int uint;
-typedef unsigned long ulong;
-typedef unsigned long long ulonglong;
-typedef char* string;
-
 #define HEX_API __declspec(dllexport)
 #define USING_GLM_API 
 

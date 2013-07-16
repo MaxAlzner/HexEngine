@@ -245,11 +245,12 @@ HEX_API void SetUniform(UNIFORM uniform)
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_BASECOLOR_RENDER;
 		break;
-	case UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION:
+	case UNIFORM_FLAG_BLIT_RENDER:
 		glUniform1i(Uniforms.flag, 3);
 		LastFlag = CurrentFlag;
-		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION;
+		CurrentFlag = UNIFORM_FLAG_BLIT_RENDER;
 		break;
+
 	case UNIFORM_FLAG_POSTPROCESS_GUASSIAN:
 		glUniform1i(Uniforms.flag, 4);
 		LastFlag = CurrentFlag;
@@ -260,11 +261,24 @@ HEX_API void SetUniform(UNIFORM uniform)
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN;
 		break;
-	case UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D:
+
+	case UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION:
 		glUniform1i(Uniforms.flag, 6);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION;
+		break;
+	case UNIFORM_FLAG_POSTPROCESS_LUMINANCE:
+		glUniform1i(Uniforms.flag, 7);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_LUMINANCE;
+		break;
+
+	case UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D:
+		glUniform1i(Uniforms.flag, 8);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D;
 		break;
+
 	case UNIFORM_FLAG_PREVIOUS:
 		SetUniform(LastFlag);
 		break;

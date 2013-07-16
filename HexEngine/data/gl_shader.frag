@@ -48,12 +48,12 @@ const float r = 5.2;
 
 float average(vec3 color)
 {
-	return (pow(color.r, gamma)) + (pow(color.g, gamma)) + (pow(color.b, gamma));
-	return (color.r + color.g + color.b) / 3.;
+	return min(pow(color.r, gamma) + pow(color.g, gamma) + pow(color.b, gamma), 1.);
+	return pow(color.r, gamma) + pow(color.g, gamma) + pow(color.b, gamma);
 }
 float luminance(vec3 color)
 {
-	return (0.2126 * pow(color.r, gamma)) + (0.7152 * pow(color.g, gamma)) + (0.0722  * pow(color.b, gamma));
+	return min((0.2126 * pow(color.r, gamma)) + (0.7152 * pow(color.g, gamma)) + (0.0722  * pow(color.b, gamma)), 1.);
 }
 float gr(float a, float b)
 {
@@ -71,6 +71,7 @@ vec4 anaglyphic_3d()
 	g += rightChannel * 0.5;
 	return g;
 }
+
 vec4 gaussian_blur()
 {
 	vec4 g = vec4(0.);
@@ -241,15 +242,24 @@ void main()
 		// rendering shadow map
 		return;
 		case 2:
+		case 3:
 		outColor = texture(color_map, tex_coord);
 		return;
+
 		case 4:
 		outColor = gaussian_blur();
 		return;
 		case 5:
 		outColor = bilateral_gaussian_blur();
 		return;
-		case 6:
+
+		case 6:// ambient occlusion
+		return;
+		case 7:// luminance
+		outColor = vec4(luminance(texture(color_map, tex_coord).rgb));
+		return;
+
+		case 8:
 		outColor = anaglyphic_3d();
 		return;
 

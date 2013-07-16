@@ -17,6 +17,13 @@
 #define _MALIB_BEGIN namespace MALib {
 #define _MALIB_END }
 
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
+typedef unsigned long ulong;
+typedef unsigned long long ulonglong;
+typedef char* string;
+
 #include "MA_Array.h"
 #include "MA_List.h"
 #include "MA_HashTable.h"

@@ -145,7 +145,8 @@ HEX_API void OnFrameDraw()
 	}
 	else
 	{
-		LeftEyeRender.blit();
+		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, LeftEyeRender.colorMap);
+		PostProcess(UNIFORM_FLAG_BLIT_RENDER);
 	}
 
 	SDL_GL_SwapBuffers();

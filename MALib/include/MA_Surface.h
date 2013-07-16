@@ -33,6 +33,7 @@ bool MALIB_API ImportTGAFile(const char* filepath, SURFACE** outSurface);
 bool MALIB_API ExportBMPFile(const char* filepath, SURFACE* surface);
 bool MALIB_API ExportTGAFile(const char* filepath, SURFACE* surface);
 
+void MALIB_API CreateSurface(SURFACE** surface, const char* name, unsigned width, unsigned height, PIXELFORMAT format);
 void MALIB_API FreeSurface(SURFACE** surface);
 
 _MALIB_END

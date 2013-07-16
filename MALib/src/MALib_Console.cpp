@@ -6,42 +6,19 @@ int main()
 	MALib::LOG_Initialize(true);
 	MALib::RANDOM_Initialize();
 
-	/*MALib::LOG_Message("IMPORTING OBJ");
-	MALib::OBJ_MESH* mesh = 0;
-	MALib::ImportOBJFile("puzzle.obj", &mesh);
+	MALib::SURFACE* s = new MALib::SURFACE("test image", 512, 512, MALib::PIXELFORMAT_RGBA);
+	MALib::SURFACE* b = new MALib::SURFACE("test image", 64, 64, MALib::PIXELFORMAT_RGBA);
 
-	MALib::LOG_Message("BAKING OBJ");
-	MALib::VERTEXBUFFER* bake = 0;
-	MALib::BakeOBJ(mesh, &bake);*/
-	
-	MALib::LOG_Message("IMPORTING TGA");
-	MALib::SURFACE* tgaTest = 0;
-	MALib::ImportTGAFile("uv_layout.tga", &tgaTest);
-	//MALib::LOG_Message("EXPORTING TGA");
-	//MALib::ExportTGAFile("uv_layout.tga", tgaTest);
-	
-	MALib::LOG_Message("IMPORTING BMP");
-	MALib::SURFACE* bmpTest = 0;
-	MALib::ImportBMPFile("uv_layout.bmp", &bmpTest);
-	MALib::LOG_Message("EXPORTING BMP");
-	MALib::ExportBMPFile("uv_layout_out.bmp", bmpTest);
-	MALib::LOG_Message("EXPORTING TGA");
-	MALib::ExportTGAFile("uv_layout_out.tga", bmpTest);
-	
-	/*MALib::LOG_Message("EXPORTING VMP");
-	MALib::ExportVMPFile("puzzle.vmp", bake);
-	
-	MALib::LOG_Message("IMPORTING VMP");
-	MALib::VERTEXBUFFER* vmpTest = 0;
-	MALib::ImportVMPFile("puzzle.vmp", &vmpTest);
-	
-	MALib::LOG_Message("FREEING OBJ AND BAKE");
-	MALib::FreeOBJMesh(&mesh);
-	MALib::FreeVertexBuffer(&bake);*/
+	MALib::DrawCircle(s, 128, 128, 48, 0xFF2255FF);
+	MALib::DrawBox(s, 156, 32, 256, 160, 0x25BF0288);
+	MALib::DrawLine(s, 24, 24, 384, 480, 0x118899AA);
+	MALib::ClearBitmap(b, 0xDEADBEEF);
+	MALib::DrawCircle(b, 32, 32, 32, 0xBA2357BB);
+	MALib::DrawBitmap(s, b, 160, 148);
 
-	MALib::TEXTFILE* shaderFile = 0;
-	MALib::ImportTextFile("gl_shader.frag", &shaderFile);
-	MALib::FreeTextFile(&shaderFile);
+	MALib::ExportBMPFile("testDraw.bmp", s);
+	MALib::ExportTGAFile("testDraw.tga", s);
+	MALib::FreeSurface(&s);
 
 	MALib::LOG_Unitialize();
 	return 0;

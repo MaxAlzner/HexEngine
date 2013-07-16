@@ -157,6 +157,17 @@ MALIB_API VEC4 Homogenize(VEC4& v)
 	return VEC4(v.x / v.w, v.y / v.w, v.z / v.w, v.w / v.w);
 }
 
+MALIB_API void CalculateNormal(const VEC4& a, const VEC4& b, const VEC4& c, VEC3* outNormal)
+{
+	VEC3 u = CreateVector(a, b);
+	VEC3 v = CreateVector(b, c);
+	VEC3 normal;
+	normal.x = (u.y * v.z) - (u.z * v.y);
+	normal.y = (u.z * v.x) - (u.x * v.z);
+	normal.z = (u.x * v.y) - (u.y * v.x);
+	normal = Normalize(normal);
+	*outNormal = normal;
+}
 MALIB_API void CalculateTangent(const VEC3& av, const VEC3& bv, const VEC3& cv, const VEC2& at, const VEC2& bt, const VEC2& ct, VEC3* outTangent, VEC3* outBinormal)
 {
 	// http://www.terathon.com/code/tangent.html
