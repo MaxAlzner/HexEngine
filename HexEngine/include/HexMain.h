@@ -25,14 +25,7 @@
 
 #include "..\libraries\glm\ext.hpp"
 
-#define HEX_API __declspec(dllexport)
-#define USING_GLM_API 
-
-#define HEX_BEGIN namespace HEX\
-	{\
-		class HexEntity;
-#define HEX_END }
-
+#include "core\HexDef.h"
 #include "core\HexInputDef.h"
 
 #include "nodes\NodeBase.h"

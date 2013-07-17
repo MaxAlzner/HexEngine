@@ -8,7 +8,6 @@ struct UniformLocations
 	int os_to_ws;
 	int ws_to_cs;
 	int ws_to_ls;
-	int billboard;
 	int projection;
 	int directionalLight_ws;
 	int directionalLight_color;
@@ -58,7 +57,6 @@ HEX_API void InitializeUniforms()
 	Uniforms.os_to_ws = glGetUniformLocation(ShaderProgram, "os_to_ws");
 	Uniforms.ws_to_cs = glGetUniformLocation(ShaderProgram, "ws_to_cs");
 	Uniforms.ws_to_ls = glGetUniformLocation(ShaderProgram, "ws_to_ls");
-	Uniforms.billboard = glGetUniformLocation(ShaderProgram, "bollboard");
 	Uniforms.projection = glGetUniformLocation(ShaderProgram, "projection");
 	Uniforms.directionalLight_ws = glGetUniformLocation(ShaderProgram, "directionalLight_ws");
 	Uniforms.directionalLight_color = glGetUniformLocation(ShaderProgram, "directionalLight_color");
@@ -123,9 +121,6 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		break;
 	case UNIFORM_LIGHTSPACE:
 		glUniformMatrix4fv(Uniforms.ws_to_ls, 1, GL_FALSE, (const GLfloat*)data);
-		break;
-	case UNIFORM_BILLBOARD:
-		glUniformMatrix4fv(Uniforms.billboard, 1, GL_FALSE, (const GLfloat*)data);
 		break;
 	case UNIFORM_PROJECTION:
 		glUniformMatrix4fv(Uniforms.projection, 1, GL_FALSE, (const GLfloat*)data);

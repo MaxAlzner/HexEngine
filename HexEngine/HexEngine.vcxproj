@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="include\core\HexCore.h" />
     <ClInclude Include="include\core\HexData.h" />
+    <ClInclude Include="include\core\HexDef.h" />
     <ClInclude Include="include\core\HexEntity.h" />
     <ClInclude Include="include\core\HexInput.h" />
     <ClInclude Include="include\core\HexInputDef.h" />

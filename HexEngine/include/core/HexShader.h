@@ -12,7 +12,6 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_WORLDSPACE                                         = 0x00000004, 
 	UNIFORM_CAMERASPACE                                        = 0x00000005, 
 	UNIFORM_LIGHTSPACE                                         = 0x00000006, 
-	UNIFORM_BILLBOARD                                          = 0x00000007, 
 	UNIFORM_PROJECTION                                         = 0x00000008, 
 	
 	UNIFORM_DIRECTIONAL_LIGHT_VECTOR                           = 0x00000010, 

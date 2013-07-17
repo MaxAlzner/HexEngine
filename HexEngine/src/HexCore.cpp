@@ -149,6 +149,15 @@ HEX_API void OnFrameDraw()
 	}
 
 	SDL_GL_SwapBuffers();
+	
+	GLenum error = glGetError();
+	if (error == GL_INVALID_ENUM) MALib::LOG_Message("GL ERROR GL_INVALID_ENUM");
+	if (error == GL_INVALID_VALUE) MALib::LOG_Message("GL ERROR GL_INVALID_VALUE");
+	if (error == GL_INVALID_OPERATION) MALib::LOG_Message("GL ERROR GL_INVALID_OPERATION");
+	if (error == GL_INVALID_FRAMEBUFFER_OPERATION) MALib::LOG_Message("GL ERROR GL_INVALID_FRAMEBUFFER_OPERATION");
+	if (error == GL_OUT_OF_MEMORY) MALib::LOG_Message("GL ERROR GL_OUT_OF_MEMORY");
+	if (error == GL_STACK_UNDERFLOW) MALib::LOG_Message("GL ERROR GL_STACK_UNDERFLOW");
+	if (error == GL_STACK_OVERFLOW) MALib::LOG_Message("GL ERROR GL_STACK_OVERFLOW");
 }
 HEX_API void OnFrameUpdate()
 {
@@ -258,7 +267,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeAttributes();
 	InitializeUniforms();
 
-	MALib::LOG_Outvi("UNIFORMS", (int*)&Uniforms, 19);
+	MALib::LOG_Outvi("UNIFORMS", (int*)&Uniforms, 25);
 	MALib::LOG_Outvi("ATTRIBUTES", Attributes.pointer(), Attributes.length());
 	
 	MALib::LOG_Message("START INPUT");
