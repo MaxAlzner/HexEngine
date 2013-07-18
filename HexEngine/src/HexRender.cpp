@@ -47,7 +47,7 @@ void HexRender::build(uint width, uint height, bool attachColor, bool attachDept
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
 	}
 
-	if (true)//!attachColor)
+	if (!attachColor)
 	{
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);

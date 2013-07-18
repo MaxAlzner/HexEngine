@@ -203,9 +203,6 @@ HEX_API void SetUniform(UNIFORM uniform, bool value)
 {
 	switch (uniform)
 	{
-	case UNIFORM_BILLBOARD:
-		glUniform1i(0, value);
-		break;
 
 	default:
 		break;

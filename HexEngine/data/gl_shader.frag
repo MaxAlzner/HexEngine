@@ -14,7 +14,7 @@ uniform sampler2D color_map;
 uniform sampler2D normal_map;
 uniform sampler2D specular_map;
 uniform sampler2D depth_map;
-uniform sampler2DShadow shadow_map;
+uniform sampler2D shadow_map;
 
 uniform sampler2D leftEye_map;
 uniform sampler2D rightEye_map;
@@ -145,9 +145,10 @@ vec4 bilateral_gaussian_blur()
 
 float shadow_intensity()
 {
-	vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
+	//vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
 	//tex_shadow.z -= 0.02;
-	return texture(shadow_map, tex_shadow);
+	//return texture(shadow_map, tex_shadow);
+	return 0.;
 #if 0
 	float s = 1.0;
 	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.y * 0.71));
@@ -239,8 +240,8 @@ void main()
 {
 	switch (flag)
 	{
-		case 1:
-		// rendering shadow map
+		case 9://1:// rendering shadow map
+		outColor = vec4(0.);
 		return;
 		case 2:
 		case 3:

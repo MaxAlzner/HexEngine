@@ -18,14 +18,14 @@ HexRender LeftEyeRender;
 HexRender RightEyeRender;
 
 HexEntity* torus = 0;
-bool toggle = true;
+bool Toggle3D = false;
 float gamma = 0.8f;
 
 void BuildScene()
 {
 	uint entities[12];
 	uint i = 0;
-	GenEntities(9, entities);
+	GenEntities(10, entities);
 
 	BindEntity(entities[i]);i++;
 	AddMaterial(Textures[4]);
@@ -37,17 +37,22 @@ void BuildScene()
 	//AddController();
 
 	BindEntity(entities[i]);i++;
-	TransformEntity(-0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	TransformEntity(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
 	ParentEntity(i - 1, i);
 
 	BindEntity(entities[i]);i++;
-	TransformEntity(0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	TransformEntity(-0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
 	ParentEntity(i - 2, i);
+
+	BindEntity(entities[i]);i++;
+	TransformEntity(0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
+	ParentEntity(i - 3, i);
 	
 	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 1.0f, 0.0f, -50.0f, 60.0f, 0.0f);
+	TransformEntity(0.0f, 8.0f, 0.0f, -80.0f, 60.0f, 0.0f);
 	AddLight(LIGHTMODE_DIRECTIONAL, 1.0f, 0.0f, 0.0f, 0.0f);
 	
 	BindEntity(entities[i]);i++;
@@ -80,7 +85,8 @@ HEX_API void OnFrameDraw()
 	if (Paused) return;
 	
 	ResetUniforms();
-#if 0
+
+#if 1
 	ShadowRender.load();
 
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
@@ -88,50 +94,34 @@ HEX_API void OnFrameDraw()
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 	ShadowRender.unload();
-#endif
 	float ShadowMapSize = 1024.0f;
 	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
 	SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
-#if 0
-	MainRender.load();
-
-	SetUniform(UNIFORM_FLAG_NORMAL);
-	float ShadowMapSize = 1024.0f;
-	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
-	SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
-
-	uint rendering = Renderable.length();
-
-	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
-	Cameras[0]->render();
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
-
-	MainRender.unload();
 #endif
-	LeftEyeRender.load();
-
-	SetUniform(UNIFORM_FLAG_NORMAL);
 	
-	Cameras[0]->render();
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
-	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
-
-	LeftEyeRender.unload();
-	RightEyeRender.load();
-
-	SetUniform(UNIFORM_FLAG_NORMAL);
-
-	Cameras[1]->render();
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
-	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
-
-	RightEyeRender.unload();
-	
-	if (toggle)
+	if (Toggle3D)
 	{
+		LeftEyeRender.load();
+
+		SetUniform(UNIFORM_FLAG_NORMAL);
+	
+		Cameras[1]->render();
+		for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+		for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+		for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+		LeftEyeRender.unload();
+		RightEyeRender.load();
+
+		SetUniform(UNIFORM_FLAG_NORMAL);
+
+		Cameras[2]->render();
+		for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+		for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+		for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+		RightEyeRender.unload();
+
 		SetTextureSlot(UNIFORM_TEXTURE_LEFT_EYE_MAP, LeftEyeRender.colorMap);
 		SetTextureSlot(UNIFORM_TEXTURE_RIGHT_EYE_MAP, RightEyeRender.colorMap);
 
@@ -145,8 +135,22 @@ HEX_API void OnFrameDraw()
 	}
 	else
 	{
-		LeftEyeRender.blit();
+		MainRender.load();
+
+		SetUniform(UNIFORM_FLAG_NORMAL);
+		float ShadowMapSize = 1024.0f;
+		SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
+		SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
+	
+		Cameras[0]->render();
+		for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+		for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+		for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+		MainRender.unload();
+		MainRender.blit();
 	}
+	ShadowRender.blit();
 
 	SDL_GL_SwapBuffers();
 	
@@ -181,7 +185,7 @@ HEX_API void OnFixedUpdate()
 	}
 	
 	torus->transform->rotate(0.0f, 24.0f * DeltaTime, 0.0f);
-	if (Input::GetKey(KEY_SPACE, true)) toggle = !toggle;
+	if (Input::GetKey(KEY_NUMPAD_1, true)) Toggle3D = !Toggle3D;
 	if (Input::GetKey(KEY_NUMPAD_7)) gamma += 0.01f;
 	if (Input::GetKey(KEY_NUMPAD_4)) gamma -= 0.01f;
 
@@ -200,7 +204,6 @@ HEX_API bool Reshape(uint width, uint height)
 	SDL_WM_SetIcon(icon, 0);
 	SDL_FreeSurface(icon);
 	
-	//glViewport(0, 0, width, height);
 	ScreenRect = MALib::RECT(width, height);
 	RenderRect = ScreenRect;
 	OnMouseMove(width / 2, height / 2);
@@ -280,7 +283,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	InitializePostProcess();
 	MainRender.build(ScreenRect.width, ScreenRect.height, true, true);
-	ShadowRender.build(1024, 1024, false, true);
+	ShadowRender.build(1024, 1024, true, false);
 	LeftEyeRender.build(ScreenRect.width, ScreenRect.height, true, true);
 	RightEyeRender.build(ScreenRect.width, ScreenRect.height, true, true);
 	
