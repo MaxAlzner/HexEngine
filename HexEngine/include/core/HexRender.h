@@ -14,7 +14,7 @@ public:
 	void unload();
 	void destroy();
 
-	void blit();
+	void blit(HexRender* dest = NULL);
 
 	uint width;
 	uint height;

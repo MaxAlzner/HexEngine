@@ -48,9 +48,7 @@ const float r = 5.2;
 
 float average(vec3 color)
 {
-	return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722  * color.b);
-	return (color.r + color.g + color.b) / 3.;
-	return pow(color.r, gamma) + pow(color.g, gamma) + pow(color.b, gamma);
+	return clamp((0.2126 * color.r) + (0.7152 * color.g) + (0.0722  * color.b), 0., 1.);
 }
 float luminance(vec3 color)
 {
@@ -240,7 +238,7 @@ void main()
 {
 	switch (flag)
 	{
-		case 9://1:// rendering shadow map
+		case 1:// rendering shadow map
 		outColor = vec4(0.);
 		return;
 		case 2:
@@ -258,7 +256,7 @@ void main()
 		case 6:// ambient occlusion
 		return;
 		case 7:// luminance
-		outColor = vec4(luminance(texture(color_map, tex_coord).rgb));
+		outColor = vec4(vec3(luminance(texture(color_map, tex_coord).rgb)), 1.);
 		return;
 
 		case 8:

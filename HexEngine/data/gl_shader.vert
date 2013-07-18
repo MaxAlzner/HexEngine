@@ -35,7 +35,7 @@ void main()
 	if (flag > 2)
 	{
 		tex_coord = vertex.xy;
-		gl_Position = (vertex * 2.) - 1.;
+		gl_Position = vec4((vertex.xy * 2.) - 1., 0., 1.);
 		return;
 	}
 	

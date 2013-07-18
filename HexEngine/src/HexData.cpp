@@ -7,8 +7,8 @@ bool AppRunning = true;
 bool Paused = false;
 float DeltaTime = 0.0f;
 float AspectRatio = 3.0f / 4.0f;
-MALib::RECT RenderRect(800, 600);
-MALib::RECT ScreenRect = RenderRect;
+MALib::RECT RenderRect(1024, 768);
+MALib::RECT ScreenRect(800, 600);
 SDL_Surface* RenderSurface = NULL;
 
 MALib::ARRAY<HexEntity*> Cameras;

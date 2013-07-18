@@ -13,13 +13,15 @@ void UpdateDeltaTime()
 }
 
 HexRender MainRender;
-HexRender ShadowRender;
-HexRender LeftEyeRender;
-HexRender RightEyeRender;
+HexRender ShadowMap;
+//HexRender LeftEyeRender;
+//HexRender RightEyeRender;
+HexRender BrightPass;
+HexRender Luminance;
 
 HexEntity* torus = 0;
 bool Toggle3D = false;
-float gamma = 0.8f;
+float gamma = 2.2f;
 
 void BuildScene()
 {
@@ -87,19 +89,19 @@ HEX_API void OnFrameDraw()
 	ResetUniforms();
 
 #if 1
-	ShadowRender.load();
+	ShadowMap.load();
 
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
-	ShadowRender.unload();
+	ShadowMap.unload();
 	float ShadowMapSize = 1024.0f;
-	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
+	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap.depthMap);
 	SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
 #endif
 	
-	if (Toggle3D)
+	/*if (Toggle3D)
 	{
 		LeftEyeRender.load();
 
@@ -134,13 +136,10 @@ HEX_API void OnFrameDraw()
 		PostProcess(UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D);
 	}
 	else
-	{
+	{*/
 		MainRender.load();
 
 		SetUniform(UNIFORM_FLAG_NORMAL);
-		float ShadowMapSize = 1024.0f;
-		SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowRender.depthMap);
-		SetUniform(UNIFORM_SHADOW_MAP_SIZE, &ShadowMapSize);
 	
 		Cameras[0]->render();
 		for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
@@ -148,9 +147,25 @@ HEX_API void OnFrameDraw()
 		for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 		MainRender.unload();
-		MainRender.blit();
-	}
-	ShadowRender.blit();
+		//MainRender.blit();
+	//}
+	//ShadowRender.blit();
+	//MainRender.blit();
+	
+	//MainRender.blit(&Luminance);
+
+	BrightPass.load();
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
+	SetUniform(UNIFORM_GAMMA, &gamma);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_LUMINANCE);
+	BrightPass.unload();
+
+	//SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, Luminance.colorMap);
+	//PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN);
+	//PostProcess(UNIFORM_FLAG_POSTPROCESS_LUMINANCE);
+
+	BrightPass.blit();
+	//LuminanceRender.blit();
 
 	SDL_GL_SwapBuffers();
 	
@@ -205,8 +220,9 @@ HEX_API bool Reshape(uint width, uint height)
 	SDL_FreeSurface(icon);
 	
 	ScreenRect = MALib::RECT(width, height);
-	RenderRect = ScreenRect;
 	OnMouseMove(width / 2, height / 2);
+
+	glViewport(0, 0, width, height);
 
 	return true;
 }
@@ -282,10 +298,13 @@ HEX_API bool Initialize(uint argc, string* argv)
 	
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	InitializePostProcess();
-	MainRender.build(ScreenRect.width, ScreenRect.height, true, true);
-	ShadowRender.build(1024, 1024, true, false);
-	LeftEyeRender.build(ScreenRect.width, ScreenRect.height, true, true);
-	RightEyeRender.build(ScreenRect.width, ScreenRect.height, true, true);
+
+	MainRender.build(RenderRect.width, RenderRect.height, true, true);
+	ShadowMap.build(1024, 1024, true, false);
+	//LeftEyeRender.build(RenderRect.width, RenderRect.height, true, true);
+	//RightEyeRender.build(RenderRect.width, RenderRect.height, true, true);
+	BrightPass.build(RenderRect.width, RenderRect.height, true, false);
+	Luminance.build(32, 32, true, false);
 	
 	MALib::LOG_Message("START SCENE");
 	BuildScene();
