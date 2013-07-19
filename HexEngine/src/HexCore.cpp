@@ -88,7 +88,7 @@ HEX_API void OnFrameDraw()
 	
 	ResetUniforms();
 
-#if 1
+#if 0
 	ShadowMap.load();
 
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
@@ -147,12 +147,12 @@ HEX_API void OnFrameDraw()
 		for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 		MainRender.unload();
-		//MainRender.blit();
 	//}
 	//ShadowRender.blit();
 	//MainRender.blit();
 	
 	//MainRender.blit(&Luminance);
+#if 1
 
 	BrightPass.load();
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
@@ -166,6 +166,7 @@ HEX_API void OnFrameDraw()
 
 	BrightPass.blit();
 	//LuminanceRender.blit();
+#endif
 
 	SDL_GL_SwapBuffers();
 	
@@ -300,7 +301,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializePostProcess();
 
 	MainRender.build(RenderRect.width, RenderRect.height, true, true);
-	ShadowMap.build(1024, 1024, true, false);
+	//ShadowMap.build(1024, 1024, true, false);
 	//LeftEyeRender.build(RenderRect.width, RenderRect.height, true, true);
 	//RightEyeRender.build(RenderRect.width, RenderRect.height, true, true);
 	BrightPass.build(RenderRect.width, RenderRect.height, true, false);

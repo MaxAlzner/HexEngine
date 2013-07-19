@@ -14,7 +14,7 @@ uniform sampler2D color_map;
 uniform sampler2D normal_map;
 uniform sampler2D specular_map;
 uniform sampler2D depth_map;
-uniform sampler2DShadow shadow_map;
+uniform sampler2D shadow_map;
 
 uniform sampler2D leftEye_map;
 uniform sampler2D rightEye_map;
@@ -48,9 +48,7 @@ const float r = 5.2;
 
 float average(vec3 color)
 {
-	return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722  * color.b);
-	return (color.r + color.g + color.b) / 3.;
-	return pow(color.r, gamma) + pow(color.g, gamma) + pow(color.b, gamma);
+	return clamp((0.2126 * color.r) + (0.7152 * color.g) + (0.0722  * color.b), 0., 1.);
 }
 float luminance(vec3 color)
 {
@@ -145,9 +143,10 @@ vec4 bilateral_gaussian_blur()
 
 float shadow_intensity()
 {
-	vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
+	//vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
 	//tex_shadow.z -= 0.02;
-	return texture(shadow_map, tex_shadow);
+	//return texture(shadow_map, tex_shadow);
+	return 0.;
 #if 0
 	float s = 1.0;
 	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.y * 0.71));
@@ -239,8 +238,8 @@ void main()
 {
 	switch (flag)
 	{
-		case 1:
-		// rendering shadow map
+		case 1:// rendering shadow map
+		outColor = vec4(0.);
 		return;
 		case 2:
 		case 3:
@@ -257,7 +256,7 @@ void main()
 		case 6:// ambient occlusion
 		return;
 		case 7:// luminance
-		outColor = vec4(luminance(texture(color_map, tex_coord).rgb));
+		outColor = vec4(vec3(luminance(texture(color_map, tex_coord).rgb)), 1.);
 		return;
 
 		case 8:
