@@ -18,6 +18,7 @@ struct UniformLocations
 	int uv_repeat;
 	int uv_offset;
 	int shadow_size;
+	int luminance_size;
 	int random_filter;
 	int gamma;
 	int leftEye_color;
@@ -25,6 +26,7 @@ struct UniformLocations
 	int color_map;
 	int normal_map;
 	int specular_map;
+	int luminance_map;
 	int depth_map;
 	int shadow_map;
 	int leftEye_map;
@@ -41,6 +43,7 @@ UNIFORM CurrentFlag = UNIFORM_FLAG_NORMAL;
 
 MALib::ARRAY<GLint> Attributes;
 UniformLocations Uniforms;
+uint NumOfUniforms = 0;
 GLuint ShaderProgram = 0;
 	
 HEX_API void InitializeAttributes()
@@ -67,6 +70,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.uv_repeat = glGetUniformLocation(ShaderProgram, "uv_repeat");
 	Uniforms.uv_offset = glGetUniformLocation(ShaderProgram, "uv_offset");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
+	Uniforms.luminance_size = glGetUniformLocation(ShaderProgram, "luminance_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
 	Uniforms.gamma = glGetUniformLocation(ShaderProgram, "gamma");
 	Uniforms.leftEye_color = glGetUniformLocation(ShaderProgram, "leftEye_color");
@@ -74,11 +78,13 @@ HEX_API void InitializeUniforms()
 	Uniforms.color_map = glGetUniformLocation(ShaderProgram, "color_map");
 	Uniforms.normal_map = glGetUniformLocation(ShaderProgram, "normal_map");
 	Uniforms.specular_map = glGetUniformLocation(ShaderProgram, "specular_map");
+	Uniforms.luminance_map = glGetUniformLocation(ShaderProgram, "luminance_map");
 	Uniforms.depth_map = glGetUniformLocation(ShaderProgram, "depth_map");
 	Uniforms.shadow_map = glGetUniformLocation(ShaderProgram, "shadow_map");
 	Uniforms.leftEye_map = glGetUniformLocation(ShaderProgram, "leftEye_map");
 	Uniforms.rightEye_map = glGetUniformLocation(ShaderProgram, "rightEye_map");
 	Uniforms.flag = glGetUniformLocation(ShaderProgram, "flag");
+	NumOfUniforms = sizeof(Uniforms) / sizeof(int);
 	
 	uint filter_size = 36 * 2;
 	float* randoms = new float[filter_size];
@@ -91,10 +97,23 @@ HEX_API void InitializeUniforms()
 		randoms[i + 0] = x;
 		randoms[i + 1] = y;
 	}
+	MALib::LOG_Outvf("RANDOM FILTER", randoms, filter_size);
 	SetUniform(UNIFORM_RANDOM_FILTER, filter_size / 2, randoms);
 	delete [] randoms;
 
 	CurrentFlag = UNIFORM_FLAG_NORMAL;
+}
+
+HEX_API extern void DebugError(const string action)
+{
+	GLenum error = glGetError();
+	if (error == GL_INVALID_ENUM)                  MALib::LOG_Message(action, "GL ERROR GL_INVALID_ENUM");
+	if (error == GL_INVALID_VALUE)                 MALib::LOG_Message(action, "GL ERROR GL_INVALID_VALUE");
+	if (error == GL_INVALID_OPERATION)             MALib::LOG_Message(action, "GL ERROR GL_INVALID_OPERATION");
+	if (error == GL_INVALID_FRAMEBUFFER_OPERATION) MALib::LOG_Message(action, "GL ERROR GL_INVALID_FRAMEBUFFER_OPERATION");
+	if (error == GL_OUT_OF_MEMORY)                 MALib::LOG_Message(action, "GL ERROR GL_OUT_OF_MEMORY");
+	if (error == GL_STACK_UNDERFLOW)               MALib::LOG_Message(action, "GL ERROR GL_STACK_UNDERFLOW");
+	if (error == GL_STACK_OVERFLOW)                MALib::LOG_Message(action, "GL ERROR GL_STACK_OVERFLOW");
 }
 
 HEX_API void SetUniform(UNIFORM uniform, void* data)
@@ -168,12 +187,6 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		glUniform2fv(Uniforms.uv_offset, 1, (const GLfloat*)data);
 		break;
 		
-	case UNIFORM_SHADOW_MAP_SIZE:
-		glUniform1fv(Uniforms.shadow_size, 1, (const GLfloat*)data);
-		break;
-	case UNIFORM_GAMMA:
-		glUniform1fv(Uniforms.gamma, 1, (const GLfloat*)data);
-		break;
 	case UNIFORM_LEFT_EYE_COLOR:
 		glUniform4fv(Uniforms.leftEye_color, 1, (const GLfloat*)data);
 		break;
@@ -199,10 +212,31 @@ HEX_API void SetUniform(UNIFORM uniform, uint stackSize, void* data)
 		break;
 	}
 }
+HEX_API void SetUniform(UNIFORM uniform, float value)
+{
+	switch (uniform)
+	{
+	case UNIFORM_SHADOW_MAP_SIZE:
+		glUniform1f(Uniforms.shadow_size, (const GLfloat)value);
+		break;
+	case UNIFORM_LUMINANCE_MAP_SIZE:
+		glUniform1f(Uniforms.luminance_size, (const GLfloat)value);
+		break;
+
+	case UNIFORM_GAMMA:
+		glUniform1f(Uniforms.gamma, (const GLfloat)value);
+		break;
+
+	default:
+		break;
+	}
+}
 HEX_API void SetUniform(UNIFORM uniform, bool value)
 {
 	switch (uniform)
 	{
+	case 0:
+		break;
 
 	default:
 		break;
@@ -244,31 +278,42 @@ HEX_API void SetUniform(UNIFORM uniform)
 		break;
 
 	case UNIFORM_FLAG_POSTPROCESS_GUASSIAN:
-		glUniform1i(Uniforms.flag, 4);
+		glUniform1i(Uniforms.flag, 11);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_GUASSIAN;
 		break;
+	case UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE:
+		glUniform1i(Uniforms.flag, 12);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE;
+		break;
 	case UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN:
-		glUniform1i(Uniforms.flag, 5);
+		glUniform1i(Uniforms.flag, 13);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN;
 		break;
 
 	case UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION:
-		glUniform1i(Uniforms.flag, 6);
+		glUniform1i(Uniforms.flag, 21);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION;
 		break;
-	case UNIFORM_FLAG_POSTPROCESS_LUMINANCE:
-		glUniform1i(Uniforms.flag, 7);
+	case UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS:
+		glUniform1i(Uniforms.flag, 22);
 		LastFlag = CurrentFlag;
-		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_LUMINANCE;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS;
 		break;
 
 	case UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D:
-		glUniform1i(Uniforms.flag, 8);
+		glUniform1i(Uniforms.flag, 31);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D;
+		break;
+
+	case UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER:
+		glUniform1i(Uniforms.flag, 32);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER;
 		break;
 
 	case UNIFORM_FLAG_PREVIOUS:
@@ -300,6 +345,12 @@ HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		break;
+	case UNIFORM_TEXTURE_LUMINANCE_MAP:
+		glUniform1i(Uniforms.luminance_map, 4);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		break;
+
 	case UNIFORM_TEXTURE_DEPTH_MAP:
 		glUniform1i(Uniforms.depth_map, 1);
 		glActiveTexture(GL_TEXTURE1);
@@ -310,6 +361,7 @@ HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		break;
+
 	case UNIFORM_TEXTURE_LEFT_EYE_MAP:
 		glUniform1i(Uniforms.leftEye_map, 0);
 		glActiveTexture(GL_TEXTURE0);
@@ -349,9 +401,9 @@ HEX_API bool CompileShader(const string filepath, GLenum type, GLint* outShader)
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 	
 	GLint log_length = 0;
-	char* buffer = new char[256];
+	char* buffer = new char[512];
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
-	glGetShaderInfoLog(shader, 256, &log_length, buffer);
+	glGetShaderInfoLog(shader, 512, &log_length, buffer);
 
 	MALib::LOG_Message("Compiled shader", filepath);
 	if (buffer[0] != '\0') MALib::LOG_Message(buffer);

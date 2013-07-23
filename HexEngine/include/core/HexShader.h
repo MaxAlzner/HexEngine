@@ -25,6 +25,7 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_UV_OFFSET                                          = 0x00000110, 
 	
 	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000200, 
+	UNIFORM_LUMINANCE_MAP_SIZE                                 = 0x00000201, 
 	UNIFORM_RANDOM_FILTER                                      = 0x00000210, 
 	UNIFORM_GAMMA                                              = 0x00000211, 
 	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000221, 
@@ -33,6 +34,7 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_TEXTURE_COLOR_MAP                                  = 0x00010000, 
 	UNIFORM_TEXTURE_NORMAL_MAP                                 = 0x00020000, 
 	UNIFORM_TEXTURE_SPECULAR_MAP                               = 0x00030000, 
+	UNIFORM_TEXTURE_LUMINANCE_MAP                              = 0x00040000, 
 	UNIFORM_TEXTURE_DEPTH_MAP                                  = 0x00011000, 
 	UNIFORM_TEXTURE_SHADOW_MAP                                 = 0x00012000, 
 	UNIFORM_TEXTURE_LEFT_EYE_MAP                               = 0x00010100, 
@@ -43,24 +45,30 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_FLAG_BASECOLOR_RENDER                              = 0x10000002, 
 	UNIFORM_FLAG_BLIT_RENDER                                   = 0x10000003, 
 	UNIFORM_FLAG_POSTPROCESS_GUASSIAN                          = 0x20000001, 
-	UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN                = 0x20000002, 
+	UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE                    = 0x20000002, 
+	UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN                = 0x20000003, 
 	UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION                  = 0x20000010, 
-	UNIFORM_FLAG_POSTPROCESS_LUMINANCE                         = 0x20000020, 
+	UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS                        = 0x20000020, 
 	UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D                     = 0x20001000, 
-	UNIFORM_FLAG_PREVIOUS                                      = 0x11000000, 
+	UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER                      = 0x30000000, 
+	UNIFORM_FLAG_PREVIOUS                                      = 0xFFFFFFF0, 
 };
 
 typedef struct UniformLocations UniformLocations;
 
 extern MALib::ARRAY<GLint> Attributes;
 extern UniformLocations Uniforms;
+extern uint NumOfUniforms;
 extern GLuint ShaderProgram;
 
 HEX_API extern void InitializeAttributes();
 HEX_API extern void InitializeUniforms();
 
+HEX_API extern void DebugError(const string action);
+
 HEX_API extern void SetUniform(UNIFORM uniform, void* data);
 HEX_API extern void SetUniform(UNIFORM uniform, uint stackSize, void* data);
+HEX_API extern void SetUniform(UNIFORM uniform, float value);
 HEX_API extern void SetUniform(UNIFORM uniform, bool value);
 HEX_API extern void SetUniform(UNIFORM uniform);
 HEX_API extern void SetTextureSlot(UNIFORM uniform, GLuint texture);

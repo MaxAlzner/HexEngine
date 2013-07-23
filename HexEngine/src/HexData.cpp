@@ -37,25 +37,27 @@ HEX_API void InitializeData()
 	Entities.resize(32);
 	Nodes.resize(128);
 
-	RegisterVMP("data/capsule.vmp");
-	RegisterVMP("data/cube.vmp");
-	RegisterVMP("data/plane.vmp");
-	RegisterVMP("data/puzzle.vmp");
-	RegisterVMP("data/sphere.vmp");
-	RegisterVMP("data/torus.vmp");
-	RegisterVMP("data/skybox.vmp");
+	RegisterVMP("data/SkyDome.vmp");
+	RegisterVMP("data/EV_Catwalk.vmp");
+	RegisterVMP("data/EV_Landing_Straight.vmp");
+	RegisterVMP("data/EV_Platform.vmp");
+	RegisterVMP("data/EV_Stairs.vmp");
 
-	RegisterBMP("data/tile01_d.bmp");
-	RegisterBMP("data/tile01_n.bmp");
-	RegisterBMP("data/grass01_d.bmp");
-	RegisterBMP("data/grass01_n.bmp");
-	RegisterBMP("data/sky.bmp");
-	RegisterBMP("data/skybox_test.bmp");
+	RegisterBMP("data/CloudsSkyBox.bmp");
+	RegisterTGA("data/EV_Catwalk_D.tga");
+	RegisterTGA("data/EV_Catwalk_N.tga");
+	RegisterTGA("data/EV_Landing_Straight_D.tga");
+	RegisterTGA("data/EV_Landing_Straight_N.tga");
+	RegisterTGA("data/EV_Platform_D.tga");
+	RegisterTGA("data/EV_Platform_N.tga");
+	RegisterTGA("data/EV_Stairs_D.tga");
+	RegisterTGA("data/EV_Stairs_N.tga");
 
 	MALib::LOG_Message("END ASSET LOADING");
 }
 HEX_API void UninitializeData()
 {
+	for (unsigned i = 0; i < Nodes.length(); i++) Nodes[i]->destroy();
 	for (unsigned i = 0; i < Meshes.length(); i++) MALib::FreeVertexBuffer(&Meshes[i]);
 	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);
 	for (unsigned i = 0; i < Entities.length(); i++) delete Entities[i];
@@ -202,7 +204,7 @@ HEX_API void AddSkybox()
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 	ShapeNode* box = new ShapeNode;
-	MALib::VERTEXBUFFER* mesh = Meshes[6];
+	MALib::VERTEXBUFFER* mesh = Meshes[0];
 	box->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
 	BoundEntity->setShape(box);
 	Nodes.add(box);

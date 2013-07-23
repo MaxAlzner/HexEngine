@@ -24,17 +24,17 @@ void LightNode::load()
 		glm::mat4 view = glm::mat4(1.0f);
 		//view *= glm::translate(glm::vec3(0.5f, 0.5f, 0.5f));
 		//view *= glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-		//view *= MainCamera->perspective;
+		view *= MainCamera->perspective;
 
-		view *= glm::lookAt(glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view *= glm::lookAt(glm::vec3(2.0f, 3.2f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		//view *= glm::lookAt(eye, focus, this->root->transform->up);
-		//view *= glm::translate(glm::vec3(0.0f, 0.0f, 1.0f));
+		//view *= glm::lookAt(eye, focus, glm::vec3(0.0f, 1.0f, 0.0f));
+		//view *= glm::scale(0.5f, 0.5f, 0.5f);
 		//view *= this->root->transform->space;
 
 		SetUniform(UNIFORM_DIRECTIONAL_LIGHT_VECTOR, glm::value_ptr(this->root->transform->forward));
 		SetUniform(UNIFORM_DIRECTIONAL_LIGHT_COLOR, &this->color);
 		SetUniform(UNIFORM_WS_TO_LS, glm::value_ptr(view));
-		//SetUniform(UNIFORM_WS_TO_LS, glm::value_ptr(this->root->transform->space));
 	}
 	else if (this->mode == LIGHTMODE_POINT)
 	{

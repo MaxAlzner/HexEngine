@@ -16,8 +16,8 @@ public:
 
 	void blit(HexRender* dest = NULL);
 
-	uint width;
-	uint height;
+	MALib::RECT dimensions;
+	MALib::RECT view;
 	uint framebuffer;
 	uint colorMap;
 	uint depthMap;
