@@ -85,9 +85,10 @@ vec4 ambient_occlusion()
 vec4 bright_pass()
 {
 	vec3 color = texture(color_map, tex_coord).rgb;
+	float depth = 1.;// - average(texture(depth_map, tex_coord).rgb);
 	vec3 brightness = vec3(pow(color.r, gamma), pow(color.g, gamma), pow(color.b, gamma));
 	brightness = clamp(brightness, 0., 1.);
-	return vec4(brightness, 1.);
+	return vec4(brightness * depth, 1.);
 }
 
 vec4 gaussian_blur()

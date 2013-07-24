@@ -131,7 +131,7 @@ HEX_API void OnFrameDraw()
 
 	MainRender.unload();
 	LuminanceCounter++;
-	if (LuminanceCounter <= 30)
+	if (true)//LuminanceCounter >= 30)
 	{
 		BrightPass.load();
 
