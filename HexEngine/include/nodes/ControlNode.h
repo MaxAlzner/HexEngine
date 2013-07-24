@@ -16,6 +16,9 @@ public:
 	void onStart();
 	void onFrameUpdate();
 	void onFixedUpdate();
+
+	glm::vec2 rotation;
+	glm::vec2 sensitivity;
 };
 
 HEX_END

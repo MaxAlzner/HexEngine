@@ -21,6 +21,7 @@ HexRender Luminance;
 
 bool Toggle3D = false;
 bool ToggleLuminance = true;
+uint LuminanceCounter = 0;
 float gamma = 2.2f;
 
 void BuildScene()
@@ -129,23 +130,28 @@ HEX_API void OnFrameDraw()
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 	MainRender.unload();
-	BrightPass.load();
+	LuminanceCounter++;
+	if (LuminanceCounter <= 30)
+	{
+		BrightPass.load();
 
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
-	SetUniform(UNIFORM_GAMMA, gamma);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
+		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
+		SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
+		SetUniform(UNIFORM_GAMMA, gamma);
+		PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
 
-	BrightPass.unload();
-	Luminance.load();
+		BrightPass.unload();
+		Luminance.load();
 
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
+		PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
 
-	Luminance.unload();
+		Luminance.unload();
+		LuminanceCounter = 0;
+	}
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
-	SetUniform(UNIFORM_LUMINANCE_MAP_SIZE, 32.0f);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
 	
 	//Luminance.blit();
@@ -198,8 +204,6 @@ HEX_API bool Reshape(uint width, uint height)
 	ScreenRect = MALib::RECT(width, height);
 	OnMouseMove(width / 2, height / 2);
 
-	//glViewport(0, 0, ScreenRect.width, ScreenRect.height);
-
 	return true;
 }
 HEX_API bool Initialize(uint argc, string* argv)
@@ -226,13 +230,6 @@ HEX_API bool Initialize(uint argc, string* argv)
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	SDL_WM_SetCaption("HexDemo", "HexDemo");
-	
-	/*MALib::LOG_Message("START TTF");
-	if (TTF_Init() < 0)
-	{
-		MALib::LOG_Message("Unable to initialize SDL_TTF.");
-		return false;
-	}*/
 	
 	MALib::LOG_Message("START RESHAPE");
 	Reshape(ScreenRect.width, ScreenRect.height);
@@ -270,8 +267,6 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeInput();
 	MALib::LOG_Message("START DATA");
 	InitializeData();
-	/*MALib::LOG_Message("START FONT");
-	InitializeFont();*/
 	
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	InitializePostProcess();
@@ -293,7 +288,6 @@ HEX_API bool Initialize(uint argc, string* argv)
 HEX_API bool Unitialize()
 {
 	UninitializePostProcess();
-	//UninitializeFont();
 	UninitializeData();
 	UninitializeInput();
 	SDL_Quit();

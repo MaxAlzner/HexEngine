@@ -64,7 +64,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;libfreetype-6.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -86,7 +86,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;libfreetype-6.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL.lib;SDLmain.lib;MALib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -101,7 +101,6 @@
     <ClInclude Include="include\core\HexInput.h" />
     <ClInclude Include="include\core\HexInputDef.h" />
     <ClInclude Include="include\core\HexRender.h" />
-    <ClInclude Include="include\core\HexText.h" />
     <ClInclude Include="include\HexMain.h" />
     <ClInclude Include="include\core\HexShader.h" />
     <ClInclude Include="include\nodes\CameraNode.h" />
@@ -246,7 +245,6 @@
     <ClCompile Include="src\HexMain.cpp" />
     <ClCompile Include="src\HexRender.cpp" />
     <ClCompile Include="src\HexShader.cpp" />
-    <ClCompile Include="src\HexText.cpp" />
     <ClCompile Include="src\LightNode.cpp" />
     <ClCompile Include="src\MaterialNode.cpp" />
     <ClCompile Include="src\NodeBase.cpp" />

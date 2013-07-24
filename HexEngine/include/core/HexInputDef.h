@@ -183,6 +183,7 @@ typedef struct MouseInput
 	bool left;
 	bool right;
 	bool middle;
+	bool active;
 } MouseInput;
 
 typedef struct KeyInput

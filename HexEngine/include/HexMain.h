@@ -11,15 +11,8 @@
 
 #include <Windows.h>
 
-/*#include <ft2build.h>
-#include <freetype.h>
-#include <ftglyph.h>
-#include <ftoutln.h>
-#include <fttrigon.h>*/
-
 #include <glew.h>
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 #include <MALib.h>
 
@@ -39,10 +32,8 @@
 #include "nodes\SkyboxNode.h"
 
 #include "core\HexEntity.h"
-//#include "core\HexTimer.h"
 #include "core\HexInput.h"
 #include "core\HexShader.h"
 #include "core\HexRender.h"
 #include "core\HexData.h"
-#include "core\HexText.h"
 #include "core\HexCore.h"

@@ -153,7 +153,7 @@ HEX_API void PollEvents()
 			break;
 			
 		case SDL_ACTIVEEVENT:
-			//Paused = !(event.active.gain != 0);
+			Input::mouse.active = event.active.gain;
 			break;
 		case SDL_QUIT:
 			AppRunning = false;
