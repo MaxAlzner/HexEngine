@@ -49,6 +49,9 @@ const float roughness = 0.6;
 const float ref_index = 1.2;
 const float r = 5.2;
 
+const float middle_gray = 0.18;
+const float white_cutoff = 0.8;
+
 float average(vec3 v)
 {
 	return (v.r + v.g + v.b) / 3.;
@@ -85,10 +88,18 @@ vec4 ambient_occlusion()
 vec4 bright_pass()
 {
 	vec3 color = texture(color_map, tex_coord).rgb;
-	float depth = 1.;// - average(texture(depth_map, tex_coord).rgb);
+#if 0
 	vec3 brightness = vec3(pow(color.r, gamma), pow(color.g, gamma), pow(color.b, gamma));
 	brightness = clamp(brightness, 0., 1.);
-	return vec4(brightness * depth, 1.);
+	return vec4(brightness, 1.);
+#else
+	color *= middle_gray + 0.08;
+	color *= (1. + (color / (white_cutoff * white_cutoff)));
+	color -= 5.;
+
+	color /= (10. + color);
+	return vec4(color, 1.);
+#endif
 }
 
 vec4 gaussian_blur()
