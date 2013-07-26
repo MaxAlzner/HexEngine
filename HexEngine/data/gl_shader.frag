@@ -35,7 +35,17 @@ uniform vec4 rightEye_color;
 
 uniform int flag;
 
-uniform float gaussian_weights[25] = 
+uniform float gaussian_weights_7x7[49] = 
+float[49](
+	0.000001, 0.000020, 0.000171, 0.000352, 0.000171, 0.000020, 0.000001, 
+	0.000020, 0.000722, 0.006262, 0.012865, 0.006262, 0.000722, 0.000020, 
+	0.000171, 0.006262, 0.054300, 0.111555, 0.054300, 0.006262, 0.000171, 
+	0.000352, 0.012865, 0.111555, 0.229183, 0.111555, 0.012865, 0.000352, 
+	0.000171, 0.006262, 0.054300, 0.111555, 0.054300, 0.006262, 0.000171, 
+	0.000020, 0.000722, 0.006262, 0.012865, 0.006262, 0.000722, 0.000020, 
+	0.000001, 0.000020, 0.000171, 0.000352, 0.000171, 0.000020, 0.000001
+);
+uniform float gaussian_weights_5x5[25] = 
 float[25](
 	0.000722, 0.006262, 0.012865, 0.006262, 0.000722, 
 	0.006262, 0.054300, 0.111555, 0.054300, 0.006262, 
@@ -49,6 +59,7 @@ const float roughness = 0.6;
 const float ref_index = 1.2;
 const float r = 5.2;
 
+const vec3 reinhard = vec3(0.2126, 0.7152, 0.0722);
 const float middle_gray = 0.18;
 const float white_cutoff = 0.8;
 
@@ -88,53 +99,100 @@ vec4 ambient_occlusion()
 vec4 bright_pass()
 {
 	vec3 color = texture(color_map, tex_coord).rgb;
-#if 0
+#if 1
 	vec3 brightness = vec3(pow(color.r, gamma), pow(color.g, gamma), pow(color.b, gamma));
-	brightness = clamp(brightness, 0., 1.);
-	return vec4(brightness, 1.);
+	brightness = clamp(brightness, 0., white_cutoff);
 #else
-	color *= middle_gray + 0.08;
-	color *= (1. + (color / (white_cutoff * white_cutoff)));
-	color -= 5.;
-
-	color /= (10. + color);
-	return vec4(color, 1.);
+	vec3 brightness = color;
 #endif
+	return vec4(brightness, 1.);
 }
 
 vec4 gaussian_blur()
 {
 	vec4 g = vec4(0.);
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -2)) * gaussian_weights[ 0];
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -2)) * gaussian_weights[ 1];
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -2)) * gaussian_weights[ 2];
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -2)) * gaussian_weights[ 3];
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -2)) * gaussian_weights[ 4];
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -1)) * gaussian_weights[ 5];
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -1)) * gaussian_weights[ 6];
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -1)) * gaussian_weights[ 7];
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -1)) * gaussian_weights[ 8];
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -1)) * gaussian_weights[ 9];
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  0)) * gaussian_weights[10];
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  0)) * gaussian_weights[11];
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  0)) * gaussian_weights[12];
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  0)) * gaussian_weights[13];
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  0)) * gaussian_weights[14];
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  1)) * gaussian_weights[15];
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  1)) * gaussian_weights[16];
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  1)) * gaussian_weights[17];
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  1)) * gaussian_weights[18];
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  1)) * gaussian_weights[19];
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  2)) * gaussian_weights[20];
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  2)) * gaussian_weights[21];
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  2)) * gaussian_weights[22];
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  2)) * gaussian_weights[23];
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  2)) * gaussian_weights[24];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -2)) * gaussian_weights_5x5[ 0];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -2)) * gaussian_weights_5x5[ 1];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -2)) * gaussian_weights_5x5[ 2];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -2)) * gaussian_weights_5x5[ 3];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -2)) * gaussian_weights_5x5[ 4];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -1)) * gaussian_weights_5x5[ 5];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -1)) * gaussian_weights_5x5[ 6];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -1)) * gaussian_weights_5x5[ 7];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -1)) * gaussian_weights_5x5[ 8];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -1)) * gaussian_weights_5x5[ 9];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  0)) * gaussian_weights_5x5[10];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  0)) * gaussian_weights_5x5[11];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  0)) * gaussian_weights_5x5[12];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  0)) * gaussian_weights_5x5[13];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  0)) * gaussian_weights_5x5[14];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  1)) * gaussian_weights_5x5[15];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  1)) * gaussian_weights_5x5[16];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  1)) * gaussian_weights_5x5[17];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  1)) * gaussian_weights_5x5[18];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  1)) * gaussian_weights_5x5[19];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  2)) * gaussian_weights_5x5[20];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  2)) * gaussian_weights_5x5[21];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  2)) * gaussian_weights_5x5[22];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  2)) * gaussian_weights_5x5[23];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  2)) * gaussian_weights_5x5[24];
 	return g;
 }
 vec4 gaussian_blur_large()
 {
 	vec4 g = vec4(0.);
+#if 1
+	g += textureOffset(color_map, tex_coord, ivec2(-3,  3)) * gaussian_weights_7x7[ 0];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  3)) * gaussian_weights_7x7[ 1];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  3)) * gaussian_weights_7x7[ 2];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  3)) * gaussian_weights_7x7[ 3];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  3)) * gaussian_weights_7x7[ 4];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  3)) * gaussian_weights_7x7[ 5];
+	g += textureOffset(color_map, tex_coord, ivec2( 3,  3)) * gaussian_weights_7x7[ 6];
+	g += textureOffset(color_map, tex_coord, ivec2(-3,  2)) * gaussian_weights_7x7[ 7];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  2)) * gaussian_weights_7x7[ 8];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  2)) * gaussian_weights_7x7[ 9];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  2)) * gaussian_weights_7x7[10];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  2)) * gaussian_weights_7x7[11];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  2)) * gaussian_weights_7x7[12];
+	g += textureOffset(color_map, tex_coord, ivec2( 3,  2)) * gaussian_weights_7x7[13];
+	g += textureOffset(color_map, tex_coord, ivec2(-3,  1)) * gaussian_weights_7x7[14];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  1)) * gaussian_weights_7x7[15];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  1)) * gaussian_weights_7x7[16];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  1)) * gaussian_weights_7x7[17];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  1)) * gaussian_weights_7x7[18];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  1)) * gaussian_weights_7x7[19];
+	g += textureOffset(color_map, tex_coord, ivec2( 3,  1)) * gaussian_weights_7x7[20];
+	g += textureOffset(color_map, tex_coord, ivec2(-3,  0)) * gaussian_weights_7x7[21];
+	g += textureOffset(color_map, tex_coord, ivec2(-2,  0)) * gaussian_weights_7x7[22];
+	g += textureOffset(color_map, tex_coord, ivec2(-1,  0)) * gaussian_weights_7x7[23];
+	g += textureOffset(color_map, tex_coord, ivec2( 0,  0)) * gaussian_weights_7x7[24];
+	g += textureOffset(color_map, tex_coord, ivec2( 1,  0)) * gaussian_weights_7x7[25];
+	g += textureOffset(color_map, tex_coord, ivec2( 2,  0)) * gaussian_weights_7x7[26];
+	g += textureOffset(color_map, tex_coord, ivec2( 3,  0)) * gaussian_weights_7x7[27];
+	g += textureOffset(color_map, tex_coord, ivec2(-3, -1)) * gaussian_weights_7x7[28];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -1)) * gaussian_weights_7x7[29];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -1)) * gaussian_weights_7x7[30];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -1)) * gaussian_weights_7x7[31];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -1)) * gaussian_weights_7x7[32];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -1)) * gaussian_weights_7x7[33];
+	g += textureOffset(color_map, tex_coord, ivec2( 3, -1)) * gaussian_weights_7x7[34];
+	g += textureOffset(color_map, tex_coord, ivec2(-3, -2)) * gaussian_weights_7x7[35];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -2)) * gaussian_weights_7x7[36];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -2)) * gaussian_weights_7x7[37];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -2)) * gaussian_weights_7x7[38];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -2)) * gaussian_weights_7x7[39];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -2)) * gaussian_weights_7x7[40];
+	g += textureOffset(color_map, tex_coord, ivec2( 3, -2)) * gaussian_weights_7x7[41];
+	g += textureOffset(color_map, tex_coord, ivec2(-3, -3)) * gaussian_weights_7x7[42];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, -3)) * gaussian_weights_7x7[43];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, -3)) * gaussian_weights_7x7[44];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, -3)) * gaussian_weights_7x7[45];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, -3)) * gaussian_weights_7x7[46];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, -3)) * gaussian_weights_7x7[47];
+	g += textureOffset(color_map, tex_coord, ivec2( 3, -3)) * gaussian_weights_7x7[48];
+	return g;
+#else
 	g += textureOffset(color_map, tex_coord, ivec2(-5,  5));
 	g += textureOffset(color_map, tex_coord, ivec2(-4,  5));
 	g += textureOffset(color_map, tex_coord, ivec2(-3,  5));
@@ -257,11 +315,12 @@ vec4 gaussian_blur_large()
 	g += textureOffset(color_map, tex_coord, ivec2( 4, -5));
 	g += textureOffset(color_map, tex_coord, ivec2( 5, -5));
 	return g / 121.;
+#endif
 }
 #define S(x, y, w) \
 do {\
 	float v = average(textureOffset(depth_map, tex_coord, ivec2(x, y)).rgb);\
-	float b = gaussian_weights[w] * gr(p, v);\
+	float b = gaussian_weights_5x5[w] * gr(p, v);\
 	k += b;\
 	g += textureOffset(color_map, tex_coord, ivec2(x, y)) * b;\
 } while (false)
@@ -343,7 +402,7 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in vec3 light_po
 	float h_dot_v = dot(h, v);
 	float h_dot_l = dot(h, l);
 	
-	/*float g1 = (2. * n_dot_h * n_dot_v) / h_dot_v;
+	float g1 = (2. * n_dot_h * n_dot_v) / h_dot_v;
 	float g2 = (2. * n_dot_h * n_dot_l) / h_dot_v;
 	float g = 1.;
 	if (g1 < g) g = g1;
@@ -351,21 +410,22 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in vec3 light_po
 	float m = roughness * roughness;
 	float r = (1. / (m * pow(n_dot_h, 4.))) * exp((pow(n_dot_h, 2.) - 1.) / (m * pow(n_dot_h, 2.)));
 	float f = (ref_index + pow(1. - h_dot_v, 5.)) * (1. - ref_index);
-	float specular = max((abs(f * r * g) / n_dot_v), 0.);*/
+	float specular = max((abs(f * r * g) / n_dot_v), 0.);
+	
+	float lambert = max(n_dot_l, 0.);
 
-	float lambert = clamp(n_dot_l, ambient_intensity, 1.);
-
-	vec3 diffuse = (light_color * lambert);// + vec3(specular);
+	vec3 diffuse = (light_color * lambert) + vec3(specular);
 	albedo += (diffuse * atten);
 }
 void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
 {
 	vec3 l = normalize(directionalLight_ss);
+	vec3 h = normalize(l + v);
 
 	float n_dot_l = dot(n, l);
 
 	//float shadow = shadow_intensity();
-	float lambert = max(n_dot_l, ambient_intensity);
+	float lambert = max(n_dot_l, 0.);
 	
 	vec3 diffuse = (directionalLight_color.rgb * lambert);
 	albedo += diffuse;
@@ -383,12 +443,12 @@ vec4 main_render()
 	
 	vec3 albedo = vec3(0.);
 
-	directionalLight_albedo(albedo, n, v);
+	//directionalLight_albedo(albedo, n, v);
 	
-	//if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, pointLight4_ss[0], pointLight4_color[0].rgb, pointLight4_falloff[0]);
-	//if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, pointLight4_ss[1], pointLight4_color[1].rgb, pointLight4_falloff[1]);
-	//if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, pointLight4_ss[2], pointLight4_color[2].rgb, pointLight4_falloff[2]);
-	//if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, pointLight4_ss[3], pointLight4_color[3].rgb, pointLight4_falloff[3]);
+	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, pointLight4_ss[0], pointLight4_color[0].rgb, pointLight4_falloff[0]);
+	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, pointLight4_ss[1], pointLight4_color[1].rgb, pointLight4_falloff[1]);
+	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, pointLight4_ss[2], pointLight4_color[2].rgb, pointLight4_falloff[2]);
+	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, pointLight4_ss[3], pointLight4_color[3].rgb, pointLight4_falloff[3]);
 
 	//return vec4(shadow_intensity());
 	//return vec4(abs(directionalLight_ss), 1.);

@@ -39,9 +39,11 @@ HEX_API extern void TransformEntity(float x, float y, float z, float rx = 0.0f, 
 HEX_API extern void ParentEntity(uint parent, uint child);
 
 HEX_API extern void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ);
-HEX_API extern void AddLight(HEX_LIGHTMODE mode, float intensity, float rx = 0.0f, float ry = 0.0f, float rz = 0.0f);
 HEX_API extern void AddController();
 HEX_API extern void AddSkybox();
+
+HEX_API extern void AddDirectionalLight(float intensity, MALib::COLOR& color);
+HEX_API extern void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff = 0.0f, float linearFalloff = 0.0f, float quadFalloff = 0.0f);
 
 HEX_API extern void AddShape(MALib::VERTEXBUFFER* mesh);
 HEX_API extern void AddMaterial(MALib::SURFACE* colorMap, MALib::SURFACE* normalMap = NULL);

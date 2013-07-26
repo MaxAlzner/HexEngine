@@ -104,7 +104,7 @@ HEX_API void InitializeUniforms()
 	CurrentFlag = UNIFORM_FLAG_NORMAL;
 }
 
-HEX_API extern void DebugError(const string action)
+HEX_API void DebugError(const string action)
 {
 	GLenum error = glGetError();
 	if (error == GL_INVALID_ENUM)                  MALib::LOG_Message(action, "GL ERROR GL_INVALID_ENUM");
@@ -154,30 +154,33 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		
 	case UNIFORM_POINT_LIGHT_POSITION:
 		if (numOfPointLights < 1) break;
-		n = numOfPointLights - 0;
+		n = numOfPointLights - 1;
 		pointLight4position_buffer[(n * 4) + 0] = ((float*)data)[0];
 		pointLight4position_buffer[(n * 4) + 1] = ((float*)data)[1];
 		pointLight4position_buffer[(n * 4) + 2] = ((float*)data)[2];
-		pointLight4position_buffer[(n * 4) + 3] = ((float*)data)[3];
+		pointLight4position_buffer[(n * 4) + 3] = 1.0f;
 		glUniform4fv(Uniforms.pointLight4_ws, 1, (const GLfloat*)pointLight4position_buffer);
+		//MALib::LOG_Outvf("POINTLIGHT POSITIONS", pointLight4position_buffer, 16);
 		break;
 	case UNIFORM_POINT_LIGHT_COLOR:
 		if (numOfPointLights < 1) break;
-		n = numOfPointLights - 0;
+		n = numOfPointLights - 1;
 		pointLight4color_buffer[(n * 4) + 0] = ((float*)data)[0];
 		pointLight4color_buffer[(n * 4) + 1] = ((float*)data)[1];
 		pointLight4color_buffer[(n * 4) + 2] = ((float*)data)[2];
 		pointLight4color_buffer[(n * 4) + 3] = ((float*)data)[3];
 		glUniform4fv(Uniforms.pointLight4_color, 1, (const GLfloat*)pointLight4color_buffer);
+		//MALib::LOG_Outvf("POINTLIGHT COLORS", pointLight4color_buffer, 16);
 		break;
 	case UNIFORM_POINT_LIGHT_FALLOFF:
 		if (numOfPointLights < 1) break;
-		n = numOfPointLights - 0;
+		n = numOfPointLights - 1;
 		pointLight4falloff_buffer[(n * 4) + 0] = ((float*)data)[0];
 		pointLight4falloff_buffer[(n * 4) + 1] = ((float*)data)[1];
 		pointLight4falloff_buffer[(n * 4) + 2] = ((float*)data)[2];
-		pointLight4falloff_buffer[(n * 4) + 3] = ((float*)data)[3];
+		pointLight4falloff_buffer[(n * 4) + 3] = 0.0f;
 		glUniform3fv(Uniforms.pointLight4_falloff, 1, (const GLfloat*)pointLight4falloff_buffer);
+		//MALib::LOG_Outvf("POINTLIGHT FALLOFFS", pointLight4falloff_buffer, 16);
 		break;
 
 	case UNIFORM_UV_REPEAT:
@@ -254,6 +257,7 @@ HEX_API void SetUniform(UNIFORM uniform)
 		}
 		numOfPointLights++;
 		glUniform1i(Uniforms.numOfPointLights, numOfPointLights);
+		//MALib::LOG_Out1i("NUM OF POINTLIGHTS", numOfPointLights);
 		break;
 		
 	case UNIFORM_FLAG_NORMAL:
@@ -377,7 +381,7 @@ HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 		break;
 	}
 }
-HEX_API extern void ResetUniforms()
+HEX_API void ResetUniforms()
 {
 	numOfPointLights = 0;
 	glUniform1i(Uniforms.numOfPointLights, 0);

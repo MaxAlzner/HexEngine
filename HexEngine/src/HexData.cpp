@@ -179,17 +179,6 @@ HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float far
 	Cameras.add(BoundEntity);
 	MainCamera = node;
 }
-HEX_API void AddLight(HEX_LIGHTMODE mode, float intensity, float rx, float ry, float rz)
-{
-	if (BoundEntity == NULL) return;
-	LightNode* node = new LightNode;
-	node->mode = mode;
-	node->intensity = intensity;
-	BoundEntity->transform->rotate(rx, ry, rz);
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-	Lights.add(BoundEntity);
-}
 HEX_API void AddController()
 {
 	if (BoundEntity == NULL) return;
@@ -209,6 +198,32 @@ HEX_API void AddSkybox()
 	BoundEntity->setShape(box);
 	Nodes.add(box);
 	Skyboxes.add(BoundEntity);
+}
+
+HEX_API void AddDirectionalLight(float intensity, MALib::COLOR& color)
+{
+	if (BoundEntity == NULL) return;
+	LightNode* node = new LightNode;
+	node->mode = LIGHTMODE_DIRECTIONAL;
+	node->intensity = intensity;
+	node->color = color;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+	Lights.add(BoundEntity);
+}
+HEX_API void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff, float linearFalloff, float quadFalloff)
+{
+	if (BoundEntity == NULL) return;
+	LightNode* node = new LightNode;
+	node->mode = LIGHTMODE_POINT;
+	node->intensity = intensity;
+	node->color = color;
+	node->falloff.x = constantFalloff;
+	node->falloff.y = linearFalloff;
+	node->falloff.z = quadFalloff;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+	Lights.add(BoundEntity);
 }
 
 HEX_API void AddShape(MALib::VERTEXBUFFER* mesh)

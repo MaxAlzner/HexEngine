@@ -14,8 +14,6 @@ void UpdateDeltaTime()
 
 HexRender MainRender;
 HexRender ShadowMap;
-//HexRender LeftEyeRender;
-//HexRender RightEyeRender;
 HexRender BrightPass;
 HexRender Luminance;
 
@@ -51,11 +49,11 @@ void BuildScene()
 	
 	BindEntity(entities[i]);i++;
 	TransformEntity(0.0f, 8.0f, 0.0f, -80.0f, 60.0f, 0.0f);
-	AddLight(LIGHTMODE_DIRECTIONAL, 1.0f, 0.0f, 0.0f, 0.0f);
+	AddDirectionalLight(0.25f, MALib::COLOR());
 	
 	BindEntity(entities[i]);i++;
-	TransformEntity(2.0f, 2.0f, -3.0f, 0.0f, 0.0f, 0.0f);
-	AddLight(LIGHTMODE_POINT, 1.0f);
+	TransformEntity(0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	AddPointLight(1.0f, MALib::COLOR(), 1.2f, 0.25f, 0.01f);
 
 	BindEntity(entities[i]);i++;
 	AddMaterial(Textures[0]);
@@ -108,7 +106,6 @@ HEX_API void OnFrameDraw()
 	if (Paused) return;
 	
 	ResetUniforms();
-
 #if 1
 	ShadowMap.load();
 
@@ -118,6 +115,7 @@ HEX_API void OnFrameDraw()
 
 	ShadowMap.unload();
 #endif
+	ResetUniforms();
 	MainRender.load();
 
 	SetUniform(UNIFORM_FLAG_NORMAL);
@@ -154,7 +152,12 @@ HEX_API void OnFrameDraw()
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
 	
-	//Luminance.blit();
+#if 0
+	BrightPass.blit();
+#elif 0
+	Luminance.blit();
+#endif
+
 	if (!ToggleLuminance) MainRender.blit();
 
 	SDL_GL_SwapBuffers();
@@ -244,6 +247,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 	
 	MALib::LOG_Message("GL VENDOR                  ", (char*)glGetString(GL_VENDOR));
 	MALib::LOG_Message("GL RENDERER                ", (char*)glGetString(GL_RENDERER));
@@ -273,8 +277,6 @@ HEX_API bool Initialize(uint argc, string* argv)
 
 	MainRender.build(ScreenRect.width, ScreenRect.height, true, true);
 	ShadowMap.build(1024, 1024, true, false);
-	//LeftEyeRender.build(RenderRect.width, RenderRect.height, true, true);
-	//RightEyeRender.build(RenderRect.width, RenderRect.height, true, true);
 	BrightPass.build(128, 128, true, false);
 	Luminance.build(128, 128, true, false);
 	
