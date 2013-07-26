@@ -25,7 +25,7 @@ HexEntity* BoundEntity = NULL;
 
 HEX_API void InitializeData()
 {
-	MALib::LOG_Message("START ASSET LOADING");
+	//MALib::LOG_Message("START ASSET LOADING");
 	
 	Cameras.resize(8);
 	Lights.resize(8);
@@ -37,23 +37,7 @@ HEX_API void InitializeData()
 	Entities.resize(32);
 	Nodes.resize(128);
 
-	RegisterVMP("data/SkyDome.vmp");
-	RegisterVMP("data/EV_Catwalk.vmp");
-	RegisterVMP("data/EV_Landing_Straight.vmp");
-	RegisterVMP("data/EV_Platform.vmp");
-	RegisterVMP("data/EV_Stairs.vmp");
-
-	RegisterBMP("data/CloudsSkyBox.bmp");
-	RegisterTGA("data/EV_Catwalk_D.tga");
-	RegisterTGA("data/EV_Catwalk_N.tga");
-	RegisterTGA("data/EV_Landing_Straight_D.tga");
-	RegisterTGA("data/EV_Landing_Straight_N.tga");
-	RegisterTGA("data/EV_Platform_D.tga");
-	RegisterTGA("data/EV_Platform_N.tga");
-	RegisterTGA("data/EV_Stairs_D.tga");
-	RegisterTGA("data/EV_Stairs_N.tga");
-
-	MALib::LOG_Message("END ASSET LOADING");
+	//MALib::LOG_Message("END ASSET LOADING");
 }
 HEX_API void UninitializeData()
 {
@@ -82,56 +66,64 @@ HEX_API bool ToggleRunning()
 	return AppRunning;
 }
 
-HEX_API bool RegisterOBJ(const string filepath)
+HEX_API void RegisterOBJ(uint* mesh, const string filepath)
 {
-	MALib::OBJ_MESH* mesh = 0;
-	if (!MALib::ImportOBJFile(filepath, &mesh))
+	if (mesh == NULL) return;
+	MALib::OBJ_MESH* obj = 0;
+	if (!MALib::ImportOBJFile(filepath, &obj))
 	{
 		MALib::LOG_Message("Could not load OBJ file", filepath);
-		return false;
+		return;
 	}
 	MALib::VERTEXBUFFER* baked = 0;
-	if (!MALib::BakeOBJ(mesh, &baked))
+	if (!MALib::BakeOBJ(obj, &baked))
 	{
 		MALib::LOG_Message("Could not bake OBJ mesh", filepath);
-		return false;
+		return;
 	}
 	Meshes.add(baked);
-	MALib::FreeOBJMesh(&mesh);
-	return true;
+	MALib::FreeOBJMesh(&obj);
+	uint n = Meshes.length();
+	*mesh = n;
 }
-HEX_API bool RegisterVMP(const string filepath)
+HEX_API void RegisterVMP(uint* mesh, const string filepath)
 {
+	if (mesh == NULL) return;
 	MALib::VERTEXBUFFER* buffer = 0;
 	if (!MALib::ImportVMPFile(filepath, &buffer))
 	{
 		MALib::LOG_Message("Could not load VMP mesh", filepath);
-		return false;
+		return;
 	}
 	Meshes.add(buffer);
-	return true;
+	uint n = Meshes.length();
+	*mesh = n;
 }
-HEX_API bool RegisterBMP(const string filepath)
+HEX_API void RegisterBMP(uint* texture, const string filepath)
 {
+	if (texture == NULL) return;
 	MALib::SURFACE* surface = 0;
 	if (!MALib::ImportBMPFile(filepath, &surface))
 	{
 		MALib::LOG_Message("Could not load BMP image", filepath);
-		return false;
+		return;
 	}
 	Textures.add(surface);
-	return true;
+	uint n = Textures.length();
+	*texture = n;
 }
-HEX_API bool RegisterTGA(const string filepath)
+HEX_API void RegisterTGA(uint* texture, const string filepath)
 {
+	if (texture == NULL) return;
 	MALib::SURFACE* surface = 0;
 	if (!MALib::ImportTGAFile(filepath, &surface))
 	{
 		MALib::LOG_Message("Could not load TGA image", filepath);
-		return false;
+		return;
 	}
 	Textures.add(surface);
-	return true;
+	uint n = Textures.length();
+	*texture = n;
 }
 
 HEX_API void GenEntities(uint size, uint* entities)
@@ -186,17 +178,27 @@ HEX_API void AddController()
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 }
-HEX_API void AddSkybox()
+HEX_API void AddSkybox(uint skyMesh, uint skyMap)
 {
 	if (BoundEntity == NULL) return;
+	if (skyMesh == 0 || skyMap == 0) return;
 	SkyboxNode* node = new SkyboxNode;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
+
+	MALib::VERTEXBUFFER* mesh = Meshes[skyMesh - 1];
+	MALib::SURFACE* texture = Textures[skyMap - 1];
+
 	ShapeNode* box = new ShapeNode;
-	MALib::VERTEXBUFFER* mesh = Meshes[0];
 	box->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
 	BoundEntity->setShape(box);
 	Nodes.add(box);
+
+	MaterialNode* mat = new MaterialNode;
+	mat->setColorMap(texture);
+	BoundEntity->setMaterial(mat);
+	Nodes.add(mat);
+
 	Skyboxes.add(BoundEntity);
 }
 
@@ -226,21 +228,23 @@ HEX_API void AddPointLight(float intensity, MALib::COLOR& color, float constantF
 	Lights.add(BoundEntity);
 }
 
-HEX_API void AddShape(MALib::VERTEXBUFFER* mesh)
+HEX_API void AddShape(uint mesh)
 {
-	if (BoundEntity == NULL || mesh == NULL) return;
+	if (BoundEntity == NULL || mesh == 0) return;
 	ShapeNode* node = new ShapeNode;
-	node->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
+	MALib::VERTEXBUFFER* buffer = Meshes[mesh - 1];
+	node->build(buffer->buffer, buffer->vertices, buffer->stride, buffer->components);
 	BoundEntity->setShape(node);
 	Nodes.add(node);
 	Renderable.add(BoundEntity);
 }
-HEX_API void AddMaterial(MALib::SURFACE* colorMap, MALib::SURFACE* normalMap)
+HEX_API void AddMaterial(uint colorMap, uint normalMap)
 {
 	if (BoundEntity == NULL) return;
+	if (colorMap == 0 || normalMap == 0) return;
 	MaterialNode* node = new MaterialNode;
-	node->setColorMap(colorMap);
-	node->setNormalMap(normalMap);
+	node->setColorMap(Textures[colorMap - 1]);
+	node->setNormalMap(Textures[normalMap - 1]);
 	BoundEntity->setMaterial(node);
 	Nodes.add(node);
 }

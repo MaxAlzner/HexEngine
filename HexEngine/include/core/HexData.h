@@ -28,10 +28,10 @@ HEX_API extern void UninitializeData();
 HEX_API extern bool IsRunning();
 HEX_API extern bool ToggleRunning();
 
-HEX_API extern bool RegisterOBJ(const string filepath);
-HEX_API extern bool RegisterVMP(const string filepath);
-HEX_API extern bool RegisterBMP(const string filepath);
-HEX_API extern bool RegisterTGA(const string filepath);
+HEX_API extern void RegisterOBJ(uint* mesh, const string filepath);
+HEX_API extern void RegisterVMP(uint* mesh, const string filepath);
+HEX_API extern void RegisterBMP(uint* texture, const string filepath);
+HEX_API extern void RegisterTGA(uint* texture, const string filepath);
 
 HEX_API extern void GenEntities(uint size, uint* entities);
 HEX_API extern void BindEntity(uint entity);
@@ -40,13 +40,13 @@ HEX_API extern void ParentEntity(uint parent, uint child);
 
 HEX_API extern void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ);
 HEX_API extern void AddController();
-HEX_API extern void AddSkybox();
+HEX_API extern void AddSkybox(uint skyMesh, uint skyMap);
 
 HEX_API extern void AddDirectionalLight(float intensity, MALib::COLOR& color);
 HEX_API extern void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff = 0.0f, float linearFalloff = 0.0f, float quadFalloff = 0.0f);
 
-HEX_API extern void AddShape(MALib::VERTEXBUFFER* mesh);
-HEX_API extern void AddMaterial(MALib::SURFACE* colorMap, MALib::SURFACE* normalMap = NULL);
+HEX_API extern void AddShape(uint mesh);
+HEX_API extern void AddMaterial(uint colorMap, uint normalMap = 0);
 	
 HEX_END
 #endif

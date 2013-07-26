@@ -20,6 +20,7 @@
 
 #include "core\HexDef.h"
 #include "core\HexInputDef.h"
+#include "core\HexParameter.h"
 
 #include "nodes\NodeBase.h"
 #include "nodes\TransformNode.h"

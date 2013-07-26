@@ -22,88 +22,10 @@ bool ToggleLuminance = true;
 uint LuminanceCounter = 0;
 float gamma = 2.2f;
 
-void BuildScene()
-{
-	uint entities[14];
-	uint i = 0;
-	GenEntities(14, entities);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 1.0f, -4.0f, 0.0f, 0.0f, 0.0f);
-	AddController();
-
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 128.0f);
-	ParentEntity(i - 1, i);
-
-	BindEntity(entities[i]);i++;
-	TransformEntity(-0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
-	ParentEntity(i - 2, i);
-
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.015f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddCamera(45.0f, 4.0f / 3.0f, 0.01f, 100.0f);
-	ParentEntity(i - 3, i);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 8.0f, 0.0f, -80.0f, 60.0f, 0.0f);
-	AddDirectionalLight(0.25f, MALib::COLOR());
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddPointLight(1.0f, MALib::COLOR(), 1.2f, 0.25f, 0.01f);
-
-	BindEntity(entities[i]);i++;
-	AddMaterial(Textures[0]);
-	AddSkybox();
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddShape(Meshes[3]);
-	AddMaterial(Textures[5], Textures[6]);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(2.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddShape(Meshes[1]);
-	AddMaterial(Textures[1], Textures[2]);
-	ParentEntity(i - 1, i);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(2.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddShape(Meshes[2]);
-	AddMaterial(Textures[3], Textures[4]);
-	ParentEntity(i - 2, i);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(8.331f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f);
-	AddShape(Meshes[2]);
-	AddMaterial(Textures[3], Textures[4]);
-	ParentEntity(i - 3, i);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(-2.5f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f);
-	AddShape(Meshes[1]);
-	AddMaterial(Textures[1], Textures[2]);
-	ParentEntity(i - 4, i);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(-2.5f, 0.0f, 0.0f, 0.0f, 180.0f, 0.0f);
-	AddShape(Meshes[2]);
-	AddMaterial(Textures[3], Textures[4]);
-	ParentEntity(i - 5, i);
-	
-	BindEntity(entities[i]);i++;
-	TransformEntity(-8.331f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	AddShape(Meshes[2]);
-	AddMaterial(Textures[3], Textures[4]);
-	ParentEntity(i - 6, i);
-}
-
 HEX_API void OnFrameDraw()
 {
 	if (Paused) return;
+	if (Cameras.length() < 1) return;
 	
 	ResetUniforms();
 #if 1
@@ -281,8 +203,8 @@ HEX_API bool Initialize(uint argc, string* argv)
 	Luminance.build(128, 128, true, false);
 	
 	MALib::LOG_Message("START SCENE");
-	BuildScene();
-	OnFixedUpdate();
+	//BuildScene();
+	//OnFixedUpdate();
 	
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;
