@@ -25,7 +25,6 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_UV_OFFSET                                          = 0x00000110, 
 	
 	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000200, 
-	UNIFORM_LUMINANCE_MAP_SIZE                                 = 0x00000201, 
 	UNIFORM_RANDOM_FILTER                                      = 0x00000210, 
 	UNIFORM_GAMMA                                              = 0x00000211, 
 	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000221, 
@@ -35,8 +34,9 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_TEXTURE_NORMAL_MAP                                 = 0x00020000, 
 	UNIFORM_TEXTURE_SPECULAR_MAP                               = 0x00030000, 
 	UNIFORM_TEXTURE_LUMINANCE_MAP                              = 0x00040000, 
-	UNIFORM_TEXTURE_DEPTH_MAP                                  = 0x00011000, 
-	UNIFORM_TEXTURE_SHADOW_MAP                                 = 0x00012000, 
+	UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP                       = 0x00011000, 
+	UNIFORM_TEXTURE_DEPTH_MAP                                  = 0x00012000, 
+	UNIFORM_TEXTURE_SHADOW_MAP                                 = 0x00013000, 
 	UNIFORM_TEXTURE_LEFT_EYE_MAP                               = 0x00010100, 
 	UNIFORM_TEXTURE_RIGHT_EYE_MAP                              = 0x00010200, 
 	

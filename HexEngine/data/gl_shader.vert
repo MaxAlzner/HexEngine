@@ -52,16 +52,18 @@ void main()
 	if (flag == 1 || flag == 2) return;
 	
 	mat4 os_to_cs = ws_to_cs * os_to_ws;
-	vec3 normal_cs = normalize((os_to_cs * vec4(normal, 0.)).xyz);
-	vec3 tangent_cs = normalize((os_to_cs * vec4(tangent, 0.)).xyz);
+	vec3 normal_cs =   normalize((os_to_cs * vec4(normal,   0.)).xyz);
+	vec3 tangent_cs =  normalize((os_to_cs * vec4(tangent,  0.)).xyz);
 	vec3 binormal_cs = normalize((os_to_cs * vec4(binormal, 0.)).xyz);
 
 	mat3 cs_to_ss = mat3(tangent_cs, binormal_cs, normal_cs);
 
 	vertex_ss = vertex_cs.xyz * cs_to_ss;
-	view_ss = vec3(0., 0., 1.) * cs_to_ss;
+	view_ss = vec3(0., 0., 0.) * cs_to_ss;
+
+	vec3 directionalLight_cs = normalize((ws_to_cs * vec4(directionalLight_ws, 0.)).xyz);
+	directionalLight_ss = -directionalLight_cs * cs_to_ss;
 	
-	directionalLight_ss = -normalize((ws_to_cs * vec4(directionalLight_ws, 1.)).xyz * cs_to_ss);
 	if (numOfPointLights > 0) pointLight4_ss[0] = (ws_to_cs * pointLight4_ws[0]).xyz * cs_to_ss;
 	if (numOfPointLights > 1) pointLight4_ss[1] = (ws_to_cs * pointLight4_ws[1]).xyz * cs_to_ss;
 	if (numOfPointLights > 2) pointLight4_ss[2] = (ws_to_cs * pointLight4_ws[2]).xyz * cs_to_ss;

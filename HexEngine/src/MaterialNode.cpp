@@ -15,6 +15,7 @@ MaterialNode::MaterialNode()
 {
 	this->colorMap = 0;
 	this->normalMap = 0;
+	this->specularMap = 0;
 	this->overlay = MALib::COLOR();
 	this->specular = MALib::COLOR();
 	this->roughness = 0.8f;
@@ -31,6 +32,7 @@ void MaterialNode::load()
 {
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, this->colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_NORMAL_MAP, this->normalMap);
+	SetTextureSlot(UNIFORM_TEXTURE_SPECULAR_MAP, this->specularMap);
 	SetUniform(UNIFORM_UV_REPEAT, &this->uvRepeat);
 	SetUniform(UNIFORM_UV_OFFSET, &this->uvOffset);
 }
@@ -41,6 +43,7 @@ void MaterialNode::destroy()
 {
 	glDeleteTextures(1, &this->colorMap);
 	glDeleteTextures(1, &this->normalMap);
+	glDeleteTextures(1, &this->specularMap);
 }
 
 void MaterialNode::setColorMap(MALib::SURFACE* texture)
@@ -58,6 +61,14 @@ void MaterialNode::setNormalMap(MALib::SURFACE* texture)
 void MaterialNode::setNormalMap(SDL_Surface* texture)
 {
 	MaterialNode::BuildTexture(&this->normalMap, texture);
+}
+void MaterialNode::setSpecularMap(MALib::SURFACE* texture)
+{
+	MaterialNode::BuildTexture(&this->specularMap, texture);
+}
+void MaterialNode::setSpecularMap(SDL_Surface* texture)
+{
+	MaterialNode::BuildTexture(&this->specularMap, texture);
 }
 
 void MaterialNode::BuildTexture(GLuint* outID, MALib::SURFACE* texture)

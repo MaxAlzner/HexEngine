@@ -209,6 +209,7 @@ HEX_API void AddDirectionalLight(float intensity, MALib::COLOR& color)
 	node->mode = LIGHTMODE_DIRECTIONAL;
 	node->intensity = intensity;
 	node->color = color;
+	node->color.a = intensity;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 	Lights.add(BoundEntity);
@@ -220,6 +221,7 @@ HEX_API void AddPointLight(float intensity, MALib::COLOR& color, float constantF
 	node->mode = LIGHTMODE_POINT;
 	node->intensity = intensity;
 	node->color = color;
+	node->color.a = intensity;
 	node->falloff.x = constantFalloff;
 	node->falloff.y = linearFalloff;
 	node->falloff.z = quadFalloff;
@@ -238,13 +240,14 @@ HEX_API void AddShape(uint mesh)
 	Nodes.add(node);
 	Renderable.add(BoundEntity);
 }
-HEX_API void AddMaterial(uint colorMap, uint normalMap)
+HEX_API void AddMaterial(uint colorMap, uint normalMap, uint specularMap)
 {
 	if (BoundEntity == NULL) return;
-	if (colorMap == 0 || normalMap == 0) return;
+	if (colorMap == 0) return;
 	MaterialNode* node = new MaterialNode;
 	node->setColorMap(Textures[colorMap - 1]);
-	node->setNormalMap(Textures[normalMap - 1]);
+	if (normalMap != 0) node->setNormalMap(Textures[normalMap - 1]);
+	if (specularMap != 0) node->setSpecularMap(Textures[specularMap - 1]);
 	BoundEntity->setMaterial(node);
 	Nodes.add(node);
 }

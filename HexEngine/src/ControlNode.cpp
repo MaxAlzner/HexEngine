@@ -5,6 +5,11 @@ HEX_BEGIN
 
 ControlNode::ControlNode()
 {
+	this->rotation = glm::vec2(0.0f, 0.0f);
+	this->sensitivity = glm::vec2(90.0f);
+	this->deadzone = 0.1f;
+	this->rangeX = glm::vec2(-360.0f, 360.0f);
+	this->rangeY = glm::vec2(-60.0f, 60.0f);
 }
 ControlNode::~ControlNode()
 {
@@ -30,16 +35,14 @@ void ControlNode::onFixedUpdate()
 {
 	glm::vec3 f;
 	glm::vec3 r;
-	float rx = 0.0f;
-	float ry = 0.0f;
 
 	if (Input::controller.connected)
 	{
 		f = this->root->transform->forward * -Input::GetAxis(XBOX_L_STICK_Y);
 		r = this->root->transform->right   * -Input::GetAxis(XBOX_L_STICK_X);
 		
-		rx = -Input::GetAxis(XBOX_R_STICK_X);
-		ry =  Input::GetAxis(XBOX_R_STICK_Y);
+		this->rotation.x += Input::GetAxis(XBOX_R_STICK_Y) * this->sensitivity.x * DeltaTime;
+		this->rotation.y += Input::GetAxis(XBOX_R_STICK_X) * this->sensitivity.y * DeltaTime;
 	}
 	else
 	{
@@ -54,20 +57,23 @@ void ControlNode::onFixedUpdate()
 
 		if (Input::mouse.active)
 		{
-			rx = -((Input::mouse.scalarY * 2.0f) - 1.0f);
-			ry =  ((Input::mouse.scalarX * 2.0f) - 1.0f);
-			if (Input::mouse.scalarX < 0.75f && Input::mouse.scalarX > 0.25f) ry = 0.0f;
-			if (Input::mouse.scalarY < 0.75f && Input::mouse.scalarY > 0.25f) rx = 0.0f;
+			float mx = ((Input::mouse.scalarX * 2.0f) - 1.0f);
+			float my = ((Input::mouse.scalarY * 2.0f) - 1.0f);
+			float mag = sqrt(pow(mx, 2) + pow(my, 2));
+			if (mag > this->deadzone)
+			{
+				this->rotation.x = this->root->transform->rotation.y + (mx * this->sensitivity.x * DeltaTime);
+				this->rotation.y += my * this->sensitivity.y * DeltaTime;
+			}
 		}
 	}
 
 	f *= DeltaTime;
 	r *= DeltaTime;
-	rx *= DeltaTime;
-	ry *= DeltaTime;
+	this->rotation.y = MALib::Clamp(this->rotation.y, this->rangeY.x, this->rangeY.y);
 
 	this->root->transform->translate(f.x + r.x, 0.0f, f.z + r.z);
-	this->root->transform->rotate(rx * 60.0f, ry * 60.0f, 0.0f);
+	this->root->transform->rotation = glm::vec3(-this->rotation.y, this->rotation.x, 0.0f);
 }
 	
 HEX_END

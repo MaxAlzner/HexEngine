@@ -17,9 +17,12 @@ public:
 	void setColorMap(SDL_Surface* texture);
 	void setNormalMap(MALib::SURFACE* texture);
 	void setNormalMap(SDL_Surface* texture);
+	void setSpecularMap(MALib::SURFACE* texture);
+	void setSpecularMap(SDL_Surface* texture);
 
 	GLuint colorMap;
 	GLuint normalMap;
+	GLuint specularMap;
 	MALib::COLOR overlay;
 	MALib::COLOR specular;
 	float roughness;

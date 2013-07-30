@@ -46,7 +46,7 @@ HEX_API extern void AddDirectionalLight(float intensity, MALib::COLOR& color);
 HEX_API extern void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff = 0.0f, float linearFalloff = 0.0f, float quadFalloff = 0.0f);
 
 HEX_API extern void AddShape(uint mesh);
-HEX_API extern void AddMaterial(uint colorMap, uint normalMap = 0);
+HEX_API extern void AddMaterial(uint colorMap, uint normalMap = 0, uint specularMap = 0);
 	
 HEX_END
 #endif

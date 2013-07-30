@@ -28,7 +28,7 @@ public:
 	HEX_LIGHTMODE mode;
 	float intensity;
 	MALib::COLOR color;
-	MALib::VEC3 falloff;
+	glm::vec3 falloff;
 };
 
 HEX_END

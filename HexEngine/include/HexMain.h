@@ -3,6 +3,8 @@
 #pragma comment(lib, "SDL.lib")
 #pragma comment(lib, "SDLmain.lib")
 
+#define _USE_MATH_DEFINES
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string>

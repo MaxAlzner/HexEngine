@@ -18,7 +18,6 @@ struct UniformLocations
 	int uv_repeat;
 	int uv_offset;
 	int shadow_size;
-	int luminance_size;
 	int random_filter;
 	int gamma;
 	int leftEye_color;
@@ -28,6 +27,7 @@ struct UniformLocations
 	int specular_map;
 	int luminance_map;
 	int depth_map;
+	int ao_map;
 	int shadow_map;
 	int leftEye_map;
 	int rightEye_map;
@@ -70,7 +70,6 @@ HEX_API void InitializeUniforms()
 	Uniforms.uv_repeat = glGetUniformLocation(ShaderProgram, "uv_repeat");
 	Uniforms.uv_offset = glGetUniformLocation(ShaderProgram, "uv_offset");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
-	Uniforms.luminance_size = glGetUniformLocation(ShaderProgram, "luminance_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
 	Uniforms.gamma = glGetUniformLocation(ShaderProgram, "gamma");
 	Uniforms.leftEye_color = glGetUniformLocation(ShaderProgram, "leftEye_color");
@@ -80,6 +79,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.specular_map = glGetUniformLocation(ShaderProgram, "specular_map");
 	Uniforms.luminance_map = glGetUniformLocation(ShaderProgram, "luminance_map");
 	Uniforms.depth_map = glGetUniformLocation(ShaderProgram, "depth_map");
+	Uniforms.ao_map = glGetUniformLocation(ShaderProgram, "ao_map");
 	Uniforms.shadow_map = glGetUniformLocation(ShaderProgram, "shadow_map");
 	Uniforms.leftEye_map = glGetUniformLocation(ShaderProgram, "leftEye_map");
 	Uniforms.rightEye_map = glGetUniformLocation(ShaderProgram, "rightEye_map");
@@ -159,7 +159,7 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		pointLight4position_buffer[(n * 4) + 1] = ((float*)data)[1];
 		pointLight4position_buffer[(n * 4) + 2] = ((float*)data)[2];
 		pointLight4position_buffer[(n * 4) + 3] = 1.0f;
-		glUniform4fv(Uniforms.pointLight4_ws, 1, (const GLfloat*)pointLight4position_buffer);
+		glUniform4fv(Uniforms.pointLight4_ws, numOfPointLights, (const GLfloat*)pointLight4position_buffer);
 		//MALib::LOG_Outvf("POINTLIGHT POSITIONS", pointLight4position_buffer, 16);
 		break;
 	case UNIFORM_POINT_LIGHT_COLOR:
@@ -169,7 +169,7 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		pointLight4color_buffer[(n * 4) + 1] = ((float*)data)[1];
 		pointLight4color_buffer[(n * 4) + 2] = ((float*)data)[2];
 		pointLight4color_buffer[(n * 4) + 3] = ((float*)data)[3];
-		glUniform4fv(Uniforms.pointLight4_color, 1, (const GLfloat*)pointLight4color_buffer);
+		glUniform4fv(Uniforms.pointLight4_color, numOfPointLights, (const GLfloat*)pointLight4color_buffer);
 		//MALib::LOG_Outvf("POINTLIGHT COLORS", pointLight4color_buffer, 16);
 		break;
 	case UNIFORM_POINT_LIGHT_FALLOFF:
@@ -179,7 +179,7 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		pointLight4falloff_buffer[(n * 4) + 1] = ((float*)data)[1];
 		pointLight4falloff_buffer[(n * 4) + 2] = ((float*)data)[2];
 		pointLight4falloff_buffer[(n * 4) + 3] = 0.0f;
-		glUniform3fv(Uniforms.pointLight4_falloff, 1, (const GLfloat*)pointLight4falloff_buffer);
+		glUniform3fv(Uniforms.pointLight4_falloff, numOfPointLights, (const GLfloat*)pointLight4falloff_buffer);
 		//MALib::LOG_Outvf("POINTLIGHT FALLOFFS", pointLight4falloff_buffer, 16);
 		break;
 
@@ -221,9 +221,6 @@ HEX_API void SetUniform(UNIFORM uniform, float value)
 	{
 	case UNIFORM_SHADOW_MAP_SIZE:
 		glUniform1f(Uniforms.shadow_size, (const GLfloat)value);
-		break;
-	case UNIFORM_LUMINANCE_MAP_SIZE:
-		glUniform1f(Uniforms.luminance_size, (const GLfloat)value);
 		break;
 
 	case UNIFORM_GAMMA:
@@ -358,6 +355,11 @@ HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 	case UNIFORM_TEXTURE_DEPTH_MAP:
 		glUniform1i(Uniforms.depth_map, 1);
 		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		break;
+	case UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP:
+		glUniform1i(Uniforms.ao_map, 5);
+		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		break;
 	case UNIFORM_TEXTURE_SHADOW_MAP:

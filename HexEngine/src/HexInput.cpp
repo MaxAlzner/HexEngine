@@ -102,6 +102,7 @@ HEX_API bool Input::IsKeyUp(uchar code)
 
 HEX_API void InitializeInput()
 {
+	Input::mouse.active = true;
 	for (uint i = 0; i < KEY_BUFFERSIZE; i++) Input::key.pressed[i] = false;
 	for (uint i = 0; i < KEY_BUFFERSIZE; i++) Input::key.latched[i] = false;
 	for (uint i = 0; i < CONTROLLER_AXIS_BUFFERSIZE; i++) Input::controller.axis[i] = 0.0f;

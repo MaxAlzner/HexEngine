@@ -8,7 +8,7 @@ LightNode::LightNode()
 	this->mode = LIGHTMODE_NONE;
 	this->intensity = 1.0f;
 	this->color = MALib::COLOR();
-	this->falloff = MALib::VEC3(1.0f, 1.0f, 1.0f);
+	this->falloff = glm::vec3(1.0f);
 }
 LightNode::~LightNode()
 {
@@ -38,10 +38,12 @@ void LightNode::load()
 	}
 	else if (this->mode == LIGHTMODE_POINT)
 	{
+		glm::vec3 deltaFalloff = this->falloff;// * DeltaTime;
+
 		SetUniform(UNIFORM_ADD_POINT_LIGHT);
 		SetUniform(UNIFORM_POINT_LIGHT_POSITION, glm::value_ptr(this->root->transform->translation));
 		SetUniform(UNIFORM_POINT_LIGHT_COLOR, &this->color);
-		SetUniform(UNIFORM_POINT_LIGHT_FALLOFF, &this->falloff);
+		SetUniform(UNIFORM_POINT_LIGHT_FALLOFF, glm::value_ptr(deltaFalloff));
 	}
 }
 void LightNode::unload()

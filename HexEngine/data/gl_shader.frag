@@ -16,6 +16,7 @@ uniform sampler2D specular_map;
 uniform sampler2D luminance_map;
 
 uniform sampler2D depth_map;
+uniform sampler2D ao_map;
 uniform sampler2D shadow_map;
 
 uniform sampler2D leftEye_map;
@@ -27,7 +28,6 @@ uniform vec3 pointLight4_falloff[4];
 uniform int numOfPointLights;
 
 uniform float shadow_size;
-uniform float luminance_size;
 uniform vec2[36] random_filter;
 uniform float gamma;
 uniform vec4 leftEye_color;
@@ -94,7 +94,12 @@ vec4 anaglyphic_3d()
 
 vec4 ambient_occlusion()
 {
-	return vec4(0.);
+	float depth = average(texture(depth_map, tex_coord).rgb);
+	float n = 1.0;
+	float f = 24.0;
+	depth = (2.0 * n) / ((f + n) - (depth * (f - n)));
+
+	return vec4(vec3(depth), 1.);
 }
 vec4 bright_pass()
 {
@@ -388,7 +393,20 @@ float shadow_intensity()
 #endif
 }
 
-void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in vec3 light_position, in vec3 light_color, in vec3 light_falloff)
+void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
+{
+	vec3 l = normalize(directionalLight_ss);
+	vec3 h = normalize(l + v);
+
+	float n_dot_l = dot(n, l);
+
+	//float shadow = shadow_intensity();
+	float lambert = max(n_dot_l, 0.);
+	
+	vec3 diffuse = (directionalLight_color.rgb * lambert);
+	albedo += diffuse * directionalLight_color.a;
+}
+void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specular_intensity, in vec3 light_position, in vec4 light_color, in vec3 light_falloff)
 {
 	float dist = distance(light_position, vertex_ss);
 	float atten = 1. / (light_falloff.x + (light_falloff.y * dist) + (light_falloff.z * dist * dist));
@@ -410,25 +428,12 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in vec3 light_po
 	float m = roughness * roughness;
 	float r = (1. / (m * pow(n_dot_h, 4.))) * exp((pow(n_dot_h, 2.) - 1.) / (m * pow(n_dot_h, 2.)));
 	float f = (ref_index + pow(1. - h_dot_v, 5.)) * (1. - ref_index);
-	float specular = max((abs(f * r * g) / n_dot_v), 0.);
+	float specular = max((abs(f * r * g) / n_dot_v), 0.) * specular_intensity;
 	
 	float lambert = max(n_dot_l, 0.);
 
-	vec3 diffuse = (light_color * lambert) + vec3(specular);
-	albedo += (diffuse * atten);
-}
-void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
-{
-	vec3 l = normalize(directionalLight_ss);
-	vec3 h = normalize(l + v);
-
-	float n_dot_l = dot(n, l);
-
-	//float shadow = shadow_intensity();
-	float lambert = max(n_dot_l, 0.);
-	
-	vec3 diffuse = (directionalLight_color.rgb * lambert);
-	albedo += diffuse;
+	vec3 diffuse = (light_color.rgb * lambert) + vec3(specular * lambert);
+	albedo += (diffuse * atten * light_color.a);
 }
 
 vec4 main_render()
@@ -436,44 +441,26 @@ vec4 main_render()
 	vec4 sample_color = texture(color_map, tex_coord);
 	vec3 color = sample_color.rgb;
 
+	vec4 sample_specular = texture(specular_map, tex_coord);
+	float specular_intensity = average(sample_specular.rgb);
+
 	vec4 sample_normal = texture(normal_map, tex_coord);
 	vec3 n = normalize((sample_normal.rgb * 2.) - 1.);
-	vec3 v = normalize(view_ss);
-	//n = vec3(0., 0., 1.);
+	vec3 v = normalize(view_ss - vertex_ss);
 	
 	vec3 albedo = vec3(0.);
 
 	directionalLight_albedo(albedo, n, v);
 	
-	//if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, pointLight4_ss[0], pointLight4_color[0].rgb, pointLight4_falloff[0]);
-	//if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, pointLight4_ss[1], pointLight4_color[1].rgb, pointLight4_falloff[1]);
-	//if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, pointLight4_ss[2], pointLight4_color[2].rgb, pointLight4_falloff[2]);
-	//if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, pointLight4_ss[3], pointLight4_color[3].rgb, pointLight4_falloff[3]);
+	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[0], pointLight4_color[0], pointLight4_falloff[0]);
+	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[1], pointLight4_color[1], pointLight4_falloff[1]);
+	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[2], pointLight4_color[2], pointLight4_falloff[2]);
+	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[3], pointLight4_color[3], pointLight4_falloff[3]);
 
-	//return vec4(shadow_intensity());
-	//return vec4(abs(directionalLight_ss), 1.);
 	return vec4(color * albedo, 1.);
 }
 vec4 final_render()
 {
-	vec2 incr = vec2(1. / luminance_size);
-#if 0
-	vec4 sum = vec4(0.);
-	for (int i = 0; i < random_filter.length(); i++)
-	{
-		vec2 sample_coord = incr;
-		sample_coord *= random_filter[i];
-		sum += texture(luminance_map, tex_coord + sample_coord);
-	}
-	vec4 luminance = sum / float(random_filter.length());
-#elif 0
-	vec2 filter = vec2(cos(tex_coord.x), sin(tex_coord.x));
-	vec2 sample_coord = vec2(
-		(incr.x * filter.x) - (incr.y * filter.y), 
-		(incr.x * filter.y) + (incr.y * filter.x)
-	);
-	vec4 luminance = vec4(tex_coord + sample_coord, 0., 1.);//texture(luminance_map, sample_coord);
-#endif
 	vec4 luminance = texture(luminance_map, tex_coord);
 	vec4 base = texture(color_map, tex_coord);
 	return base + luminance;
