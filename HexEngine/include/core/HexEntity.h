@@ -19,6 +19,9 @@ public:
 	void setShape(ShapeNode* node);
 	void addComponent(ComponentNode* node);
 
+	template <typename T> T* getComponent();
+	//template <typename T> void getComponents(ARRAY<T*>& list);
+
 	void parentTo(HexEntity* entity);
 
 	TransformNode* transform;

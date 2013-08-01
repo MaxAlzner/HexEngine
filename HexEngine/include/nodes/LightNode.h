@@ -2,7 +2,7 @@
 #define _LIGHTNODE_H_
 HEX_BEGIN
 
-HEX_API typedef enum HEX_LIGHTMODE
+HEX_API typedef enum LIGHTMODE
 {
 	LIGHTMODE_NONE         = 0, 
 	LIGHTMODE_DIRECTIONAL  = 1, 
@@ -25,7 +25,7 @@ public:
 	void onFrameUpdate();
 	void onFixedUpdate();
 
-	HEX_LIGHTMODE mode;
+	LIGHTMODE mode;
 	float intensity;
 	MALib::COLOR color;
 	glm::vec3 falloff;

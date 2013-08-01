@@ -105,6 +105,10 @@ void HexEntity::addComponent(ComponentNode* node)
 	node->parentTo(this);
 }
 
+template <typename T> T* HexEntity::getComponent()
+{
+}
+
 void HexEntity::parentTo(HexEntity* entity)
 {
 	if (entity == NULL) return;

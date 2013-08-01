@@ -12,6 +12,19 @@ public:
 	void load();
 	void unload();
 	void destroy();
+
+	void setTranslationX(float v);
+	void setTranslationY(float v);
+	void setTranslationZ(float v);
+	void setRotationX(float v);
+	void setRotationY(float v);
+	void setRotationZ(float v);
+	void setScaleX(float v);
+	void setScaleY(float v);
+	void setScaleZ(float v);
+	void setTranslation(float x, float y, float z);
+	void setRotation(float x, float y, float z);
+	void setScale(float x, float y, float z);
 	
 	void translate(float x, float y, float z);
 	void rotate(float x, float y, float z);

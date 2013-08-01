@@ -21,6 +21,43 @@ void TransformNode::destroy()
 {
 }
 
+void TransformNode::setTranslationX(float v)
+{
+}
+void TransformNode::setTranslationY(float v)
+{
+}
+void TransformNode::setTranslationZ(float v)
+{
+}
+void TransformNode::setRotationX(float v)
+{
+}
+void TransformNode::setRotationY(float v)
+{
+}
+void TransformNode::setRotationZ(float v)
+{
+}
+void TransformNode::setScaleX(float v)
+{
+}
+void TransformNode::setScaleY(float v)
+{
+}
+void TransformNode::setScaleZ(float v)
+{
+}
+void TransformNode::setTranslation(float x, float y, float z)
+{
+}
+void TransformNode::setRotation(float x, float y, float z)
+{
+}
+void TransformNode::setScale(float x, float y, float z)
+{
+}
+
 void TransformNode::translate(float x, float y, float z)
 {
 	if (x == 0.0f && y == 0.0f && z == 0.0f) return;

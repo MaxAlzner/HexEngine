@@ -452,10 +452,12 @@ vec4 main_render()
 
 	directionalLight_albedo(albedo, n, v);
 	
+#if 0
 	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[0], pointLight4_color[0], pointLight4_falloff[0]);
 	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[1], pointLight4_color[1], pointLight4_falloff[1]);
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[2], pointLight4_color[2], pointLight4_falloff[2]);
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[3], pointLight4_color[3], pointLight4_falloff[3]);
+#endif
 
 	return vec4(color * albedo, 1.);
 }
