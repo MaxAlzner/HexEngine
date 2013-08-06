@@ -12,6 +12,20 @@ void UpdateDeltaTime()
 	Ping = NewPing;
 	//MALib::LOG_Out1f("DELTA TIME", DeltaTime);
 }
+void UpdateFrameCount()
+{
+	static uint SecondCount = 0;
+	static uint FrameCount = 0;
+	FrameCount++;
+	uint CurrentTime = (uint)time(0);
+	if (SecondCount != CurrentTime)
+	{
+		SecondCount = CurrentTime;
+		//MALib::LOG_Out1i("SECOND COUNT", SecondCount);
+		MALib::LOG_Out1i("FRAME COUNT", FrameCount);
+		FrameCount = 0;
+	}
+}
 
 HexRender MainRender;
 HexRender ShadowMap;
@@ -25,16 +39,18 @@ float Gamma = 2.2f;
 
 HEX_API void OnFrameDraw()
 {
-	if (Paused) return;
 	if (Cameras.length() < 1) return;
 	
-#if 0
+	Cameras[0]->load();
+#if 1
 	ResetUniforms();
 	ShadowMap.load();
 
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
+	for (unsigned i = 0; i < Casters.length(); i++) Casters[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
 
 	ShadowMap.unload();
 #endif
@@ -45,10 +61,10 @@ HEX_API void OnFrameDraw()
 	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap.colorMap);
 	SetUniform(UNIFORM_SHADOW_MAP_SIZE, 1024.0f);
 	
-	Cameras[0]->render();
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
 	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
 
 	MainRender.unload();
 #if 1
@@ -60,25 +76,20 @@ HEX_API void OnFrameDraw()
 	AmbientOcclusion.unload();
 #endif
 #if 1
-	//LuminanceCounter++;
-	//if (LuminanceCounter >= 30)
-	//{
-		BrightPass.load();
+	BrightPass.load();
 
-		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
-		SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
-		SetUniform(UNIFORM_GAMMA, Gamma);
-		PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
+	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
+	SetUniform(UNIFORM_GAMMA, Gamma);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
 
-		BrightPass.unload();
-		Luminance.load();
+	BrightPass.unload();
+	Luminance.load();
 
-		SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-		PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
 
-		Luminance.unload();
-	//	LuminanceCounter = 0;
-	//}
+	Luminance.unload();
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
@@ -86,7 +97,12 @@ HEX_API void OnFrameDraw()
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
 #endif
 	
-	if (Toggle) AmbientOcclusion.blit();
+	if (Toggle)
+	{
+		AmbientOcclusion.blit();
+		//ShadowMap.blit();
+	}
+	Cameras[0]->unload();
 
 	SDL_GL_SwapBuffers();
 }
@@ -99,19 +115,24 @@ HEX_API void OnFrameUpdate()
 		Entities[i]->frameUpdate();
 	}
 
+	static float screenSize[2] = {float(ScreenRect.width), float(ScreenRect.height)};
+	SetUniform(UNIFORM_SCREEN_SIZE, screenSize);
+
+	UpdateFrameCount();
 	UpdateDeltaTime();
 }
 HEX_API void OnFixedUpdate()
 {
-	if (Paused) return;
 	if (Input::IsKeyDown(KEY_ESCAPE) || Input::IsButtonDown(XBOX_BACK)) ToggleRunning();
+	if (Input::GetKey(KEY_SPACE, true)) Paused = !Paused;
+	if (Paused) return;
 
 	for (unsigned i = 0; i < Entities.length(); i++)
 	{
 		Entities[i]->fixedUpdate();
 	}
 	
-	if (Input::GetKey(KEY_SPACE, true)) Toggle = !Toggle;
+	if (Input::GetKey(KEY_NUMPAD_1, true)) Toggle = !Toggle;
 	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
 	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
 

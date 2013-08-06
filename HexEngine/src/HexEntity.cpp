@@ -53,7 +53,8 @@ void HexEntity::fixedUpdate()
 		}
 	}
 }
-void HexEntity::render()
+
+void HexEntity::load()
 {
 	if (this->transform != NULL) this->transform->load();
 	if (this->material != NULL) this->material->load();
@@ -65,12 +66,11 @@ void HexEntity::render()
 			component->load();
 		}
 	}
-	if (this->shape != NULL)
-	{
-		this->shape->load();
-		this->shape->batch();
-		this->shape->unload();
-	}
+	if (this->shape != NULL) this->shape->load();
+}
+void HexEntity::unload()
+{
+	if (this->shape != NULL) this->shape->unload();
 	for (unsigned i = 0; i < this->components.length(); i++)
 	{
 		ComponentNode* component = this->components[i];
@@ -81,6 +81,12 @@ void HexEntity::render()
 	}
 	if (this->material != NULL) this->material->unload();
 	if (this->transform != NULL) this->transform->unload();
+}
+void HexEntity::render()
+{
+	this->load();
+	if (this->shape != NULL) this->shape->batch();
+	this->unload();
 }
 
 void HexEntity::setTransform(TransformNode* node)

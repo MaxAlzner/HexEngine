@@ -6,14 +6,15 @@ HEX_BEGIN
 bool AppRunning = true;
 bool Paused = false;
 float DeltaTime = 0.0f;
-float AspectRatio = 3.0f / 4.0f;
-MALib::RECT RenderRect(1024, 768);
-MALib::RECT ScreenRect(800, 600);
+float AspectRatio = 128.0f / 72.0f;
+MALib::RECT RenderRect(1280, 720);
+MALib::RECT ScreenRect(1280, 720);
 SDL_Surface* RenderSurface = NULL;
 
 MALib::ARRAY<HexEntity*> Cameras;
 MALib::ARRAY<HexEntity*> Lights;
 MALib::ARRAY<HexEntity*> Skyboxes;
+MALib::ARRAY<HexEntity*> Casters;
 MALib::ARRAY<HexEntity*> Renderable;
 CameraNode* MainCamera = NULL;
 	
@@ -30,6 +31,7 @@ HEX_API void InitializeData()
 	Cameras.resize(8);
 	Lights.resize(8);
 	Skyboxes.resize(8);
+	Casters.resize(32);
 	Renderable.resize(32);
 
 	Meshes.resize(24);
@@ -49,6 +51,7 @@ HEX_API void UninitializeData()
 	Cameras.clear();
 	Lights.clear();
 	Skyboxes.clear();
+	Casters.clear();
 	Renderable.clear();
 	Meshes.clear();
 	Textures.clear();

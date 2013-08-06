@@ -20,17 +20,14 @@ void CameraNode::load()
 {
 	if (this->root == NULL) return;
 	if (this->root->transform == NULL) return;
-	
-	glm::vec3 eye = this->root->transform->position;
-	glm::vec3 focus = eye + (this->root->transform->forward);
-	this->viewSpace = glm::lookAt(eye, focus, this->root->transform->up);
-	this->perspective = glm::perspective(this->fovAngle, this->aspectRatio, this->nearZ, this->farZ);
+	MainCamera = this;
 	
 	SetUniform(UNIFORM_WS_TO_CS, glm::value_ptr(this->viewSpace));
 	SetUniform(UNIFORM_PROJECTION, glm::value_ptr(this->perspective));
 }
 void CameraNode::unload()
 {
+	MainCamera = NULL;
 }
 void CameraNode::destroy()
 {
@@ -41,6 +38,10 @@ void CameraNode::onStart()
 }
 void CameraNode::onFrameUpdate()
 {
+	glm::vec3 eye = this->root->transform->position;
+	glm::vec3 focus = eye + (this->root->transform->forward);
+	this->viewSpace = glm::lookAt(eye, focus, this->root->transform->up);
+	this->perspective = glm::perspective(this->fovAngle, this->aspectRatio, this->nearZ, this->farZ);
 }
 void CameraNode::onFixedUpdate()
 {

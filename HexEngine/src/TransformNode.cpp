@@ -23,39 +23,59 @@ void TransformNode::destroy()
 
 void TransformNode::setTranslationX(float v)
 {
+	this->translation.x = v;
 }
 void TransformNode::setTranslationY(float v)
 {
+	this->translation.y = v;
 }
 void TransformNode::setTranslationZ(float v)
 {
+	this->translation.z = v;
 }
 void TransformNode::setRotationX(float v)
 {
+	this->rotation.x = v;
 }
 void TransformNode::setRotationY(float v)
 {
+	this->rotation.y = v;
 }
 void TransformNode::setRotationZ(float v)
 {
+	this->rotation.z = v;
 }
 void TransformNode::setScaleX(float v)
 {
+	this->scaled.x = v;
 }
 void TransformNode::setScaleY(float v)
 {
+	this->scaled.y = v;
 }
 void TransformNode::setScaleZ(float v)
 {
+	this->scaled.z = v;
 }
 void TransformNode::setTranslation(float x, float y, float z)
 {
+	this->translation.x = x;
+	this->translation.y = y;
+	this->translation.z = z;
 }
 void TransformNode::setRotation(float x, float y, float z)
 {
+	this->rotation.x = x;
+	this->rotation.y = y;
+	this->rotation.z = z;
+
+	glm::mod(this->rotation, 360.0f);
 }
 void TransformNode::setScale(float x, float y, float z)
 {
+	this->scaled.x = x;
+	this->scaled.y = y;
+	this->scaled.z = z;
 }
 
 void TransformNode::translate(float x, float y, float z)

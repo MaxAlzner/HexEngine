@@ -160,7 +160,10 @@ HEX_API void PollEvents()
 			AppRunning = false;
 			break;
 		case SDL_VIDEORESIZE:
-			Reshape(event.resize.w, unsigned(float(event.resize.w) * AspectRatio));
+			if ((uint)event.resize.w != ScreenRect.width) 
+				Reshape(event.resize.w, unsigned(float(event.resize.w) * pow(AspectRatio, -1)));
+			else 
+				Reshape(unsigned(float(event.resize.h) * AspectRatio), event.resize.h);
 			break;
 
 		default:

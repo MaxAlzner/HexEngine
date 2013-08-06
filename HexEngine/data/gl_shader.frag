@@ -27,6 +27,7 @@ uniform vec4 pointLight4_color[4];
 uniform vec3 pointLight4_falloff[4];
 uniform int numOfPointLights;
 
+uniform vec2 screen_size;
 uniform float shadow_size;
 uniform vec2[36] random_filter;
 uniform float gamma;
@@ -92,12 +93,19 @@ vec4 anaglyphic_3d()
 	return g;
 }
 
+#define D(x, y) \
+do {\
+	float d = average(textureOffset(depth_map, tex_coord, ivec2(x, y)).rgb);\
+} while (false)
 vec4 ambient_occlusion()
 {
+	vec2 incr = 1. / screen_size;
 	float depth = average(texture(depth_map, tex_coord).rgb);
 	float n = 1.0;
 	float f = 24.0;
 	depth = (2.0 * n) / ((f + n) - (depth * (f - n)));
+
+	float ao = 0.;
 
 	return vec4(vec3(depth), 1.);
 }
@@ -400,7 +408,6 @@ void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
 
 	float n_dot_l = dot(n, l);
 
-	//float shadow = shadow_intensity();
 	float lambert = max(n_dot_l, 0.);
 	
 	vec3 diffuse = (directionalLight_color.rgb * lambert);
@@ -438,6 +445,8 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specula
 
 vec4 main_render()
 {
+	//return vec4(shadow_intensity());
+	
 	vec4 sample_color = texture(color_map, tex_coord);
 	vec3 color = sample_color.rgb;
 
@@ -452,17 +461,23 @@ vec4 main_render()
 
 	directionalLight_albedo(albedo, n, v);
 	
-#if 0
+#if 1
 	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[0], pointLight4_color[0], pointLight4_falloff[0]);
 	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[1], pointLight4_color[1], pointLight4_falloff[1]);
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[2], pointLight4_color[2], pointLight4_falloff[2]);
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[3], pointLight4_color[3], pointLight4_falloff[3]);
 #endif
 
+	//float shadow = shadow_intensity();
+	
 	return vec4(color * albedo, 1.);
 }
 vec4 final_render()
 {
+	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.x * 0.71));
+	vec2 coord = vec2(0.5 / 128.);
+	coord = vec2((coord.x * filter.x) - (coord.y * filter.y), (coord.x * filter.y) + (coord.y * filter.x));
+
 	vec4 luminance = texture(luminance_map, tex_coord);
 	vec4 base = texture(color_map, tex_coord);
 	return base + luminance;

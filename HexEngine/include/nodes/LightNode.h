@@ -29,6 +29,9 @@ public:
 	float intensity;
 	MALib::COLOR color;
 	glm::vec3 falloff;
+	
+	glm::mat4 lightPerspective;
+	glm::mat4 lightSpace;
 };
 
 HEX_END

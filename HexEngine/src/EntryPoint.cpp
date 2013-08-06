@@ -49,7 +49,7 @@ void Build()
 	HEX::AddSkybox(meshes[0], textures[0]);
 	
 	HEX::BindEntity(entities[i]);i++;
-	HEX::TransformEntity(0.0f, 1.0f, -4.0f);
+	HEX::TransformEntity(0.0f, 2.4f, -4.0f);
 	HEX::AddController();
 
 	HEX::BindEntity(entities[i]);i++;
@@ -134,6 +134,13 @@ void Build()
 	HEX::AddShape(meshes[5]);
 	HEX::AddMaterial(textures[13], textures[14], textures[15]);
 #endif
+
+	HEX::BindEntity(entities[i]);i++;
+	HEX::TransformEntity(0.0f, 4.8f, 0.0f, 0.0f, 90.0f, 0.0f);
+	HEX::AddShape(meshes[3]);
+	HEX::AddMaterial(textures[7], textures[8], textures[9]);
+	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_SCALE_XYZ, 0.2f, 0.2f, 0.2f);
+	HEX::SetParameter(HEX::PARAMETER_MATERIAL_SHADOW_CASTER, true);
 }
 
 int main(int argc, char **argv)

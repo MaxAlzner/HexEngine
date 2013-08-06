@@ -131,6 +131,7 @@ HEX_API void SetParameter(PARAMETER parameter, bool value)
 	{
 	case PARAMETER_MATERIAL_SHADOW_CASTER:
 		BoundEntity->material->shadowCaster = value;
+		Casters.add(BoundEntity);
 		break;
 
 	default:

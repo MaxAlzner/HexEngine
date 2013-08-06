@@ -39,17 +39,17 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(SolutionDir)libraries\FreeType;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(SolutionDir)libraries\GL\include;$(SolutionDir)libraries\GL\include\GL;$(SolutionDir)libraries\SDL\include;$(SolutionDir)libraries\MALib\include;$(SolutionDir)libraries\FreeType\include;$(SolutionDir)libraries\FreeType\include\freetype;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(SolutionDir)libraries\FreeType;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(USERPROFILE)\My Documents\GitHub\MALib\MALib\bin;$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\FreeType;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(USERPROFILE)\My Documents\GitHub\MALib\MALib\include;$(SolutionDir)libraries\GL\include;$(SolutionDir)libraries\GL\include\GL;$(SolutionDir)libraries\SDL\include;$(SolutionDir)libraries\FreeType\include;$(SolutionDir)libraries\FreeType\include\freetype;$(IncludePath)</IncludePath>
+    <LibraryPath>$(USERPROFILE)\My Documents\GitHub\MALib\MALib\bin;$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\FreeType;$(LibraryPath)</LibraryPath>
     <OutDir>bin\</OutDir>
     <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <ExecutablePath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(SolutionDir)libraries\FreeType;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(SolutionDir)libraries\GL\include;$(SolutionDir)libraries\GL\include\GL;$(SolutionDir)libraries\SDL\include;$(SolutionDir)libraries\MALib\include;$(SolutionDir)libraries\FreeType\include;$(SolutionDir)libraries\FreeType\include\freetype;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\MALib;$(SolutionDir)libraries\FreeType;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(USERPROFILE)\My Documents\GitHub\MALib\MALib\bin;$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\FreeType;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(USERPROFILE)\My Documents\GitHub\MALib\MALib\include;$(SolutionDir)libraries\GL\include;$(SolutionDir)libraries\GL\include\GL;$(SolutionDir)libraries\SDL\include;$(SolutionDir)libraries\FreeType\include;$(SolutionDir)libraries\FreeType\include\freetype;$(IncludePath)</IncludePath>
+    <LibraryPath>$(USERPROFILE)\My Documents\GitHub\MALib\MALib\bin;$(SolutionDir)libraries\GL;$(SolutionDir)libraries\SDL;$(SolutionDir)libraries\FreeType;$(LibraryPath)</LibraryPath>
     <OutDir>bin\</OutDir>
     <IntDir>output\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>

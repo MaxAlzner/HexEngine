@@ -17,6 +17,7 @@ struct UniformLocations
 	int numOfPointLights;
 	int uv_repeat;
 	int uv_offset;
+	int screen_size;
 	int shadow_size;
 	int random_filter;
 	int gamma;
@@ -69,6 +70,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.numOfPointLights = glGetUniformLocation(ShaderProgram, "numOfPointLights");
 	Uniforms.uv_repeat = glGetUniformLocation(ShaderProgram, "uv_repeat");
 	Uniforms.uv_offset = glGetUniformLocation(ShaderProgram, "uv_offset");
+	Uniforms.screen_size = glGetUniformLocation(ShaderProgram, "screen_size");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
 	Uniforms.gamma = glGetUniformLocation(ShaderProgram, "gamma");
@@ -97,7 +99,7 @@ HEX_API void InitializeUniforms()
 		randoms[i + 0] = x;
 		randoms[i + 1] = y;
 	}
-	MALib::LOG_Outvf("RANDOM FILTER", randoms, filter_size);
+	//MALib::LOG_Outvf("RANDOM FILTER", randoms, filter_size);
 	SetUniform(UNIFORM_RANDOM_FILTER, filter_size / 2, randoms);
 	delete [] randoms;
 
@@ -188,6 +190,9 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		break;
 	case UNIFORM_UV_OFFSET:
 		glUniform2fv(Uniforms.uv_offset, 1, (const GLfloat*)data);
+		break;
+	case UNIFORM_SCREEN_SIZE:
+		glUniform2fv(Uniforms.screen_size, 1, (const GLfloat*)data);
 		break;
 		
 	case UNIFORM_LEFT_EYE_COLOR:

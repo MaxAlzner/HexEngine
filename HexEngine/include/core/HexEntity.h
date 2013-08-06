@@ -12,6 +12,9 @@ public:
 	void start();
 	void frameUpdate();
 	void fixedUpdate();
+
+	void load();
+	void unload();
 	void render();
 
 	void setTransform(TransformNode* node);

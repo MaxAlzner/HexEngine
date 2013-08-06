@@ -13,6 +13,7 @@ extern SDL_Surface* RenderSurface;
 extern MALib::ARRAY<HexEntity*> Cameras;
 extern MALib::ARRAY<HexEntity*> Lights;
 extern MALib::ARRAY<HexEntity*> Skyboxes;
+extern MALib::ARRAY<HexEntity*> Casters;
 extern MALib::ARRAY<HexEntity*> Renderable;
 extern CameraNode* MainCamera;
 	

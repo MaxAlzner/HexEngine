@@ -106,6 +106,3 @@ void main(void)
 	ao/=16.0;
  
 	gl_FragColor = vec4(1.0-ao) * texture2D(texture1,texCoord);
-
-gamma = 2.2
-luminance = .2126 * R^gamma + .7152 * G^gamma + .0722 * B^gamma;

@@ -24,7 +24,8 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_UV_REPEAT                                          = 0x00000100, 
 	UNIFORM_UV_OFFSET                                          = 0x00000110, 
 	
-	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000200, 
+	UNIFORM_SCREEN_SIZE                                        = 0x00000201, 
+	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000202, 
 	UNIFORM_RANDOM_FILTER                                      = 0x00000210, 
 	UNIFORM_GAMMA                                              = 0x00000211, 
 	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000221, 
@@ -55,6 +56,9 @@ HEX_API typedef enum UNIFORM
 };
 
 typedef struct UniformLocations UniformLocations;
+
+extern UNIFORM LastFlag;
+extern UNIFORM CurrentFlag;
 
 extern MALib::ARRAY<GLint> Attributes;
 extern UniformLocations Uniforms;
