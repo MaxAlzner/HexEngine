@@ -33,8 +33,7 @@ HexRender BrightPass;
 HexRender Luminance;
 HexRender AmbientOcclusion;
 
-bool Toggle = false;
-uint LuminanceCounter = 0;
+bool Toggle = true;
 float Gamma = 2.2f;
 
 HEX_API void OnFrameDraw()

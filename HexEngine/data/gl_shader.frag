@@ -64,6 +64,9 @@ const vec3 reinhard = vec3(0.2126, 0.7152, 0.0722);
 const float middle_gray = 0.18;
 const float white_cutoff = 0.8;
 
+const float nearZ = 1.0;
+const float farZ = 24.0;
+
 float average(vec3 v)
 {
 	return (v.r + v.g + v.b) / 3.;
@@ -81,6 +84,19 @@ float gr(float a, float b)
 	return exp(1. - abs(a - b));
 }
 
+float read_depth(in vec2 coord)
+{
+	float depth = average(texture(depth_map, tex_coord).rgb);
+	return (2.0 * nearZ) / ((farZ + nearZ) - (depth * (farZ - nearZ)));
+}
+float compare_depths(in float d1, in float d2)
+{
+	float atten = (d1 - d2) / (farZ - nearZ);
+	float occlusion = max(dot(d1, d2), 0.);
+
+	return clamp(atten, 0., 1.);
+}
+
 vec4 anaglyphic_3d()
 {
 	float leftEye_value = gray(texture(leftEye_map, tex_coord).rgb);
@@ -93,21 +109,106 @@ vec4 anaglyphic_3d()
 	return g;
 }
 
-#define D(x, y) \
-do {\
-	float d = average(textureOffset(depth_map, tex_coord, ivec2(x, y)).rgb);\
-} while (false)
 vec4 ambient_occlusion()
 {
+	float depth = read_depth(tex_coord);
 	vec2 incr = 1. / screen_size;
-	float depth = average(texture(depth_map, tex_coord).rgb);
-	float n = 1.0;
-	float f = 24.0;
-	depth = (2.0 * n) / ((f + n) - (depth * (f - n)));
-
+	
 	float ao = 0.;
-
-	return vec4(vec3(depth), 1.);
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -4))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -3))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -2))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -1))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  0))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  0))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  1))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  1))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  2))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  2))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  3))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  3))));
+	
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  4))));
+	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  4))));
+ 
+	ao /= 81.;
+	ao = 1. - ao;
+	
+	return vec4(vec3(ao), 1.);
 }
 vec4 bright_pass()
 {
