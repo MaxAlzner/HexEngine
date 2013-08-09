@@ -255,8 +255,6 @@
     <ClCompile Include="src\TransformNode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\gl_shader.frag" />
-    <None Include="data\gl_shader.vert" />
     <None Include="libraries\glm\core\func_common.inl" />
     <None Include="libraries\glm\core\func_exponential.inl" />
     <None Include="libraries\glm\core\func_geometric.inl" />

@@ -31,6 +31,8 @@ HexRender MainRender;
 HexRender ShadowMap;
 HexRender BrightPass;
 HexRender Luminance;
+HexRender DeferredPositions;
+HexRender DeferredNormals;
 HexRender AmbientOcclusion;
 
 bool Toggle = true;
@@ -67,14 +69,28 @@ HEX_API void OnFrameDraw()
 
 	MainRender.unload();
 #if 1
+	DeferredNormals.load();
+	
+	SetUniform(UNIFORM_FLAG_DEFER_NORMALS);
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	DeferredNormals.unload();
+	DeferredPositions.load();
+	
+	SetUniform(UNIFORM_FLAG_DEFER_POSITIONS);
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	DeferredPositions.unload();
 	AmbientOcclusion.load();
 	
 	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
+	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_POSITIONS, DeferredPositions.colorMap);
+	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_NORMALS, DeferredNormals.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION);
 	
 	AmbientOcclusion.unload();
 #endif
-#if 1
+#if 0
 	BrightPass.load();
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
@@ -94,12 +110,13 @@ HEX_API void OnFrameDraw()
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
+#else
+	MainRender.blit();
 #endif
 	
 	if (Toggle)
 	{
 		AmbientOcclusion.blit();
-		//ShadowMap.blit();
 	}
 	Cameras[0]->unload();
 
@@ -131,7 +148,7 @@ HEX_API void OnFixedUpdate()
 		Entities[i]->fixedUpdate();
 	}
 	
-	if (Input::GetKey(KEY_NUMPAD_1, true)) Toggle = !Toggle;
+	if (Input::GetKey(KEY_1, true)) Toggle = !Toggle;
 	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
 	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
 
@@ -226,6 +243,10 @@ HEX_API bool Initialize(uint argc, string* argv)
 	ShadowMap.build(1024, 1024, true, false);
 	BrightPass.build(128, 128, true, false);
 	Luminance.build(128, 128, true, false);
+	DeferredPositions.build(RenderRect.width, RenderRect.height, true, true);
+	DeferredPositions.clear = MALib::COLOR(0.0f, 0.0f, 0.0f);
+	DeferredNormals.build(RenderRect.width, RenderRect.height, true, true);
+	DeferredNormals.clear = MALib::COLOR(0.0f, 0.0f, 0.0f);
 	AmbientOcclusion.build(RenderRect.width, RenderRect.height, true, false);
 	AmbientOcclusion.clear = MALib::COLOR(0.0f, 0.0f, 0.0f);
 	

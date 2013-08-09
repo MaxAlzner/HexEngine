@@ -14,6 +14,9 @@ public:
 	void unload();
 	void destroy();
 
+	//void addColorAttach(uint width, uint height);
+	//void setDepthAttach(uint width, uint height, bool clearDraw);
+
 	void blit(HexRender* dest = NULL);
 
 	MALib::RECT dimensions;
@@ -21,6 +24,7 @@ public:
 	uint framebuffer;
 	uint colorMap;
 	uint depthMap;
+	//MALib::ARRAY<uint> colorAttaches;
 	MALib::COLOR clear;
 };
 

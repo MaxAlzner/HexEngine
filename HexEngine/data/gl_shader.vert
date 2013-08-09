@@ -11,6 +11,9 @@ out vec4 vertex_ls;
 out vec3 vertex_ss;
 out vec3 view_ss;
 
+out vec4 vertex_def;
+out vec3 normal_def;
+
 out vec3 directionalLight_ss;
 out vec3 pointLight4_ss[4];
 
@@ -32,7 +35,7 @@ uniform int flag;
 
 void main()
 {
-	if (flag > 2)
+	if (flag > 10)
 	{
 		tex_coord = vertex.xy;
 		gl_Position = vec4((vertex.xy * 2.) - 1., 0., 1.);
@@ -46,14 +49,20 @@ void main()
 
 	gl_Position = projection * vertex_cs;
 	
+	vertex_def = vertex_cs;
 	vertex_ls = ws_to_ls * vertex_ws;
 
 	if (flag == 1 || flag == 2) return;
+	if (flag == 4) return;
 	
 	mat4 os_to_cs = ws_to_cs * os_to_ws;
+	
 	vec3 normal_cs =   normalize((os_to_cs * vec4(normal,   0.)).xyz);
 	vec3 tangent_cs =  normalize((os_to_cs * vec4(tangent,  0.)).xyz);
 	vec3 binormal_cs = normalize((os_to_cs * vec4(binormal, 0.)).xyz);
+
+	normal_def = normal_cs;
+	if (flag == 5) return;
 
 	mat3 cs_to_ss = mat3(tangent_cs, binormal_cs, normal_cs);
 

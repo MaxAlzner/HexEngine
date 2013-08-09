@@ -72,7 +72,6 @@ void HexRender::build(uint width, uint height, bool attachColor, bool attachDept
 void HexRender::load()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
-	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->framebuffer);
 	glViewport(this->dimensions.x0, this->dimensions.y0, this->dimensions.width, this->dimensions.height);
 	glClearColor(this->clear.r, this->clear.g, this->clear.b, this->clear.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -80,7 +79,6 @@ void HexRender::load()
 void HexRender::unload()
 {
 	glViewport(ScreenRect.x0, ScreenRect.y0, ScreenRect.width, ScreenRect.height);
-	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void HexRender::destroy()
@@ -93,32 +91,6 @@ void HexRender::destroy()
 void HexRender::blit(HexRender* dest)
 {
 	if (this == dest) return;
-#if 0
-	uint draw = 0;
-	uint drawX0 = ScreenRect.x0;
-	uint drawY0 = ScreenRect.y0;
-	uint drawX1 = ScreenRect.x1;
-	uint drawY1 = ScreenRect.y1;
-	if (dest != NULL)
-	{
-		draw = dest->framebuffer;
-		drawX0 = dest->dimensions.x0;
-		drawY0 = dest->dimensions.y0;
-		drawX1 = dest->dimensions.x1;
-		drawY1 = dest->dimensions.y1;
-	}
-	uint read = this->framebuffer;
-	uint readX0 = this->dimensions.x0;
-	uint readY0 = this->dimensions.y0;
-	uint readX1 = this->dimensions.x1;
-	uint readY1 = this->dimensions.y1;
-	if (drawX1 < this->dimensions.x1) drawX1 = readX1;
-	if (drawY1 < this->dimensions.y1) drawY1 = readY1;
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, read);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw);
-	if (this->colorMap != 0) glBlitFramebuffer(drawX0, drawY0, drawX1, drawY1, drawX0, drawY0, drawX1, drawY1, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	if (this->depthMap != 0) glBlitFramebuffer(drawX0, drawY0, drawX1, drawY1, drawX0, drawY0, drawX1, drawY1, GL_DEPTH_BUFFER_BIT, GL_LINEAR);
-#else
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->framebuffer);
 
 	if (dest == NULL)
@@ -133,12 +105,10 @@ void HexRender::blit(HexRender* dest)
 	{
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest->framebuffer);
 		if (this->colorMap != 0) 
-			//glBlitFramebuffer(0, 0, this->dimensions.width, this->dimensions.height, 0, 0, dest->dimensions.width, dest->dimensions.height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			glBlitFramebuffer(0, 0, dest->dimensions.width, dest->dimensions.height, 0, 0, ScreenRect.width, ScreenRect.height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 		if (this->depthMap != 0) 
 			glBlitFramebuffer(0, 0, dest->dimensions.width, dest->dimensions.height, 0, 0, ScreenRect.width, ScreenRect.height, GL_DEPTH_BUFFER_BIT, GL_LINEAR);
 	}
-#endif
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

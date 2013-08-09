@@ -28,6 +28,7 @@ struct UniformLocations
 	int specular_map;
 	int luminance_map;
 	int depth_map;
+	int position_map;
 	int ao_map;
 	int shadow_map;
 	int leftEye_map;
@@ -81,6 +82,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.specular_map = glGetUniformLocation(ShaderProgram, "specular_map");
 	Uniforms.luminance_map = glGetUniformLocation(ShaderProgram, "luminance_map");
 	Uniforms.depth_map = glGetUniformLocation(ShaderProgram, "depth_map");
+	Uniforms.position_map = glGetUniformLocation(ShaderProgram, "position_map");
 	Uniforms.ao_map = glGetUniformLocation(ShaderProgram, "ao_map");
 	Uniforms.shadow_map = glGetUniformLocation(ShaderProgram, "shadow_map");
 	Uniforms.leftEye_map = glGetUniformLocation(ShaderProgram, "leftEye_map");
@@ -277,10 +279,16 @@ HEX_API void SetUniform(UNIFORM uniform)
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_BASECOLOR_RENDER;
 		break;
-	case UNIFORM_FLAG_BLIT_RENDER:
-		glUniform1i(Uniforms.flag, 3);
+
+	case UNIFORM_FLAG_DEFER_POSITIONS:
+		glUniform1i(Uniforms.flag, 4);
 		LastFlag = CurrentFlag;
-		CurrentFlag = UNIFORM_FLAG_BLIT_RENDER;
+		CurrentFlag = UNIFORM_FLAG_DEFER_POSITIONS;
+		break;
+	case UNIFORM_FLAG_DEFER_NORMALS:
+		glUniform1i(Uniforms.flag, 5);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_DEFER_NORMALS;
 		break;
 
 	case UNIFORM_FLAG_POSTPROCESS_GUASSIAN:
@@ -315,9 +323,14 @@ HEX_API void SetUniform(UNIFORM uniform)
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_ANAGLYPHIC_3D;
 		break;
-
+		
+	case UNIFORM_FLAG_BLIT_RENDER:
+		glUniform1i(Uniforms.flag, 41);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_BLIT_RENDER;
+		break;
 	case UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER:
-		glUniform1i(Uniforms.flag, 32);
+		glUniform1i(Uniforms.flag, 51);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER;
 		break;
@@ -383,6 +396,15 @@ HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		break;
+
+	case UNIFORM_TEXTURE_DEFERRED_NORMALS:
+		glUniform1i(Uniforms.normal_map, 2);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texture);
+	case UNIFORM_TEXTURE_DEFERRED_POSITIONS:
+		glUniform1i(Uniforms.position_map, 3);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 	default:
 		break;

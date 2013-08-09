@@ -5,6 +5,9 @@ in vec4 vertex_ls;
 in vec3 vertex_ss;
 in vec3 view_ss;
 
+in vec4 vertex_def;
+in vec3 normal_def;
+
 in vec3 directionalLight_ss;
 in vec3 pointLight4_ss[4];
 
@@ -16,6 +19,7 @@ uniform sampler2D specular_map;
 uniform sampler2D luminance_map;
 
 uniform sampler2D depth_map;
+uniform sampler2D position_map;
 uniform sampler2D ao_map;
 uniform sampler2D shadow_map;
 
@@ -87,14 +91,24 @@ float gr(float a, float b)
 float read_depth(in vec2 coord)
 {
 	float depth = average(texture(depth_map, tex_coord).rgb);
-	return (2.0 * nearZ) / ((farZ + nearZ) - (depth * (farZ - nearZ)));
+	float d = (2.0 * nearZ) / ((farZ + nearZ) - (depth * (farZ - nearZ)));
+	return clamp(d, 0., 1.);
 }
 float compare_depths(in float d1, in float d2)
 {
+#if 1
 	float atten = (d1 - d2) / (farZ - nearZ);
 	float occlusion = max(dot(d1, d2), 0.);
+#else
+	vec3 r = normalize(vec3(0., 0., d2) - vec3(0., 0., d1));
+	vec3 n = vec3(0., 0., 1.);
+	float occlusion = dot(r, n);
 
-	return clamp(atten, 0., 1.);
+	float d = length(r);
+	float atten = 1. / (1. + d);
+#endif
+
+	return clamp(occlusion * d1, 0., 1.);
 }
 
 vec4 anaglyphic_3d()
@@ -112,101 +126,17 @@ vec4 anaglyphic_3d()
 vec4 ambient_occlusion()
 {
 	float depth = read_depth(tex_coord);
+	vec3 normal = normalize((texture(normal_map, tex_coord).rgb * 2.) - 1.);
+
+	return vec4(normal, 1.);
+
+	if (depth > 0.9) return vec4(1.);
 	vec2 incr = 1. / screen_size;
 	
 	float ao = 0.;
 	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -4))));
 	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -3))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -2))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3, -1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4, -1))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  0))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  0))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  1))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  1))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  2))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  2))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  3))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  3))));
-	
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-4,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-3,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-2,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2(-1,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 0,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 1,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 2,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 3,  4))));
-	ao += compare_depths(depth, read_depth(tex_coord + (incr * vec2( 4,  4))));
- 
-	ao /= 81.;
-	ao = 1. - ao;
+	ao = clamp(1. - ao, 0., 1.);
 	
 	return vec4(vec3(ao), 1.);
 }
@@ -562,7 +492,7 @@ vec4 main_render()
 
 	directionalLight_albedo(albedo, n, v);
 	
-#if 1
+#if 0
 	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[0], pointLight4_color[0], pointLight4_falloff[0]);
 	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[1], pointLight4_color[1], pointLight4_falloff[1]);
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[2], pointLight4_color[2], pointLight4_falloff[2]);
@@ -592,8 +522,15 @@ void main()
 		outColor = vec4(0., 0., 0., 1.);
 		return;
 		case 2:
-		case 3:
+		case 41:
 		outColor = texture(color_map, tex_coord);
+		return;
+
+		case 4:
+		outColor = vec4(vertex_def.x, vertex_def.y, vertex_def.z, length(vertex_def) / (farZ - nearZ));
+		return;
+		case 5:
+		outColor = vec4((normal_def.x * .5) + .5, (normal_def.y * .5) + .5, 1., 1.);
 		return;
 
 		case 11:
@@ -616,7 +553,8 @@ void main()
 		case 31:
 		outColor = anaglyphic_3d();
 		return;
-		case 32:
+
+		case 51:
 		outColor = final_render();
 		return;
 
