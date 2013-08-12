@@ -88,6 +88,15 @@ void HexRender::destroy()
 	glDeleteFramebuffers(1, &this->framebuffer);
 }
 
+void HexRender::setClearColor(float r, float g, float b)
+{
+	this->clear.r = r;
+	this->clear.g = g;
+	this->clear.b = b;
+	this->load();
+	this->unload();
+}
+
 void HexRender::blit(HexRender* dest)
 {
 	if (this == dest) return;

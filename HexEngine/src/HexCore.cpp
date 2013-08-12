@@ -27,23 +27,85 @@ void UpdateFrameCount()
 	}
 }
 
-HexRender MainRender;
-HexRender ShadowMap;
-HexRender BrightPass;
-HexRender Luminance;
-HexRender DeferredPositions;
-HexRender DeferredNormals;
-HexRender AmbientOcclusion;
-
-bool Toggle = true;
+bool Toggle = false;
+bool ToggleLuminance = true;
+bool ToggleAmbientOcclusion = false;
 float Gamma = 2.2f;
 
+int EventThread(void* data)
+{
+	while (AppRunning)
+	{
+		PollEvents();
+	}
+	return 0;
+}
+int FixedUpdateThread(void* data)
+{
+	Uint32 LastPing = ~0;
+	while (AppRunning)
+	{
+		Uint32 NewPing = SDL_GetTicks();
+		if (NewPing - LastPing > 24)
+		{
+			OnFixedUpdate();
+			LastPing = NewPing;
+		}
+	}
+	return 0;
+}
+
+HEX_API void OnStart()
+{
+	MALib::LOG_Message("START SCENE");
+	
+	StartDrawing();
+
+	for (unsigned i = 0; i < Entities.length(); i++)
+	{
+		Entities[i]->start();
+	}
+
+#if 0
+	SDL_Thread* eventThread = SDL_CreateThread(EventThread, 0);
+	SDL_Thread* fixedUpdateThread = SDL_CreateThread(FixedUpdateThread, 0);
+
+	while (AppRunning)
+	{
+		OnFrameUpdate();
+		OnFrameDraw();
+	}
+
+	SDL_KillThread(eventThread);
+	SDL_KillThread(fixedUpdateThread);
+#else
+	Uint32 FramePing = ~0;
+	Uint32 UpdatePing = ~0;
+	while (AppRunning)
+	{
+		PollEvents();
+		
+		Uint32 NewPing = SDL_GetTicks();
+		if (NewPing - FramePing > 16)
+		{
+			OnFrameUpdate();
+			OnFrameDraw();
+			FramePing = NewPing;
+		}
+		if (NewPing - UpdatePing > 24)
+		{
+			OnFixedUpdate();
+			UpdatePing = NewPing;
+		}
+	}
+#endif
+}
 HEX_API void OnFrameDraw()
 {
 	if (Cameras.length() < 1) return;
 	
 	Cameras[0]->load();
-#if 1
+#if 0
 	ResetUniforms();
 	ShadowMap.load();
 
@@ -60,7 +122,6 @@ HEX_API void OnFrameDraw()
 
 	SetUniform(UNIFORM_FLAG_NORMAL);
 	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap.colorMap);
-	SetUniform(UNIFORM_SHADOW_MAP_SIZE, 1024.0f);
 	
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
 	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
@@ -75,40 +136,57 @@ HEX_API void OnFrameDraw()
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 
 	DeferredNormals.unload();
-	DeferredPositions.load();
-	
-	SetUniform(UNIFORM_FLAG_DEFER_POSITIONS);
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
-
-	DeferredPositions.unload();
 	AmbientOcclusion.load();
 	
 	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
 	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_POSITIONS, DeferredPositions.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_NORMALS, DeferredNormals.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION);
+	if (ToggleAmbientOcclusion) PostProcess(UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION);
 	
 	AmbientOcclusion.unload();
-#endif
 #if 0
-	BrightPass.load();
+	AmbientOcclusionBilateral.load();
 
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, AmbientOcclusion.colorMap);
+	if (ToggleAmbientOcclusion) PostProcess(UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN);
+
+	AmbientOcclusionBilateral.unload();
+	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
+#else
+	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
+#endif
+#endif
+#if 1
+	BrightPass.load();
+	
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
-	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
-	SetUniform(UNIFORM_GAMMA, Gamma);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
+	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
 
 	BrightPass.unload();
 	Luminance.load();
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
 
 	Luminance.unload();
+#if 1
+	BrightPass.load();
+	
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, Luminance.colorMap);
+	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
 
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
+	BrightPass.unload();
+	Luminance.load();
+
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
+	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+
+	Luminance.unload();
+#endif
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
-	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
+#endif
+#if 1
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
 #else
 	MainRender.blit();
@@ -116,7 +194,8 @@ HEX_API void OnFrameDraw()
 	
 	if (Toggle)
 	{
-		AmbientOcclusion.blit();
+		//AmbientOcclusion.blit();
+		Luminance.blit();
 	}
 	Cameras[0]->unload();
 
@@ -130,7 +209,9 @@ HEX_API void OnFrameUpdate()
 	{
 		Entities[i]->frameUpdate();
 	}
-
+	
+	SetUniform(UNIFORM_SHADOW_MAP_SIZE, 1024.0f);
+	SetUniform(UNIFORM_GAMMA, Gamma);
 	static float screenSize[2] = {float(ScreenRect.width), float(ScreenRect.height)};
 	SetUniform(UNIFORM_SCREEN_SIZE, screenSize);
 
@@ -139,6 +220,12 @@ HEX_API void OnFrameUpdate()
 }
 HEX_API void OnFixedUpdate()
 {
+	if (Input::GetKey(KEY_1, true)) Toggle = !Toggle;
+	if (Input::GetKey(KEY_2, true)) ToggleLuminance = !ToggleLuminance;
+	if (Input::GetKey(KEY_3, true)) ToggleAmbientOcclusion = !ToggleAmbientOcclusion;
+	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
+	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
+
 	if (Input::IsKeyDown(KEY_ESCAPE) || Input::IsButtonDown(XBOX_BACK)) ToggleRunning();
 	if (Input::GetKey(KEY_SPACE, true)) Paused = !Paused;
 	if (Paused) return;
@@ -148,10 +235,6 @@ HEX_API void OnFixedUpdate()
 		Entities[i]->fixedUpdate();
 	}
 	
-	if (Input::GetKey(KEY_1, true)) Toggle = !Toggle;
-	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
-	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
-
 	PollControllers();
 }
 
@@ -182,81 +265,21 @@ HEX_API bool Initialize(uint argc, string* argv)
 		MALib::LOG_Message(argv[i]);
 	}
 	MALib::LOG_Message("START INTIALIZING");
-	
-	MALib::LOG_Message("START SDL");
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-	{
-		MALib::LOG_Message("Unable to initialize SDL.");
-		MALib::LOG_Message(SDL_GetError());
-		return false;
-	}
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-	SDL_WM_SetCaption("HexDemo", "HexDemo");
-	
-	MALib::LOG_Message("START RESHAPE");
-	Reshape(ScreenRect.width, ScreenRect.height);
-	
-	MALib::LOG_Message("START GLEW");
-	GLenum glewStatus = glewInit();
-	if (!GLEW_VERSION_3_0)
-	{
-		MALib::LOG_Message("Requires OpenGL 3.0 or later.");
-		return false;
-	}
 
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
-	
-	MALib::LOG_Message("GL VENDOR                  ", (char*)glGetString(GL_VENDOR));
-	MALib::LOG_Message("GL RENDERER                ", (char*)glGetString(GL_RENDERER));
-	MALib::LOG_Message("GL VERSION                 ", (char*)glGetString(GL_VERSION));
-	MALib::LOG_Message("GL SHADING_LANGUAGE_VERSION", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-	
-	MALib::LOG_Message("START SHADER");
-	if (!BuildProgram("data/gl_shader.vert", "data/gl_shader.frag"))
-	{
-		MALib::LOG_Message("Could not build shaders.");
-		return false;
-	}
-	InitializeAttributes();
-	InitializeUniforms();
-
-	MALib::LOG_Out1i("NUM OF UNIFORMS", NumOfUniforms);
-	MALib::LOG_Outvi("UNIFORMS", (int*)&Uniforms, NumOfUniforms);
-	MALib::LOG_Outvi("ATTRIBUTES", Attributes.pointer(), Attributes.length());
-	
 	MALib::LOG_Message("START INPUT");
 	InitializeInput();
 	MALib::LOG_Message("START DATA");
 	InitializeData();
 	
-	MALib::LOG_Message("START FRAMEBUFFERS");
-	InitializePostProcess();
-
-	MainRender.build(RenderRect.width, RenderRect.height, true, true);
-	ShadowMap.build(1024, 1024, true, false);
-	BrightPass.build(128, 128, true, false);
-	Luminance.build(128, 128, true, false);
-	DeferredPositions.build(RenderRect.width, RenderRect.height, true, true);
-	DeferredPositions.clear = MALib::COLOR(0.0f, 0.0f, 0.0f);
-	DeferredNormals.build(RenderRect.width, RenderRect.height, true, true);
-	DeferredNormals.clear = MALib::COLOR(0.0f, 0.0f, 0.0f);
-	AmbientOcclusion.build(RenderRect.width, RenderRect.height, true, false);
-	AmbientOcclusion.clear = MALib::COLOR(0.0f, 0.0f, 0.0f);
-	
-	MALib::LOG_Message("START SCENE");
+	if (!InitializeDraw()) 
+		return false;
 	
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;
 }
 HEX_API bool Unitialize()
 {
+	UninitializeDraw();
 	UninitializePostProcess();
 	UninitializeData();
 	UninitializeInput();

@@ -2,6 +2,8 @@
 #define _MATERIALNODE_H_
 HEX_BEGIN
 
+
+
 class MaterialNode : public NodeBase
 {
 public:
@@ -11,18 +13,20 @@ public:
 		
 	void load();
 	void unload();
+	void build();
 	void destroy();
 
-	void setColorMap(MALib::SURFACE* texture);
-	void setColorMap(SDL_Surface* texture);
-	void setNormalMap(MALib::SURFACE* texture);
-	void setNormalMap(SDL_Surface* texture);
-	void setSpecularMap(MALib::SURFACE* texture);
-	void setSpecularMap(SDL_Surface* texture);
+	void setColorMap(uint texture);
+	void setNormalMap(uint texture);
+	void setSpecularMap(uint texture);
 
+	uint colorTexture;
+	uint normalTexture;
+	uint specularTexture;
 	GLuint colorMap;
 	GLuint normalMap;
 	GLuint specularMap;
+
 	MALib::COLOR overlay;
 	MALib::COLOR specular;
 	float roughness;
@@ -30,6 +34,7 @@ public:
 	MALib::VEC2 uvRepeat;
 	MALib::VEC2 uvOffset;
 	bool shadowCaster;
+	bool built;
 
 	static void BuildTexture(GLuint* outID, MALib::SURFACE* texture);
 	static void BuildTexture(GLuint* outID, SDL_Surface* texture);

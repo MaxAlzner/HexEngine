@@ -9,15 +9,20 @@ public:
 	ShapeNode();
 	~ShapeNode();
 
-	void build(void* data, uint count, uint stride, uint attributes);
 	void load();
 	void unload();
+	void build();
 	void destroy();
 	void batch();
 
+	void setMesh(uint mesh);
+
+	uint mesh;
 	GLuint vao;
 	GLuint buffer;
 	GLsizei count;
+
+	bool built;
 };
 
 HEX_END

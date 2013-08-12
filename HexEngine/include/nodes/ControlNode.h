@@ -19,7 +19,6 @@ public:
 
 	glm::vec2 rotation;
 	glm::vec2 sensitivity;
-	float deadzone;
 	glm::vec2 rangeX;
 	glm::vec2 rangeY;
 };

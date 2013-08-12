@@ -129,9 +129,14 @@ HEX_API void SetParameter(PARAMETER parameter, bool value)
 
 	switch (parameter)
 	{
+	case PARAMETER_STATIC:
+		BoundEntity->isStatic = value;
+		break;
+
 	case PARAMETER_MATERIAL_SHADOW_CASTER:
 		BoundEntity->material->shadowCaster = value;
-		Casters.add(BoundEntity);
+		if (value) Casters.add(BoundEntity);
+		else Casters.remove(BoundEntity);
 		break;
 
 	default:

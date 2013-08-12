@@ -33,6 +33,8 @@ public:
 	MALib::ARRAY<ComponentNode*> components;
 	HexEntity* parent;
 	MALib::ARRAY<HexEntity*> children;
+
+	bool isStatic;
 };
 
 HEX_END

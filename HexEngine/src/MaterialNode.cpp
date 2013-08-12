@@ -13,9 +13,13 @@ HEX_BEGIN
 
 MaterialNode::MaterialNode()
 {
+	this->colorTexture = 0;
+	this->normalTexture = 0;
+	this->specularTexture = 0;
 	this->colorMap = 0;
 	this->normalMap = 0;
 	this->specularMap = 0;
+
 	this->overlay = MALib::COLOR();
 	this->specular = MALib::COLOR();
 	this->roughness = 0.8f;
@@ -23,6 +27,7 @@ MaterialNode::MaterialNode()
 	this->uvRepeat = MALib::VEC2(1.0f, 1.0f);
 	this->uvOffset = MALib::VEC2(0.0f, 0.0f);
 	this->shadowCaster = false;
+	this->built = false;
 }
 MaterialNode::~MaterialNode()
 {
@@ -39,36 +44,37 @@ void MaterialNode::load()
 void MaterialNode::unload()
 {
 }
+void MaterialNode::build()
+{
+	MALib::SURFACE* diffuse = GetTexture(this->colorTexture);
+	MALib::SURFACE* normal = GetTexture(this->normalTexture);
+	MALib::SURFACE* specular = GetTexture(this->specularTexture);
+
+	MaterialNode::BuildTexture(&this->colorMap, diffuse);
+	MaterialNode::BuildTexture(&this->normalMap, normal);
+	MaterialNode::BuildTexture(&this->specularMap, specular);
+
+	this->built = true;
+}
 void MaterialNode::destroy()
 {
 	glDeleteTextures(1, &this->colorMap);
 	glDeleteTextures(1, &this->normalMap);
 	glDeleteTextures(1, &this->specularMap);
+	this->built = false;
 }
 
-void MaterialNode::setColorMap(MALib::SURFACE* texture)
+void MaterialNode::setColorMap(uint texture)
 {
-	MaterialNode::BuildTexture(&this->colorMap, texture);
+	this->colorTexture = texture;
 }
-void MaterialNode::setColorMap(SDL_Surface* texture)
+void MaterialNode::setNormalMap(uint texture)
 {
-	MaterialNode::BuildTexture(&this->colorMap, texture);
+	this->normalTexture = texture;
 }
-void MaterialNode::setNormalMap(MALib::SURFACE* texture)
+void MaterialNode::setSpecularMap(uint texture)
 {
-	MaterialNode::BuildTexture(&this->normalMap, texture);
-}
-void MaterialNode::setNormalMap(SDL_Surface* texture)
-{
-	MaterialNode::BuildTexture(&this->normalMap, texture);
-}
-void MaterialNode::setSpecularMap(MALib::SURFACE* texture)
-{
-	MaterialNode::BuildTexture(&this->specularMap, texture);
-}
-void MaterialNode::setSpecularMap(SDL_Surface* texture)
-{
-	MaterialNode::BuildTexture(&this->specularMap, texture);
+	this->specularTexture = texture;
 }
 
 void MaterialNode::BuildTexture(GLuint* outID, MALib::SURFACE* texture)

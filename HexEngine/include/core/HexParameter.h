@@ -5,6 +5,8 @@ HEX_BEGIN
 HEX_API typedef enum PARAMETER
 {
 	PARAMETER_NONE                                             = 0x00000000, 
+	
+	PARAMETER_STATIC                                           = 0xF0000001, 
 
 	PARAMETER_TRANSFORM_TRANSLATION_X                          = 0x00000001, 
 	PARAMETER_TRANSFORM_TRANSLATION_Y                          = 0x00000002, 

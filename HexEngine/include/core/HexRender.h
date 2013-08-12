@@ -14,6 +14,7 @@ public:
 	void unload();
 	void destroy();
 
+	void setClearColor(float r, float g, float b);
 	//void addColorAttach(uint width, uint height);
 	//void setDepthAttach(uint width, uint height, bool clearDraw);
 

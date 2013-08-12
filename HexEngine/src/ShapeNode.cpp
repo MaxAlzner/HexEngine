@@ -5,25 +5,44 @@ HEX_BEGIN
 
 ShapeNode::ShapeNode()
 {
+	this->mesh = 0;
 	this->vao = 0;
 	this->buffer = 0;
 	this->count = 0;
+
+	this->built = false;
 }
 ShapeNode::~ShapeNode()
 {
-	this->destroy();
 }
 
-void ShapeNode::build(void* data, uint count, uint stride, uint attributes)
+void ShapeNode::load()
 {
+	if (this->root == NULL) return;
+	if (this->root->transform == NULL) return;
+
+	SetUniform(UNIFORM_OS_TO_WS, glm::value_ptr(this->root->transform->transformation));
+}
+void ShapeNode::unload()
+{
+}
+void ShapeNode::build()
+{
+	MALib::VERTEXBUFFER* vertBuffer = GetMesh(this->mesh);
+
+	if (vertBuffer == 0) return;
+	GLsizei count = vertBuffer->vertices;
+	uint stride = vertBuffer->stride;
+	uint attributes = vertBuffer->components;
+	void* data = vertBuffer->buffer;
+
+	this->count = count;
 	glGenVertexArrays(1, &this->vao);
 	glBindVertexArray(this->vao);
 
 	glGenBuffers(1, &this->buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffer);
 	
-	this->count = count;
 	GLsizeiptr size = this->count * 20 * sizeof(float);
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 
@@ -38,39 +57,34 @@ void ShapeNode::build(void* data, uint count, uint stride, uint attributes)
 	glEnableVertexAttribArray(3);
 	glEnableVertexAttribArray(4);
 	
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-}
-void ShapeNode::load()
-{
-	if (this->root == NULL) return;
-	if (this->root->transform == NULL) return;
 
-	SetUniform(UNIFORM_OS_TO_WS, glm::value_ptr(this->root->transform->transformation));
-}
-void ShapeNode::unload()
-{
+	this->built = true;
 }
 void ShapeNode::destroy()
 {
 	glDeleteVertexArrays(1, &this->vao);
 	glDeleteBuffers(1, &this->buffer);
+	this->count = 0;
+	this->built = false;
 }
 void ShapeNode::batch()
 {
-	if (this->count == 0) return;
+	if (this->count == 0 || !this->built) return;
 	
 	glBindVertexArray(this->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffer);
 
-	//glDrawElements(GL_TRIANGLES, this->count, GL_UNSIGNED_INT, this->indices);
 	glDrawArrays(GL_TRIANGLES, 0, this->count);
 	
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+void ShapeNode::setMesh(uint mesh)
+{
+	this->mesh = mesh;
 }
 
 HEX_END

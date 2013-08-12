@@ -1,7 +1,8 @@
 #ifndef _HEX_CORE_H_
 #define _HEX_CORE_H_
 HEX_BEGIN
-
+	
+HEX_API extern void OnStart();
 HEX_API extern void OnFrameDraw();
 HEX_API extern void OnFrameUpdate();
 HEX_API extern void OnFixedUpdate();

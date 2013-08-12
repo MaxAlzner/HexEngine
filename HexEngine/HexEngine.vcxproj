@@ -97,11 +97,13 @@
     <ClInclude Include="include\core\HexCore.h" />
     <ClInclude Include="include\core\HexData.h" />
     <ClInclude Include="include\core\HexDef.h" />
+    <ClInclude Include="include\core\HexDraw.h" />
     <ClInclude Include="include\core\HexEntity.h" />
     <ClInclude Include="include\core\HexInput.h" />
     <ClInclude Include="include\core\HexInputDef.h" />
     <ClInclude Include="include\core\HexParameter.h" />
     <ClInclude Include="include\core\HexRender.h" />
+    <ClInclude Include="include\core\HexScene.h" />
     <ClInclude Include="include\HexMain.h" />
     <ClInclude Include="include\core\HexShader.h" />
     <ClInclude Include="include\nodes\CameraNode.h" />
@@ -241,11 +243,13 @@
     <ClCompile Include="src\ControlNode.cpp" />
     <ClCompile Include="src\HexCore.cpp" />
     <ClCompile Include="src\HexData.cpp" />
+    <ClCompile Include="src\HexDraw.cpp" />
     <ClCompile Include="src\HexEntity.cpp" />
     <ClCompile Include="src\HexInput.cpp" />
     <ClCompile Include="src\HexMain.cpp" />
     <ClCompile Include="src\HexParameter.cpp" />
     <ClCompile Include="src\HexRender.cpp" />
+    <ClCompile Include="src\HexScene.cpp" />
     <ClCompile Include="src\HexShader.cpp" />
     <ClCompile Include="src\LightNode.cpp" />
     <ClCompile Include="src\MaterialNode.cpp" />

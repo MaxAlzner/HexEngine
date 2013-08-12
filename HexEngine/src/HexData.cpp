@@ -16,6 +16,8 @@ MALib::ARRAY<HexEntity*> Lights;
 MALib::ARRAY<HexEntity*> Skyboxes;
 MALib::ARRAY<HexEntity*> Casters;
 MALib::ARRAY<HexEntity*> Renderable;
+MALib::ARRAY<ShapeNode*> Shapes;
+MALib::ARRAY<MaterialNode*> Materials;
 CameraNode* MainCamera = NULL;
 	
 MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -26,20 +28,18 @@ HexEntity* BoundEntity = NULL;
 
 HEX_API void InitializeData()
 {
-	//MALib::LOG_Message("START ASSET LOADING");
-	
 	Cameras.resize(8);
 	Lights.resize(8);
 	Skyboxes.resize(8);
 	Casters.resize(32);
 	Renderable.resize(32);
+	Shapes.resize(32);
+	Materials.resize(32);
 
 	Meshes.resize(24);
 	Textures.resize(48);
 	Entities.resize(32);
 	Nodes.resize(128);
-
-	//MALib::LOG_Message("END ASSET LOADING");
 }
 HEX_API void UninitializeData()
 {
@@ -53,6 +53,8 @@ HEX_API void UninitializeData()
 	Skyboxes.clear();
 	Casters.clear();
 	Renderable.clear();
+	Shapes.clear();
+	Materials.clear();
 	Meshes.clear();
 	Textures.clear();
 	Entities.clear();
@@ -129,6 +131,17 @@ HEX_API void RegisterTGA(uint* texture, const string filepath)
 	*texture = n;
 }
 
+HEX_API MALib::VERTEXBUFFER* GetMesh(uint mesh)
+{
+	if (mesh == 0 || mesh > Meshes.length()) return 0;
+	return Meshes[mesh - 1];
+}
+HEX_API MALib::SURFACE* GetTexture(uint texture)
+{
+	if (texture == 0 || texture > Textures.length()) return 0;
+	return Textures[texture - 1];
+}
+
 HEX_API void GenEntities(uint size, uint* entities)
 {
 	for (uint i = 0; i < size; i++)
@@ -144,7 +157,7 @@ HEX_API void GenEntities(uint size, uint* entities)
 }
 HEX_API void BindEntity(uint entity)
 {
-	if (entity == 0) return;
+	if (entity == 0 || entity > Entities.length()) return;
 	BoundEntity = Entities[entity - 1];
 }
 HEX_API void TransformEntity(float x, float y, float z, float rx, float ry, float rz)
@@ -189,18 +202,17 @@ HEX_API void AddSkybox(uint skyMesh, uint skyMap)
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 
-	MALib::VERTEXBUFFER* mesh = Meshes[skyMesh - 1];
-	MALib::SURFACE* texture = Textures[skyMap - 1];
-
 	ShapeNode* box = new ShapeNode;
-	box->build(mesh->buffer, mesh->vertices, mesh->stride, mesh->components);
+	box->setMesh(skyMesh);
 	BoundEntity->setShape(box);
 	Nodes.add(box);
+	Shapes.add(box);
 
 	MaterialNode* mat = new MaterialNode;
-	mat->setColorMap(texture);
+	mat->setColorMap(skyMap);
 	BoundEntity->setMaterial(mat);
 	Nodes.add(mat);
+	Materials.add(mat);
 
 	Skyboxes.add(BoundEntity);
 }
@@ -237,10 +249,10 @@ HEX_API void AddShape(uint mesh)
 {
 	if (BoundEntity == NULL || mesh == 0) return;
 	ShapeNode* node = new ShapeNode;
-	MALib::VERTEXBUFFER* buffer = Meshes[mesh - 1];
-	node->build(buffer->buffer, buffer->vertices, buffer->stride, buffer->components);
+	node->setMesh(mesh);
 	BoundEntity->setShape(node);
 	Nodes.add(node);
+	Shapes.add(node);
 	Renderable.add(BoundEntity);
 }
 HEX_API void AddMaterial(uint colorMap, uint normalMap, uint specularMap)
@@ -248,11 +260,12 @@ HEX_API void AddMaterial(uint colorMap, uint normalMap, uint specularMap)
 	if (BoundEntity == NULL) return;
 	if (colorMap == 0) return;
 	MaterialNode* node = new MaterialNode;
-	node->setColorMap(Textures[colorMap - 1]);
-	if (normalMap != 0) node->setNormalMap(Textures[normalMap - 1]);
-	if (specularMap != 0) node->setSpecularMap(Textures[specularMap - 1]);
+	node->setColorMap(colorMap);
+	node->setNormalMap(normalMap);
+	node->setSpecularMap(specularMap);
 	BoundEntity->setMaterial(node);
 	Nodes.add(node);
+	Materials.add(node);
 }
 
 HEX_END

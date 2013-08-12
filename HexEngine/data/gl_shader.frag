@@ -88,27 +88,26 @@ float gr(float a, float b)
 	return exp(1. - abs(a - b));
 }
 
+vec3 unpack_normal(in vec2 coord)
+{
+	return normalize((texture(normal_map, coord).rgb * 2.) - 1.);
+}
 float read_depth(in vec2 coord)
 {
-	float depth = average(texture(depth_map, tex_coord).rgb);
+	float depth = average(texture(depth_map, coord).rgb);
+	//return depth;
 	float d = (2.0 * nearZ) / ((farZ + nearZ) - (depth * (farZ - nearZ)));
 	return clamp(d, 0., 1.);
 }
-float compare_depths(in float d1, in float d2)
+
+float occlusion(in vec2 coord, in vec3 normal, in vec3 p)
 {
-#if 1
-	float atten = (d1 - d2) / (farZ - nearZ);
-	float occlusion = max(dot(d1, d2), 0.);
-#else
-	vec3 r = normalize(vec3(0., 0., d2) - vec3(0., 0., d1));
-	vec3 n = vec3(0., 0., 1.);
-	float occlusion = dot(r, n);
+	float depth = read_depth(coord);
+	vec3 r = unpack_normal(coord);
+	vec3 v = vec3(coord, depth) - p;
 
-	float d = length(r);
-	float atten = 1. / (1. + d);
-#endif
-
-	return clamp(occlusion * d1, 0., 1.);
+	float atten = 1. / (1. + length(v));
+	return max(dot(r, normal), 0.) * atten;
 }
 
 vec4 anaglyphic_3d()
@@ -123,35 +122,138 @@ vec4 anaglyphic_3d()
 	return g;
 }
 
+#define OCCLUSION(x, y) \
+do {\
+	vec2 coord = tex_coord + (incr * vec2(x, y));\
+	float d = read_depth(coord);\
+	vec3 r = unpack_normal(coord);\
+	vec3 v = vec3(coord, d) - vec3(tex_coord, depth);\
+	float atten = 1. / (1. + length(v));\
+	ao += max(dot(r, normal), 0.) * atten;\
+	k += 1.;\
+} while (false)
 vec4 ambient_occlusion()
 {
 	float depth = read_depth(tex_coord);
-	vec3 normal = normalize((texture(normal_map, tex_coord).rgb * 2.) - 1.);
+	vec3 normal = unpack_normal(tex_coord);
 
-	return vec4(normal, 1.);
-
-	if (depth > 0.9) return vec4(1.);
-	vec2 incr = 1. / screen_size;
+	vec2 incr = 2.8 / screen_size;
+	vec3 p = vec3(tex_coord, depth);
 	
 	float ao = 0.;
+	float k = 0.;
+
+#if 1
+	ao += occlusion(tex_coord + (incr * vec2( 1.,  1.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-1.,  1.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 1., -1.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-1., -1.)), normal, p);
 	
+	ao += occlusion(tex_coord + (incr * vec2( 0., -2.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 0.,  2.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-2.,  0.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 2.,  0.)), normal, p);
 	
-	ao = clamp(1. - ao, 0., 1.);
+	ao += occlusion(tex_coord + (incr * vec2( 3.,  3.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-3.,  3.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 3., -3.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-3., -3.)), normal, p);
+	
+	ao += occlusion(tex_coord + (incr * vec2( 0., -4.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 0.,  4.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-4.,  0.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 4.,  0.)), normal, p);
+	
+	ao += occlusion(tex_coord + (incr * vec2( 5.,  5.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-5.,  5.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 5., -5.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-5., -5.)), normal, p);
+
+	ao /= 20.;
+#else
+	OCCLUSION( 1.,  1.);
+	OCCLUSION(-1.,  1.);
+	OCCLUSION( 1., -1.);
+	OCCLUSION(-1., -1.);
+	
+	OCCLUSION( 0., -2.);
+	OCCLUSION( 0.,  2.);
+	OCCLUSION(-2.,  0.);
+	OCCLUSION( 2.,  0.);
+
+	OCCLUSION( 3.,  3.);
+	OCCLUSION(-3.,  3.);
+	OCCLUSION( 3., -3.);
+	OCCLUSION(-3., -3.);
+	
+	OCCLUSION( 0., -4.);
+	OCCLUSION( 0.,  4.);
+	OCCLUSION(-4.,  0.);
+	OCCLUSION( 4.,  0.);
+
+	OCCLUSION( 5.,  5.);
+	OCCLUSION(-5.,  5.);
+	OCCLUSION( 5., -5.);
+	OCCLUSION(-5., -5.);
+	
+	ao /= k;
+#endif
+	//ao = 1. - clamp(ao, 0., 1.);
 	
 	return vec4(vec3(ao), 1.);
 }
 vec4 bright_pass()
 {
 	vec3 color = texture(color_map, tex_coord).rgb;
-#if 1
 	vec3 brightness = vec3(pow(color.r, gamma), pow(color.g, gamma), pow(color.b, gamma));
+
 	brightness = clamp(brightness, 0., white_cutoff);
-#else
-	vec3 brightness = color;
-#endif
+
 	return vec4(brightness, 1.);
 }
 
+#define GAUSSIAN_5X5_ROW(x) \
+do {\
+	int y = x + 2;\
+	g += textureOffset(color_map, tex_coord, ivec2(-2, x)) * gaussian_weights_5x5[(y * 5) + 0];\
+	g += textureOffset(color_map, tex_coord, ivec2(-1, x)) * gaussian_weights_5x5[(y * 5) + 1];\
+	g += textureOffset(color_map, tex_coord, ivec2( 0, x)) * gaussian_weights_5x5[(y * 5) + 2];\
+	g += textureOffset(color_map, tex_coord, ivec2( 1, x)) * gaussian_weights_5x5[(y * 5) + 3];\
+	g += textureOffset(color_map, tex_coord, ivec2( 2, x)) * gaussian_weights_5x5[(y * 5) + 4];\
+} while (false)
+#define GAUSSIAN_7X7_ROW(x) \
+do {\
+	int y = x + 3;\
+	g += textureOffset(color_map, tex_coord, ivec2(-3, x)) * gaussian_weights_7x7[(y * 7) + 0];\
+	g += textureOffset(color_map, tex_coord, ivec2(-2, x)) * gaussian_weights_7x7[(y * 7) + 1];\
+	g += textureOffset(color_map, tex_coord, ivec2(-1, x)) * gaussian_weights_7x7[(y * 7) + 2];\
+	g += textureOffset(color_map, tex_coord, ivec2( 0, x)) * gaussian_weights_7x7[(y * 7) + 3];\
+	g += textureOffset(color_map, tex_coord, ivec2( 1, x)) * gaussian_weights_7x7[(y * 7) + 4];\
+	g += textureOffset(color_map, tex_coord, ivec2( 2, x)) * gaussian_weights_7x7[(y * 7) + 5];\
+	g += textureOffset(color_map, tex_coord, ivec2( 3, x)) * gaussian_weights_7x7[(y * 7) + 6];\
+} while (false)
+#define GAUSSIAN_11X11_ROW(x) \
+do {\
+	g += textureOffset(color_map, tex_coord, ivec2(-5, x));\
+	g += textureOffset(color_map, tex_coord, ivec2(-4, x));\
+	g += textureOffset(color_map, tex_coord, ivec2(-3, x));\
+	g += textureOffset(color_map, tex_coord, ivec2(-2, x));\
+	g += textureOffset(color_map, tex_coord, ivec2(-1, x));\
+	g += textureOffset(color_map, tex_coord, ivec2( 0, x));\
+	g += textureOffset(color_map, tex_coord, ivec2( 1, x));\
+	g += textureOffset(color_map, tex_coord, ivec2( 2, x));\
+	g += textureOffset(color_map, tex_coord, ivec2( 3, x));\
+	g += textureOffset(color_map, tex_coord, ivec2( 4, x));\
+	g += textureOffset(color_map, tex_coord, ivec2( 5, x));\
+	k += 11.;\
+} while (false)
+#define BILATERAL_GAUSSIAN(x, y, w) \
+do {\
+	float v = average(textureOffset(depth_map, tex_coord, ivec2(x, y)).rgb);\
+	float b = gaussian_weights_5x5[w] * gr(p, v);\
+	k += b;\
+	g += textureOffset(color_map, tex_coord, ivec2(x, y)) * b;\
+} while (false)
 vec4 gaussian_blur()
 {
 	vec4 g = vec4(0.);
@@ -165,27 +267,26 @@ vec4 gaussian_blur()
 	g += textureOffset(color_map, tex_coord, ivec2( 0, -1)) * gaussian_weights_5x5[ 7];
 	g += textureOffset(color_map, tex_coord, ivec2( 1, -1)) * gaussian_weights_5x5[ 8];
 	g += textureOffset(color_map, tex_coord, ivec2( 2, -1)) * gaussian_weights_5x5[ 9];
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  0)) * gaussian_weights_5x5[10];
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  0)) * gaussian_weights_5x5[11];
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  0)) * gaussian_weights_5x5[12];
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  0)) * gaussian_weights_5x5[13];
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  0)) * gaussian_weights_5x5[14];
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  1)) * gaussian_weights_5x5[15];
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  1)) * gaussian_weights_5x5[16];
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  1)) * gaussian_weights_5x5[17];
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  1)) * gaussian_weights_5x5[18];
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  1)) * gaussian_weights_5x5[19];
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  2)) * gaussian_weights_5x5[20];
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  2)) * gaussian_weights_5x5[21];
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  2)) * gaussian_weights_5x5[22];
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  2)) * gaussian_weights_5x5[23];
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  2)) * gaussian_weights_5x5[24];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, 0)) * gaussian_weights_5x5[10];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, 0)) * gaussian_weights_5x5[11];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, 0)) * gaussian_weights_5x5[12];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, 0)) * gaussian_weights_5x5[13];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, 0)) * gaussian_weights_5x5[14];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, 1)) * gaussian_weights_5x5[15];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, 1)) * gaussian_weights_5x5[16];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, 1)) * gaussian_weights_5x5[17];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, 1)) * gaussian_weights_5x5[18];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, 1)) * gaussian_weights_5x5[19];
+	g += textureOffset(color_map, tex_coord, ivec2(-2, 2)) * gaussian_weights_5x5[20];
+	g += textureOffset(color_map, tex_coord, ivec2(-1, 2)) * gaussian_weights_5x5[21];
+	g += textureOffset(color_map, tex_coord, ivec2( 0, 2)) * gaussian_weights_5x5[22];
+	g += textureOffset(color_map, tex_coord, ivec2( 1, 2)) * gaussian_weights_5x5[23];
+	g += textureOffset(color_map, tex_coord, ivec2( 2, 2)) * gaussian_weights_5x5[24];
 	return g;
 }
 vec4 gaussian_blur_large()
 {
-	vec4 g = vec4(0.);
-#if 1
+vec4 g = vec4(0.);
 	g += textureOffset(color_map, tex_coord, ivec2(-3,  3)) * gaussian_weights_7x7[ 0];
 	g += textureOffset(color_map, tex_coord, ivec2(-2,  3)) * gaussian_weights_7x7[ 1];
 	g += textureOffset(color_map, tex_coord, ivec2(-1,  3)) * gaussian_weights_7x7[ 2];
@@ -236,168 +337,37 @@ vec4 gaussian_blur_large()
 	g += textureOffset(color_map, tex_coord, ivec2( 2, -3)) * gaussian_weights_7x7[47];
 	g += textureOffset(color_map, tex_coord, ivec2( 3, -3)) * gaussian_weights_7x7[48];
 	return g;
-#else
-	g += textureOffset(color_map, tex_coord, ivec2(-5,  5));
-	g += textureOffset(color_map, tex_coord, ivec2(-4,  5));
-	g += textureOffset(color_map, tex_coord, ivec2(-3,  5));
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  5));
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  5));
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  5));
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  5));
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  5));
-	g += textureOffset(color_map, tex_coord, ivec2( 3,  5));
-	g += textureOffset(color_map, tex_coord, ivec2( 4,  5));
-	g += textureOffset(color_map, tex_coord, ivec2( 5,  5));
-	g += textureOffset(color_map, tex_coord, ivec2(-5,  4));
-	g += textureOffset(color_map, tex_coord, ivec2(-4,  4));
-	g += textureOffset(color_map, tex_coord, ivec2(-3,  4));
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  4));
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  4));
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  4));
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  4));
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  4));
-	g += textureOffset(color_map, tex_coord, ivec2( 3,  4));
-	g += textureOffset(color_map, tex_coord, ivec2( 4,  4));
-	g += textureOffset(color_map, tex_coord, ivec2( 5,  4));
-	g += textureOffset(color_map, tex_coord, ivec2(-5,  3));
-	g += textureOffset(color_map, tex_coord, ivec2(-4,  3));
-	g += textureOffset(color_map, tex_coord, ivec2(-3,  3));
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  3));
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  3));
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  3));
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  3));
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  3));
-	g += textureOffset(color_map, tex_coord, ivec2( 3,  3));
-	g += textureOffset(color_map, tex_coord, ivec2( 4,  3));
-	g += textureOffset(color_map, tex_coord, ivec2( 5,  3));
-	g += textureOffset(color_map, tex_coord, ivec2(-5,  2));
-	g += textureOffset(color_map, tex_coord, ivec2(-4,  2));
-	g += textureOffset(color_map, tex_coord, ivec2(-3,  2));
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  2));
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  2));
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  2));
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  2));
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  2));
-	g += textureOffset(color_map, tex_coord, ivec2( 3,  2));
-	g += textureOffset(color_map, tex_coord, ivec2( 4,  2));
-	g += textureOffset(color_map, tex_coord, ivec2( 5,  2));
-	g += textureOffset(color_map, tex_coord, ivec2(-5,  1));
-	g += textureOffset(color_map, tex_coord, ivec2(-4,  1));
-	g += textureOffset(color_map, tex_coord, ivec2(-3,  1));
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  1));
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  1));
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  1));
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  1));
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  1));
-	g += textureOffset(color_map, tex_coord, ivec2( 3,  1));
-	g += textureOffset(color_map, tex_coord, ivec2( 4,  1));
-	g += textureOffset(color_map, tex_coord, ivec2( 5,  1));
-	g += textureOffset(color_map, tex_coord, ivec2(-5,  0));
-	g += textureOffset(color_map, tex_coord, ivec2(-4,  0));
-	g += textureOffset(color_map, tex_coord, ivec2(-3,  0));
-	g += textureOffset(color_map, tex_coord, ivec2(-2,  0));
-	g += textureOffset(color_map, tex_coord, ivec2(-1,  0));
-	g += textureOffset(color_map, tex_coord, ivec2( 0,  0));
-	g += textureOffset(color_map, tex_coord, ivec2( 1,  0));
-	g += textureOffset(color_map, tex_coord, ivec2( 2,  0));
-	g += textureOffset(color_map, tex_coord, ivec2( 3,  0));
-	g += textureOffset(color_map, tex_coord, ivec2( 4,  0));
-	g += textureOffset(color_map, tex_coord, ivec2( 5,  0));
-	g += textureOffset(color_map, tex_coord, ivec2(-5, -1));
-	g += textureOffset(color_map, tex_coord, ivec2(-4, -1));
-	g += textureOffset(color_map, tex_coord, ivec2(-3, -1));
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -1));
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -1));
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -1));
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -1));
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -1));
-	g += textureOffset(color_map, tex_coord, ivec2( 3, -1));
-	g += textureOffset(color_map, tex_coord, ivec2( 4, -1));
-	g += textureOffset(color_map, tex_coord, ivec2( 5, -1));
-	g += textureOffset(color_map, tex_coord, ivec2(-5, -2));
-	g += textureOffset(color_map, tex_coord, ivec2(-4, -2));
-	g += textureOffset(color_map, tex_coord, ivec2(-3, -2));
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -2));
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -2));
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -2));
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -2));
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -2));
-	g += textureOffset(color_map, tex_coord, ivec2( 3, -2));
-	g += textureOffset(color_map, tex_coord, ivec2( 4, -2));
-	g += textureOffset(color_map, tex_coord, ivec2( 5, -2));
-	g += textureOffset(color_map, tex_coord, ivec2(-5, -3));
-	g += textureOffset(color_map, tex_coord, ivec2(-4, -3));
-	g += textureOffset(color_map, tex_coord, ivec2(-3, -3));
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -3));
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -3));
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -3));
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -3));
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -3));
-	g += textureOffset(color_map, tex_coord, ivec2( 3, -3));
-	g += textureOffset(color_map, tex_coord, ivec2( 4, -3));
-	g += textureOffset(color_map, tex_coord, ivec2( 5, -3));
-	g += textureOffset(color_map, tex_coord, ivec2(-5, -4));
-	g += textureOffset(color_map, tex_coord, ivec2(-4, -4));
-	g += textureOffset(color_map, tex_coord, ivec2(-3, -4));
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -4));
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -4));
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -4));
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -4));
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -4));
-	g += textureOffset(color_map, tex_coord, ivec2( 3, -4));
-	g += textureOffset(color_map, tex_coord, ivec2( 4, -4));
-	g += textureOffset(color_map, tex_coord, ivec2( 5, -4));
-	g += textureOffset(color_map, tex_coord, ivec2(-5, -5));
-	g += textureOffset(color_map, tex_coord, ivec2(-4, -5));
-	g += textureOffset(color_map, tex_coord, ivec2(-3, -5));
-	g += textureOffset(color_map, tex_coord, ivec2(-2, -5));
-	g += textureOffset(color_map, tex_coord, ivec2(-1, -5));
-	g += textureOffset(color_map, tex_coord, ivec2( 0, -5));
-	g += textureOffset(color_map, tex_coord, ivec2( 1, -5));
-	g += textureOffset(color_map, tex_coord, ivec2( 2, -5));
-	g += textureOffset(color_map, tex_coord, ivec2( 3, -5));
-	g += textureOffset(color_map, tex_coord, ivec2( 4, -5));
-	g += textureOffset(color_map, tex_coord, ivec2( 5, -5));
-	return g / 121.;
-#endif
 }
-#define S(x, y, w) \
-do {\
-	float v = average(textureOffset(depth_map, tex_coord, ivec2(x, y)).rgb);\
-	float b = gaussian_weights_5x5[w] * gr(p, v);\
-	k += b;\
-	g += textureOffset(color_map, tex_coord, ivec2(x, y)) * b;\
-} while (false)
 vec4 bilateral_gaussian_blur()
 {
 	float p = average(texture(depth_map, tex_coord).rgb);
 	vec4 g = vec4(0.);
 	float k = 0.;
-	S(-2, -2,  0);
-	S(-1, -2,  1);
-	S( 0, -2,  2);
-	S( 1, -2,  3);
-	S( 2, -2,  4);
-	S(-2, -1,  5);
-	S(-1, -1,  6);
-	S( 0, -1,  7);
-	S( 1, -1,  8);
-	S( 2, -1,  9);
-	S(-2,  0, 10);
-	S(-1,  0, 11);
-	S( 0,  0, 12);
-	S( 1,  0, 13);
-	S( 2,  0, 14);
-	S(-2,  1, 15);
-	S(-1,  1, 16);
-	S( 0,  1, 17);
-	S( 1,  1, 18);
-	S( 2,  1, 19);
-	S(-2,  2, 20);
-	S(-1,  2, 21);
-	S( 0,  2, 22);
-	S( 1,  2, 23);
-	S( 2,  2, 24);
+	BILATERAL_GAUSSIAN(-2, -2,  0);
+	BILATERAL_GAUSSIAN(-1, -2,  1);
+	BILATERAL_GAUSSIAN( 0, -2,  2);
+	BILATERAL_GAUSSIAN( 1, -2,  3);
+	BILATERAL_GAUSSIAN( 2, -2,  4);
+	BILATERAL_GAUSSIAN(-2, -1,  5);
+	BILATERAL_GAUSSIAN(-1, -1,  6);
+	BILATERAL_GAUSSIAN( 0, -1,  7);
+	BILATERAL_GAUSSIAN( 1, -1,  8);
+	BILATERAL_GAUSSIAN( 2, -1,  9);
+	BILATERAL_GAUSSIAN(-2,  0, 10);
+	BILATERAL_GAUSSIAN(-1,  0, 11);
+	BILATERAL_GAUSSIAN( 0,  0, 12);
+	BILATERAL_GAUSSIAN( 1,  0, 13);
+	BILATERAL_GAUSSIAN( 2,  0, 14);
+	BILATERAL_GAUSSIAN(-2,  1, 15);
+	BILATERAL_GAUSSIAN(-1,  1, 16);
+	BILATERAL_GAUSSIAN( 0,  1, 17);
+	BILATERAL_GAUSSIAN( 1,  1, 18);
+	BILATERAL_GAUSSIAN( 2,  1, 19);
+	BILATERAL_GAUSSIAN(-2,  2, 20);
+	BILATERAL_GAUSSIAN(-1,  2, 21);
+	BILATERAL_GAUSSIAN( 0,  2, 22);
+	BILATERAL_GAUSSIAN( 1,  2, 23);
+	BILATERAL_GAUSSIAN( 2,  2, 24);
 	return g / k;
 }
 
@@ -432,6 +402,47 @@ float shadow_intensity()
 #endif
 }
 
+#define ATTENUATION \
+	float dist = distance(light_position, vertex_ss);\
+	float atten = 1. / (light_falloff.x + (light_falloff.y * dist) + (light_falloff.z * dist * dist));
+#define SPECULAR \
+	float n_dot_h = dot(n, h);\
+	float n_dot_v = dot(n, v);\
+	float h_dot_v = dot(h, v);\
+	float h_dot_l = dot(h, l);\
+	float g1 = (2. * n_dot_h * n_dot_v) / h_dot_v;\
+	float g2 = (2. * n_dot_h * n_dot_l) / h_dot_v;\
+	float g = 1.;\
+	if (g1 < g) g = g1;\
+	if (g2 < g) g = g2;\
+	float m = roughness * roughness;\
+	float r = (1. / (m * pow(n_dot_h, 4.))) * exp((pow(n_dot_h, 2.) - 1.) / (m * pow(n_dot_h, 2.)));\
+	float f = (ref_index + pow(1. - h_dot_v, 5.)) * (1. - ref_index);\
+	float specular = max((abs(f * r * g) / n_dot_v), 0.) * specular_intensity;
+#define LAMBERT \
+	float n_dot_l = dot(n, l);\
+	float lambert = max(n_dot_l, 0.);
+
+#define POINTLIGHT_ALBEDO(x) \
+do {\
+	vec3 light_position = pointLight4_ss[x];\
+	vec4 light_color = pointLight4_color[x];\
+	vec3 light_falloff = pointLight4_falloff[x];\
+	vec3 l = normalize(light_position - vertex_ss);\
+	vec3 h = normalize(l + v);\
+	ATTENUATION;\
+	LAMBERT;\
+	SPECULAR;\
+	vec3 diffuse = (light_color.rgb * lambert) + vec3(specular * lambert);\
+	albedo += (diffuse * atten * light_color.a);\
+} while (false)
+#define DIRECTIONAL_ALBEDO \
+do {\
+	vec3 l = normalize(directionalLight_ss);\
+	LAMBERT;\
+	vec3 diffuse = (directionalLight_color.rgb * lambert);\
+	albedo += diffuse * directionalLight_color.a;\
+} while (false)
 void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
 {
 	vec3 l = normalize(directionalLight_ss);
@@ -440,7 +451,7 @@ void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
 	float n_dot_l = dot(n, l);
 
 	float lambert = max(n_dot_l, 0.);
-	
+
 	vec3 diffuse = (directionalLight_color.rgb * lambert);
 	albedo += diffuse * directionalLight_color.a;
 }
@@ -448,7 +459,7 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specula
 {
 	float dist = distance(light_position, vertex_ss);
 	float atten = 1. / (light_falloff.x + (light_falloff.y * dist) + (light_falloff.z * dist * dist));
-	
+
 	vec3 l = normalize(light_position - vertex_ss);
 	vec3 h = normalize(l + v);
 
@@ -457,7 +468,7 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specula
 	float n_dot_v = dot(n, v);
 	float h_dot_v = dot(h, v);
 	float h_dot_l = dot(h, l);
-	
+
 	float g1 = (2. * n_dot_h * n_dot_v) / h_dot_v;
 	float g2 = (2. * n_dot_h * n_dot_l) / h_dot_v;
 	float g = 1.;
@@ -467,36 +478,42 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specula
 	float r = (1. / (m * pow(n_dot_h, 4.))) * exp((pow(n_dot_h, 2.) - 1.) / (m * pow(n_dot_h, 2.)));
 	float f = (ref_index + pow(1. - h_dot_v, 5.)) * (1. - ref_index);
 	float specular = max((abs(f * r * g) / n_dot_v), 0.) * specular_intensity;
-	
+
 	float lambert = max(n_dot_l, 0.);
 
-	vec3 diffuse = (light_color.rgb * lambert) + vec3(specular * lambert);
-	albedo += (diffuse * atten * light_color.a);
+	vec3 diffuse = (light_color.rgb * lambert * atten) + vec3(specular * lambert);
+	albedo += (diffuse * light_color.a);
 }
 
 vec4 main_render()
 {
-	//return vec4(shadow_intensity());
-	
 	vec4 sample_color = texture(color_map, tex_coord);
 	vec3 color = sample_color.rgb;
 
 	vec4 sample_specular = texture(specular_map, tex_coord);
 	float specular_intensity = average(sample_specular.rgb);
 
-	vec4 sample_normal = texture(normal_map, tex_coord);
-	vec3 n = normalize((sample_normal.rgb * 2.) - 1.);
+	vec3 n = unpack_normal(tex_coord);
 	vec3 v = normalize(view_ss - vertex_ss);
 	
 	vec3 albedo = vec3(0.);
 
-	directionalLight_albedo(albedo, n, v);
-	
 #if 0
+	DIRECTIONAL_ALBEDO;
+
+	if (numOfPointLights > 0) POINTLIGHT_ALBEDO(0);
+	if (numOfPointLights > 1) POINTLIGHT_ALBEDO(1);
+	if (numOfPointLights > 2) POINTLIGHT_ALBEDO(2);
+	if (numOfPointLights > 3) POINTLIGHT_ALBEDO(3);
+#else
+	directionalLight_albedo(albedo, n, v);
+
+#if 1
 	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[0], pointLight4_color[0], pointLight4_falloff[0]);
 	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[1], pointLight4_color[1], pointLight4_falloff[1]);
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[2], pointLight4_color[2], pointLight4_falloff[2]);
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[3], pointLight4_color[3], pointLight4_falloff[3]);
+#endif
 #endif
 
 	//float shadow = shadow_intensity();
@@ -509,9 +526,10 @@ vec4 final_render()
 	vec2 coord = vec2(0.5 / 128.);
 	coord = vec2((coord.x * filter.x) - (coord.y * filter.y), (coord.x * filter.y) + (coord.y * filter.x));
 
-	vec4 luminance = texture(luminance_map, tex_coord);
+	vec4 luminance = texture(luminance_map, tex_coord + coord);
+	vec4 ao = texture(ao_map, tex_coord);
 	vec4 base = texture(color_map, tex_coord);
-	return base + luminance;
+	return (base + luminance) * ao;
 }
 
 void main()
@@ -530,7 +548,7 @@ void main()
 		outColor = vec4(vertex_def.x, vertex_def.y, vertex_def.z, length(vertex_def) / (farZ - nearZ));
 		return;
 		case 5:
-		outColor = vec4((normal_def.x * .5) + .5, (normal_def.y * .5) + .5, 1., 1.);
+		outColor = vec4((normal_def.x * .5) + .5, (normal_def.y * .5) + .5, normal_def.z, 1.);
 		return;
 
 		case 11:

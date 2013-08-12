@@ -6,8 +6,7 @@ HEX_BEGIN
 ControlNode::ControlNode()
 {
 	this->rotation = glm::vec2(0.0f, 0.0f);
-	this->sensitivity = glm::vec2(90.0f);
-	this->deadzone = 0.1f;
+	this->sensitivity = glm::vec2(30.0f);
 	this->rangeX = glm::vec2(-360.0f, 360.0f);
 	this->rangeY = glm::vec2(-60.0f, 60.0f);
 }
@@ -27,6 +26,8 @@ void ControlNode::destroy()
 	
 void ControlNode::onStart()
 {
+	this->rotation.x = this->root->transform->rotation.y;
+	this->rotation.y = this->root->transform->rotation.x;
 }
 void ControlNode::onFrameUpdate()
 {
@@ -60,12 +61,12 @@ void ControlNode::onFixedUpdate()
 			float mx = ((Input::mouse.scalarX * 2.0f) - 1.0f);
 			float my = ((Input::mouse.scalarY * 2.0f) - 1.0f);
 			float mag = sqrt(pow(mx, 2) + pow(my, 2));
-			if (mag > this->deadzone)
-			{
-				this->rotation.x = this->root->transform->rotation.y + (mx * this->sensitivity.x * DeltaTime);
-				this->rotation.y += my * this->sensitivity.y * DeltaTime;
-			}
+
+			this->rotation.x = this->root->transform->rotation.y + (mx * this->sensitivity.x);// * DeltaTime);
+			this->rotation.y += my * this->sensitivity.y;// * DeltaTime;
 		}
+		
+		SDL_WarpMouse(ScreenRect.width / 2, ScreenRect.height / 2);
 	}
 
 	f *= DeltaTime;

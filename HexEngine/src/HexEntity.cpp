@@ -11,6 +11,7 @@ HexEntity::HexEntity()
 	this->components.resize(8);
 	this->parent = NULL;
 	this->children.resize(8);
+	this->isStatic = false;
 }
 HexEntity::~HexEntity()
 {
@@ -28,6 +29,7 @@ void HexEntity::start()
 			component->onStart();
 		}
 	}
+	if (this->transform != NULL) this->transform->recalculate();
 }
 void HexEntity::frameUpdate()
 {
@@ -39,11 +41,11 @@ void HexEntity::frameUpdate()
 			component->onFrameUpdate();
 		}
 	}
-	if (this->shape != NULL) this->shape->load();
+	//if (this->shape != NULL) this->shape->load();
 }
 void HexEntity::fixedUpdate()
 {
-	if (this->transform != NULL) this->transform->recalculate();
+	if (this->transform != NULL && !this->isStatic) this->transform->recalculate();
 	for (unsigned i = 0; i < this->components.length(); i++)
 	{
 		ComponentNode* component = this->components[i];

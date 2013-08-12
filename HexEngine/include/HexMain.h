@@ -35,8 +35,10 @@
 #include "nodes\SkyboxNode.h"
 
 #include "core\HexEntity.h"
+#include "core\HexScene.h"
 #include "core\HexInput.h"
 #include "core\HexShader.h"
 #include "core\HexRender.h"
+#include "core\HexDraw.h"
 #include "core\HexData.h"
 #include "core\HexCore.h"
