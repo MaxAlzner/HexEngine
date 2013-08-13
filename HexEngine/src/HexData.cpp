@@ -71,6 +71,25 @@ HEX_API bool ToggleRunning()
 	return AppRunning;
 }
 
+HEX_API FILETYPE GetFiletype(const string filepath)
+{
+	if (filepath == 0) return FILETYPE_NONE;
+	size_t l = strlen(filepath);
+
+	if (l > 4)
+	{
+		if      (filepath[l - 3] == 'o' && filepath[l - 2] == 'b' && filepath[l - 1] == 'j') return FILETYPE_OBJ;
+		else if (filepath[l - 3] == 'v' && filepath[l - 2] == 'm' && filepath[l - 1] == 'p') return FILETYPE_VMP;
+		else if (filepath[l - 3] == 'b' && filepath[l - 2] == 'm' && filepath[l - 1] == 'p') return FILETYPE_BMP;
+		else if (filepath[l - 3] == 't' && filepath[l - 2] == 'g' && filepath[l - 1] == 'a') return FILETYPE_TGA;
+	}
+	if (l > 6)
+	{
+		if (filepath[l - 5] == 's' && filepath[l - 4] == 'c' && filepath[l - 3] == 'e' && filepath[l - 2] == 'n' && filepath[l - 1] == 'e') return FILETYPE_SCENE;
+	}
+	return FILETYPE_NONE;
+}
+
 HEX_API void RegisterOBJ(uint* mesh, const string filepath)
 {
 	if (mesh == NULL) return;
@@ -187,10 +206,12 @@ HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float far
 	Cameras.add(BoundEntity);
 	MainCamera = node;
 }
-HEX_API void AddController()
+HEX_API void AddController(float lookSensitivity, float moveSpeed)
 {
 	if (BoundEntity == NULL) return;
 	ControlNode* node = new ControlNode;
+	node->sensitivity = glm::vec2(lookSensitivity);
+	node->moveSpeed = glm::vec2(moveSpeed);
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 }

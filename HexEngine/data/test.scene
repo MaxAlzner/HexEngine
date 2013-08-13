@@ -1,0 +1,38 @@
+
+UNIT_SIZE 4.0
+
+prefab BaseFloor
+{
+	vertexMap "data/dungeon_floor_01.vmp"
+
+	diffuse "data/dungeon_floor_dif.bmp"
+	normal "data/dungeon_floor_normal.bmp"
+	specular "data/dungeon_floor_spec.bmp"
+	
+	static true
+}
+prefab Wall
+{
+	vertexMap "data/dungeon_wall_01.vmp"
+
+	diffuse "data/brickwall_stone_root_dif.bmp"
+	normal "data/brickwall_stone_root_normal.bmp"
+	specular "data/brickwall_stone_root_spec.bmp"
+	
+	static true
+}
+
+prefab Cove
+{
+	parent BaseFloor
+	parent Wall
+	translate 0.0 0.0 1.0
+	parent Wall
+	rotate 0.0 90.0 0.0
+	translate 1.0 0.0 0.0
+	parent Wall
+	rotate 0.0 270.0 0.0
+	translate -1.0 0.0 0.0
+}
+
+load BaseFloor

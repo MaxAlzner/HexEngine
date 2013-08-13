@@ -1,6 +1,18 @@
 #ifndef _HEX_DATA_H_
 #define _HEX_DATA_H_
 HEX_BEGIN
+	
+HEX_API typedef enum FILETYPE
+{
+	FILETYPE_NONE              = 0x00000000, 
+	
+	FILETYPE_SCENE             = 0x00001001, 
+
+	FILETYPE_OBJ               = 0x00000011, 
+	FILETYPE_VMP               = 0x00000012, 
+	FILETYPE_BMP               = 0x00000101, 
+	FILETYPE_TGA               = 0x00000102, 
+};
 
 extern bool AppRunning;
 extern bool Paused;
@@ -31,6 +43,8 @@ HEX_API extern void UninitializeData();
 HEX_API extern bool IsRunning();
 HEX_API extern bool ToggleRunning();
 
+HEX_API extern FILETYPE GetFiletype(const string filepath);
+
 HEX_API extern void RegisterOBJ(uint* mesh, const string filepath);
 HEX_API extern void RegisterVMP(uint* mesh, const string filepath);
 HEX_API extern void RegisterBMP(uint* texture, const string filepath);
@@ -45,7 +59,7 @@ HEX_API extern void TransformEntity(float x, float y, float z, float rx = 0.0f, 
 HEX_API extern void ParentEntity(uint parent, uint child);
 
 HEX_API extern void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ);
-HEX_API extern void AddController();
+HEX_API extern void AddController(float lookSensitivity, float moveSpeed);
 HEX_API extern void AddSkybox(uint skyMesh, uint skyMap);
 
 HEX_API extern void AddDirectionalLight(float intensity, MALib::COLOR& color);

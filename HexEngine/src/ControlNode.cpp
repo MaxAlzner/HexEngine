@@ -7,6 +7,7 @@ ControlNode::ControlNode()
 {
 	this->rotation = glm::vec2(0.0f, 0.0f);
 	this->sensitivity = glm::vec2(30.0f);
+	this->moveSpeed = glm::vec2(1.0f);
 	this->rangeX = glm::vec2(-360.0f, 360.0f);
 	this->rangeY = glm::vec2(-60.0f, 60.0f);
 }
@@ -69,8 +70,8 @@ void ControlNode::onFixedUpdate()
 		SDL_WarpMouse(ScreenRect.width / 2, ScreenRect.height / 2);
 	}
 
-	f *= DeltaTime;
-	r *= DeltaTime;
+	f *= this->moveSpeed.y * DeltaTime;
+	r *= this->moveSpeed.x * DeltaTime;
 	this->rotation.y = MALib::Clamp(this->rotation.y, this->rangeY.x, this->rangeY.y);
 
 	this->root->transform->translate(f.x + r.x, 0.0f, f.z + r.z);

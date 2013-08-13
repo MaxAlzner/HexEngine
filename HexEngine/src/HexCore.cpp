@@ -27,7 +27,10 @@ void UpdateFrameCount()
 	}
 }
 
-bool Toggle = false;
+bool ToggleBlitBrightPass = false;
+bool ToggleBlitLuminance = false;
+bool ToggleBlitAmbientOcclusion = false;
+bool ToggleBlitDeferredNormals = false;
 bool ToggleLuminance = true;
 bool ToggleAmbientOcclusion = false;
 float Gamma = 2.2f;
@@ -144,7 +147,7 @@ HEX_API void OnFrameDraw()
 	if (ToggleAmbientOcclusion) PostProcess(UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION);
 	
 	AmbientOcclusion.unload();
-#if 0
+#if 1
 	AmbientOcclusionBilateral.load();
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, AmbientOcclusion.colorMap);
@@ -192,11 +195,11 @@ HEX_API void OnFrameDraw()
 	MainRender.blit();
 #endif
 	
-	if (Toggle)
-	{
-		//AmbientOcclusion.blit();
-		Luminance.blit();
-	}
+	if (ToggleBlitBrightPass) BrightPass.blit();
+	if (ToggleBlitLuminance) Luminance.blit();
+	if (ToggleBlitAmbientOcclusion) AmbientOcclusionBilateral.blit();
+	if (ToggleBlitDeferredNormals) DeferredNormals.blit();
+
 	Cameras[0]->unload();
 
 	SDL_GL_SwapBuffers();
@@ -220,9 +223,19 @@ HEX_API void OnFrameUpdate()
 }
 HEX_API void OnFixedUpdate()
 {
-	if (Input::GetKey(KEY_1, true)) Toggle = !Toggle;
-	if (Input::GetKey(KEY_2, true)) ToggleLuminance = !ToggleLuminance;
-	if (Input::GetKey(KEY_3, true)) ToggleAmbientOcclusion = !ToggleAmbientOcclusion;
+	if (Input::GetKey(KEY_1, true))
+	{
+		ToggleBlitLuminance = false;
+		ToggleBlitAmbientOcclusion = false;
+		ToggleBlitDeferredNormals = false;
+	}
+	if (Input::GetKey(KEY_2, true)) ToggleBlitLuminance = !ToggleBlitLuminance;
+	if (Input::GetKey(KEY_3, true)) ToggleBlitAmbientOcclusion = !ToggleBlitAmbientOcclusion;
+	if (Input::GetKey(KEY_4, true)) ToggleBlitDeferredNormals = !ToggleBlitDeferredNormals;
+
+	if (Input::GetKey(KEY_5, true)) ToggleLuminance = !ToggleLuminance;
+	if (Input::GetKey(KEY_6, true)) ToggleAmbientOcclusion = !ToggleAmbientOcclusion;
+
 	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
 	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
 

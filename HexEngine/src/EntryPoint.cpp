@@ -52,7 +52,7 @@ void Build_SkyLine()
 	HEX::BindEntity(entities[i]);i++;
 	HEX::TransformEntity(8.0f, 2.4f, 0.0f, 0.0f, 90.0f, 0.0f);
 #if 1
-	HEX::AddController();
+	HEX::AddController(30.0f, 1.0f);
 #endif
 
 	HEX::BindEntity(entities[i]);i++;
@@ -154,6 +154,9 @@ void Assets_Dungeon()
 	HEX::RegisterVMP(meshes + 1, "data/dungeon_floor_01.vmp");
 	HEX::RegisterVMP(meshes + 2, "data/dungeon_wall_01.vmp");
 	HEX::RegisterVMP(meshes + 3, "data/dungeon_pillar.vmp");
+	HEX::RegisterVMP(meshes + 4, "data/dragon_statue.vmp");
+	HEX::RegisterVMP(meshes + 5, "data/dragon_statue_base.vmp");
+	HEX::RegisterVMP(meshes + 6, "data/dungeon_ceiling.vmp");
 	
 	HEX::RegisterBMP(textures +  0, "data/NightSkyBox.bmp");
 	HEX::RegisterBMP(textures +  1, "data/dungeon_floor_dif.bmp");
@@ -165,6 +168,15 @@ void Assets_Dungeon()
 	HEX::RegisterBMP(textures +  7, "data/brick_pillar_dif.bmp");
 	HEX::RegisterBMP(textures +  8, "data/brick_pillar_normal.bmp");
 	HEX::RegisterBMP(textures +  9, "data/brick_pillar_spec.bmp");
+	HEX::RegisterBMP(textures +  10, "data/dragon_statue_dif.bmp");
+	HEX::RegisterBMP(textures +  11, "data/dragon_statue_normal.bmp");
+	HEX::RegisterBMP(textures +  12, "data/dragon_statue_spec.bmp");
+	HEX::RegisterBMP(textures +  13, "data/dragon_statue_base_dif.bmp");
+	HEX::RegisterBMP(textures +  14, "data/dragon_statue_base_normal.bmp");
+	HEX::RegisterBMP(textures +  15, "data/dragon_statue_base_spec.bmp");
+	HEX::RegisterBMP(textures +  16, "data/dungeon_ceiling_dif.bmp");
+	HEX::RegisterBMP(textures +  17, "data/dungeon_ceiling_normal.bmp");
+	HEX::RegisterBMP(textures +  18, "data/dungeon_ceiling_spec.bmp");
 }
 void Build_Dungeon()
 {
@@ -174,20 +186,20 @@ void Build_Dungeon()
 #define UNIT 150.0f
 
 	HEX::BindEntity(entities[i]);i++;
-	HEX::TransformEntity(0.0f, UNIT * 1.25f, 0.0f);
-	HEX::AddController();
+	HEX::TransformEntity(0.0f, UNIT * 1.25f, UNIT * -2.0f);
+	HEX::AddController(30.0f, UNIT * 0.8f);
 
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddCamera(45.0f, 4.0f / 3.0f, 1.0f, UNIT * 24.0f);
 	HEX::ParentEntity(i - 1, i);
 	
 	HEX::BindEntity(entities[i]);i++;
-	HEX::TransformEntity(0.0f, 8.0f, 0.0f, -80.0f, 60.0f, 0.0f);
+	HEX::TransformEntity(0.0f, 8.0f, 0.0f, -60.0f, 30.0f, 0.0f);
 	HEX::AddDirectionalLight(0.9f, MALib::COLOR());
 	
 	HEX::BindEntity(entities[i]);i++;
-	HEX::TransformEntity(0.0f, 1.0f, 0.0f);
-	HEX::AddPointLight(1.0f, MALib::COLOR(1.0f, 0.6f, 0.25f), 1.6f, 0.8f, 0.1f);
+	HEX::TransformEntity(0.0f, UNIT * 2.0f, 0.0f);
+	HEX::AddPointLight(1.0f, MALib::COLOR(0.1f, 0.4f, 1.0f), 8.0f, 24.0f, 64.0f);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[1]);
@@ -199,13 +211,6 @@ void Build_Dungeon()
 	HEX::AddMaterial(textures[4], textures[5], textures[6]);
 	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
 	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, 0.0f, 0.0f, UNIT);
-	
-	HEX::BindEntity(entities[i]);i++;
-	HEX::AddShape(meshes[2]);
-	HEX::AddMaterial(textures[4], textures[5], textures[6]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, 0.0f, 0.0f, -UNIT);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_ROTATION_Y, 180.0f);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[2]);
@@ -241,6 +246,20 @@ void Build_Dungeon()
 	HEX::AddMaterial(textures[7], textures[8], textures[9]);
 	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
 	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, -UNIT, 0.0f, -UNIT);
+	
+	HEX::BindEntity(entities[i]);i++;
+	HEX::AddShape(meshes[6]);
+	HEX::AddMaterial(textures[16], textures[17], textures[18]);
+	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
+	
+	HEX::BindEntity(entities[i]);i++;
+	HEX::AddShape(meshes[4]);
+	HEX::AddMaterial(textures[10], textures[11], textures[12]);
+	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
+	HEX::BindEntity(entities[i]);i++;
+	HEX::AddShape(meshes[5]);
+	HEX::AddMaterial(textures[13], textures[14], textures[15]);
+	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
 }
 
 int main(int argc, char **argv)
@@ -248,12 +267,14 @@ int main(int argc, char **argv)
 	if (!HEX::Initialize(argc, argv)) 
 		HEX::ToggleRunning();
 
-#if 1
+#if 0
 	Assets_SkyLine();
 	Build_SkyLine();
-#else
+#elif 0
 	Assets_Dungeon();
 	Build_Dungeon();
+#else
+	HEX::LoadScene("data/test.scene");
 #endif
 
 	HEX::OnStart();

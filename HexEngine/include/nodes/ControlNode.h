@@ -19,6 +19,7 @@ public:
 
 	glm::vec2 rotation;
 	glm::vec2 sensitivity;
+	glm::vec2 moveSpeed;
 	glm::vec2 rangeX;
 	glm::vec2 rangeY;
 };

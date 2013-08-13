@@ -137,67 +137,33 @@ vec4 ambient_occlusion()
 	float depth = read_depth(tex_coord);
 	vec3 normal = unpack_normal(tex_coord);
 
-	vec2 incr = 2.8 / screen_size;
+	vec2 incr = 6.4 / screen_size;
 	vec3 p = vec3(tex_coord, depth);
 	
 	float ao = 0.;
 	float k = 0.;
+	
+	ao += occlusion(tex_coord + (incr * vec2( 0., -1.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 0.,  1.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-1.,  0.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 1.,  0.)), normal, p);
 
-#if 1
-	ao += occlusion(tex_coord + (incr * vec2( 1.,  1.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-1.,  1.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 1., -1.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-1., -1.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 2.,  2.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-2.,  2.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 2., -2.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-2., -2.)), normal, p);
 	
-	ao += occlusion(tex_coord + (incr * vec2( 0., -2.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 0.,  2.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-2.,  0.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 2.,  0.)), normal, p);
-	
-	ao += occlusion(tex_coord + (incr * vec2( 3.,  3.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-3.,  3.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 3., -3.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-3., -3.)), normal, p);
-	
-	ao += occlusion(tex_coord + (incr * vec2( 0., -4.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 0.,  4.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-4.,  0.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 4.,  0.)), normal, p);
-	
-	ao += occlusion(tex_coord + (incr * vec2( 5.,  5.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-5.,  5.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2( 5., -5.)), normal, p);
-	ao += occlusion(tex_coord + (incr * vec2(-5., -5.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 0., -3.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 0.,  3.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-3.,  0.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 3.,  0.)), normal, p);
 
-	ao /= 20.;
-#else
-	OCCLUSION( 1.,  1.);
-	OCCLUSION(-1.,  1.);
-	OCCLUSION( 1., -1.);
-	OCCLUSION(-1., -1.);
-	
-	OCCLUSION( 0., -2.);
-	OCCLUSION( 0.,  2.);
-	OCCLUSION(-2.,  0.);
-	OCCLUSION( 2.,  0.);
+	ao += occlusion(tex_coord + (incr * vec2( 4.,  4.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-4.,  4.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2( 4., -4.)), normal, p);
+	ao += occlusion(tex_coord + (incr * vec2(-4., -4.)), normal, p);
 
-	OCCLUSION( 3.,  3.);
-	OCCLUSION(-3.,  3.);
-	OCCLUSION( 3., -3.);
-	OCCLUSION(-3., -3.);
-	
-	OCCLUSION( 0., -4.);
-	OCCLUSION( 0.,  4.);
-	OCCLUSION(-4.,  0.);
-	OCCLUSION( 4.,  0.);
-
-	OCCLUSION( 5.,  5.);
-	OCCLUSION(-5.,  5.);
-	OCCLUSION( 5., -5.);
-	OCCLUSION(-5., -5.);
-	
-	ao /= k;
-#endif
+	ao /= 16.;
 	//ao = 1. - clamp(ao, 0., 1.);
 	
 	return vec4(vec3(ao), 1.);
@@ -455,8 +421,12 @@ void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
 	vec3 diffuse = (directionalLight_color.rgb * lambert);
 	albedo += diffuse * directionalLight_color.a;
 }
-void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specular_intensity, in vec3 light_position, in vec4 light_color, in vec3 light_falloff)
+void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specular_intensity, in int light)
 {
+	vec3 light_position = pointLight4_ss[light];
+	vec4 light_color = pointLight4_color[light];
+	vec3 light_falloff = pointLight4_falloff[light];
+
 	float dist = distance(light_position, vertex_ss);
 	float atten = 1. / (light_falloff.x + (light_falloff.y * dist) + (light_falloff.z * dist * dist));
 
@@ -481,7 +451,7 @@ void pointLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v, in float specula
 
 	float lambert = max(n_dot_l, 0.);
 
-	vec3 diffuse = (light_color.rgb * lambert * atten) + vec3(specular * lambert);
+	vec3 diffuse = (light_color.rgb * lambert * atten) + vec3(light_color.rgb * specular * lambert);
 	albedo += (diffuse * light_color.a);
 }
 
@@ -498,22 +468,13 @@ vec4 main_render()
 	
 	vec3 albedo = vec3(0.);
 
-#if 0
-	DIRECTIONAL_ALBEDO;
-
-	if (numOfPointLights > 0) POINTLIGHT_ALBEDO(0);
-	if (numOfPointLights > 1) POINTLIGHT_ALBEDO(1);
-	if (numOfPointLights > 2) POINTLIGHT_ALBEDO(2);
-	if (numOfPointLights > 3) POINTLIGHT_ALBEDO(3);
-#else
 	directionalLight_albedo(albedo, n, v);
 
 #if 1
-	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[0], pointLight4_color[0], pointLight4_falloff[0]);
-	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[1], pointLight4_color[1], pointLight4_falloff[1]);
-	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[2], pointLight4_color[2], pointLight4_falloff[2]);
-	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, pointLight4_ss[3], pointLight4_color[3], pointLight4_falloff[3]);
-#endif
+	if (numOfPointLights > 0) pointLight_albedo(albedo, n, v, specular_intensity, 0);
+	if (numOfPointLights > 1) pointLight_albedo(albedo, n, v, specular_intensity, 1);
+	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, 2);
+	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, 3);
 #endif
 
 	//float shadow = shadow_intensity();
