@@ -2,11 +2,24 @@
 
 #ifdef _HEX_PARAMETER_H_
 HEX_BEGIN
+
+#define GET_LIGHTODE \
+	light = GetComponent<LightNode>();\
+	if (light == 0) break;
+#define GET_CAMERANODE \
+	camera = GetComponent<CameraNode>();\
+	if (camera == 0) break;
+#define GET_CONTROLNODE \
+	control = GetComponent<ControlNode>();\
+	if (control == 0) break;
 	
 HEX_API void ChangeParameter(PARAMETER parameter, float value)
 {
 	if (BoundEntity == NULL) return;
-
+	
+	LightNode* light = 0;
+	CameraNode* camera = 0;
+	ControlNode* control = 0;
 	switch (parameter)
 	{
 	case PARAMETER_TRANSFORM_TRANSLATE_X:
@@ -73,6 +86,76 @@ HEX_API void ChangeParameter(PARAMETER parameter, float value)
 	case PARAMETER_MATERIAL_UV_OFFSET_V:
 		BoundEntity->material->uvOffset.y = value;
 		break;
+		
+	case PARAMETER_LIGHT_INTENSITY:
+		GET_LIGHTODE;
+		light->intensity = value;
+		break;
+	case PARAMETER_LIGHT_COLOR_R:
+		GET_LIGHTODE;
+		light->color.r = value;
+		break;
+	case PARAMETER_LIGHT_COLOR_G:
+		GET_LIGHTODE;
+		light->color.g = value;
+		break;
+	case PARAMETER_LIGHT_COLOR_B:
+		GET_LIGHTODE;
+		light->color.b = value;
+		break;
+	case PARAMETER_LIGHT_FALLOFF_CONSTANT:
+		GET_LIGHTODE;
+		light->falloff.r = value;
+		break;
+	case PARAMETER_LIGHT_FALLOFF_LINEAR:
+		GET_LIGHTODE;
+		light->falloff.y = value;
+		break;
+	case PARAMETER_LIGHT_FALLOFF_QUADRATIC:
+		GET_LIGHTODE;
+		light->falloff.z = value;
+		break;
+		
+	case PARAMETER_CAMERA_FOV_ANGLE:
+		GET_CAMERANODE;
+		camera->fovAngle = value;
+		break;
+	case PARAMETER_CAMERA_ASPECT_RATIO:
+		GET_CAMERANODE;
+		camera->aspectRatio = value;
+		break;
+	case PARAMETER_CAMERA_NEARZ:
+		GET_CAMERANODE;
+		camera->nearZ = value;
+		break;
+	case PARAMETER_CAMERA_FARZ:
+		GET_CAMERANODE;
+		camera->farZ = value;
+		break;
+		
+	case PARAMETER_CONTROL_SENSITIVITY:
+		GET_CONTROLNODE;
+		control->sensitivity.x = value;
+		control->sensitivity.y = value;
+		break;
+	case PARAMETER_CONTROL_MOVESPEED_X:
+		GET_CONTROLNODE;
+		control->moveSpeed.x = value;
+		break;
+	case PARAMETER_CONTROL_MOVESPEED_Y:
+		GET_CONTROLNODE;
+		control->moveSpeed.y = value;
+		break;
+	case PARAMETER_CONTROL_RANGE_X:
+		GET_CONTROLNODE;
+		control->rangeX.x = -value;
+		control->rangeX.y = value;
+		break;
+	case PARAMETER_CONTROL_RANGE_Y:
+		GET_CONTROLNODE;
+		control->rangeY.x = -value;
+		control->rangeY.y = value;
+		break;
 
 	default:
 		break;
@@ -82,7 +165,7 @@ HEX_API void ChangeParameter(PARAMETER parameter, float v0, float v1, float v2)
 {
 	if (BoundEntity == NULL) return;
 
-	LightNode* node = 0;
+	LightNode* light = 0;
 	switch (parameter)
 	{
 	case PARAMETER_TRANSFORM_TRANSLATE_XYZ:
@@ -115,9 +198,16 @@ HEX_API void ChangeParameter(PARAMETER parameter, float v0, float v1, float v2)
 		break;
 
 	case PARAMETER_LIGHT_COLOR_RGB:
-		node = BoundEntity->getComponent<LightNode>();
+		GET_LIGHTODE;
+		light->color.r = v0;
+		light->color.g = v1;
+		light->color.b = v2;
 		break;
 	case PARAMETER_LIGHT_FALLOFF_XYZ:
+		GET_LIGHTODE;
+		light->falloff.x = v0;
+		light->falloff.y = v1;
+		light->falloff.z = v2;
 		break;
 
 	default:

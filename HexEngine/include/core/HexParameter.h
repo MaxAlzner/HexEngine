@@ -53,6 +53,8 @@ HEX_API typedef enum PARAMETER
 	PARAMETER_CONTROL_SENSITIVITY                              = 0x10001001, 
 	PARAMETER_CONTROL_MOVESPEED_X                              = 0x10001003, 
 	PARAMETER_CONTROL_MOVESPEED_Y                              = 0x10001004, 
+	PARAMETER_CONTROL_RANGE_X                                  = 0x10001005, 
+	PARAMETER_CONTROL_RANGE_Y                                  = 0x10001006, 
 	
 	PARAMETER_STATIC                                           = 0xF0000001, 
 };

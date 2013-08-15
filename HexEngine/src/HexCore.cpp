@@ -127,7 +127,7 @@ HEX_API void OnFrameDraw()
 	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap.colorMap);
 	
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
-	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->render();
+	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->root->render();
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
 

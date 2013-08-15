@@ -5,13 +5,13 @@ HEX_BEGIN
 HEX_API typedef enum FILETYPE
 {
 	FILETYPE_NONE              = 0x00000000, 
-	
-	FILETYPE_SCENE             = 0x00001001, 
 
 	FILETYPE_OBJ               = 0x00000011, 
 	FILETYPE_VMP               = 0x00000012, 
 	FILETYPE_BMP               = 0x00000101, 
 	FILETYPE_TGA               = 0x00000102, 
+	
+	FILETYPE_SCENE             = 0x00001001, 
 };
 
 extern bool AppRunning;
@@ -22,13 +22,14 @@ extern MALib::RECT RenderRect;
 extern MALib::RECT ScreenRect;
 extern SDL_Surface* RenderSurface;
 
-extern MALib::ARRAY<HexEntity*> Cameras;
-extern MALib::ARRAY<HexEntity*> Lights;
-extern MALib::ARRAY<HexEntity*> Skyboxes;
-extern MALib::ARRAY<HexEntity*> Casters;
 extern MALib::ARRAY<HexEntity*> Renderable;
+extern MALib::ARRAY<HexEntity*> Casters;
 extern MALib::ARRAY<ShapeNode*> Shapes;
 extern MALib::ARRAY<MaterialNode*> Materials;
+extern MALib::ARRAY<CameraNode*> Cameras;
+extern MALib::ARRAY<LightNode*> Lights;
+extern MALib::ARRAY<SkyboxNode*> Skyboxes;
+extern MALib::ARRAY<ControlNode*> Controllers;
 extern CameraNode* MainCamera;
 	
 extern MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -42,8 +43,6 @@ HEX_API extern void UninitializeData();
 
 HEX_API extern bool IsRunning();
 HEX_API extern bool ToggleRunning();
-
-HEX_API extern FILETYPE GetFiletype(const string filepath);
 
 HEX_API extern void RegisterOBJ(uint* mesh, const string filepath);
 HEX_API extern void RegisterVMP(uint* mesh, const string filepath);
@@ -67,6 +66,15 @@ HEX_API extern void AddPointLight(float intensity, MALib::COLOR& color, float co
 
 HEX_API extern void AddShape(uint mesh);
 HEX_API extern void AddMaterial(uint color, uint normal = 0, uint specular = 0);
+
+extern FILETYPE GetFiletype(const string filepath);
+
+template <typename T> extern T* GetComponent();
+
+template <> extern CameraNode*  GetComponent<>();
+template <> extern LightNode*   GetComponent<>();
+template <> extern SkyboxNode*  GetComponent<>();
+template <> extern ControlNode* GetComponent<>();
 	
 HEX_END
 #endif

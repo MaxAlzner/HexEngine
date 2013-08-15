@@ -277,8 +277,6 @@ int main(int argc, char **argv)
 	HEX::LoadScene("data/test.scene");
 #endif
 
-	HEX::ChangeParameter(HEX::PARAMETER_LIGHT_COLOR_RGB, 0.0f, 0.0f, 0.0f);
-
 	HEX::OnStart();
 	
 	HEX::Unitialize();

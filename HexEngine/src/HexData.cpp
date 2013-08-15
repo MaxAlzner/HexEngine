@@ -11,13 +11,14 @@ MALib::RECT RenderRect(1280, 720);
 MALib::RECT ScreenRect(1280, 720);
 SDL_Surface* RenderSurface = NULL;
 
-MALib::ARRAY<HexEntity*> Cameras;
-MALib::ARRAY<HexEntity*> Lights;
-MALib::ARRAY<HexEntity*> Skyboxes;
-MALib::ARRAY<HexEntity*> Casters;
 MALib::ARRAY<HexEntity*> Renderable;
+MALib::ARRAY<HexEntity*> Casters;
 MALib::ARRAY<ShapeNode*> Shapes;
 MALib::ARRAY<MaterialNode*> Materials;
+MALib::ARRAY<CameraNode*> Cameras;
+MALib::ARRAY<LightNode*> Lights;
+MALib::ARRAY<SkyboxNode*> Skyboxes;
+MALib::ARRAY<ControlNode*> Controllers;
 CameraNode* MainCamera = NULL;
 	
 MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -28,13 +29,14 @@ HexEntity* BoundEntity = NULL;
 
 HEX_API void InitializeData()
 {
-	Cameras.resize(8);
-	Lights.resize(8);
-	Skyboxes.resize(8);
 	Casters.resize(32);
 	Renderable.resize(32);
 	Shapes.resize(32);
 	Materials.resize(32);
+	Cameras.resize(8);
+	Lights.resize(8);
+	Skyboxes.resize(8);
+	Controllers.resize(8);
 
 	Meshes.resize(24);
 	Textures.resize(48);
@@ -48,13 +50,14 @@ HEX_API void UninitializeData()
 	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);
 	for (unsigned i = 0; i < Entities.length(); i++) delete Entities[i];
 	for (unsigned i = 0; i < Nodes.length(); i++) delete Nodes[i];
-	Cameras.clear();
-	Lights.clear();
-	Skyboxes.clear();
 	Casters.clear();
 	Renderable.clear();
 	Shapes.clear();
 	Materials.clear();
+	Cameras.clear();
+	Lights.clear();
+	Skyboxes.clear();
+	Controllers.clear();
 	Meshes.clear();
 	Textures.clear();
 	Entities.clear();
@@ -69,25 +72,6 @@ HEX_API bool ToggleRunning()
 {
 	AppRunning = !AppRunning;
 	return AppRunning;
-}
-
-HEX_API FILETYPE GetFiletype(const string filepath)
-{
-	if (filepath == 0) return FILETYPE_NONE;
-	size_t l = strlen(filepath);
-
-	if (l > 4)
-	{
-		if      (filepath[l - 3] == 'o' && filepath[l - 2] == 'b' && filepath[l - 1] == 'j') return FILETYPE_OBJ;
-		else if (filepath[l - 3] == 'v' && filepath[l - 2] == 'm' && filepath[l - 1] == 'p') return FILETYPE_VMP;
-		else if (filepath[l - 3] == 'b' && filepath[l - 2] == 'm' && filepath[l - 1] == 'p') return FILETYPE_BMP;
-		else if (filepath[l - 3] == 't' && filepath[l - 2] == 'g' && filepath[l - 1] == 'a') return FILETYPE_TGA;
-	}
-	if (l > 6)
-	{
-		if (filepath[l - 5] == 's' && filepath[l - 4] == 'c' && filepath[l - 3] == 'e' && filepath[l - 2] == 'n' && filepath[l - 1] == 'e') return FILETYPE_SCENE;
-	}
-	return FILETYPE_NONE;
 }
 
 HEX_API void RegisterOBJ(uint* mesh, const string filepath)
@@ -203,7 +187,7 @@ HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float far
 	node->farZ = farZ;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
-	Cameras.add(BoundEntity);
+	Cameras.add(node);
 	MainCamera = node;
 }
 HEX_API void AddController(float lookSensitivity, float moveSpeed)
@@ -214,6 +198,7 @@ HEX_API void AddController(float lookSensitivity, float moveSpeed)
 	node->moveSpeed = glm::vec2(moveSpeed);
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
+	Controllers.add(node);
 }
 HEX_API void AddSkybox(uint skyMesh, uint skyMap)
 {
@@ -235,7 +220,7 @@ HEX_API void AddSkybox(uint skyMesh, uint skyMap)
 	Nodes.add(mat);
 	Materials.add(mat);
 
-	Skyboxes.add(BoundEntity);
+	Skyboxes.add(node);
 }
 
 HEX_API void AddDirectionalLight(float intensity, MALib::COLOR& color)
@@ -248,7 +233,7 @@ HEX_API void AddDirectionalLight(float intensity, MALib::COLOR& color)
 	node->color.a = intensity;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
-	Lights.add(BoundEntity);
+	Lights.add(node);
 }
 HEX_API void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff, float linearFalloff, float quadFalloff)
 {
@@ -263,7 +248,7 @@ HEX_API void AddPointLight(float intensity, MALib::COLOR& color, float constantF
 	node->falloff.z = quadFalloff;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
-	Lights.add(BoundEntity);
+	Lights.add(node);
 }
 
 HEX_API void AddShape(uint mesh)
@@ -287,6 +272,79 @@ HEX_API void AddMaterial(uint colorMap, uint normalMap, uint specularMap)
 	BoundEntity->setMaterial(node);
 	Nodes.add(node);
 	Materials.add(node);
+}
+
+FILETYPE GetFiletype(const string filepath)
+{
+	if (filepath == 0) return FILETYPE_NONE;
+	size_t l = strlen(filepath);
+
+	if (l > 4)
+	{
+		if      (filepath[l - 3] == 'o' && filepath[l - 2] == 'b' && filepath[l - 1] == 'j') return FILETYPE_OBJ;
+		else if (filepath[l - 3] == 'v' && filepath[l - 2] == 'm' && filepath[l - 1] == 'p') return FILETYPE_VMP;
+		else if (filepath[l - 3] == 'b' && filepath[l - 2] == 'm' && filepath[l - 1] == 'p') return FILETYPE_BMP;
+		else if (filepath[l - 3] == 't' && filepath[l - 2] == 'g' && filepath[l - 1] == 'a') return FILETYPE_TGA;
+	}
+	if (l > 6)
+	{
+		if (filepath[l - 5] == 's' && filepath[l - 4] == 'c' && filepath[l - 3] == 'e' && filepath[l - 2] == 'n' && filepath[l - 1] == 'e') return FILETYPE_SCENE;
+	}
+	return FILETYPE_NONE;
+}
+
+template <typename T> T* GetComponent()
+{
+	return 0;
+}
+
+template <> CameraNode* GetComponent<>()
+{
+	if (BoundEntity == 0) return 0;
+	HexEntity* entity = BoundEntity;
+	for (uint i = 0; i < Cameras.length(); i++)
+	{
+		CameraNode* node = Cameras[i];
+		if (node == 0) continue;
+		if (node->root == entity) return node;
+	}
+	return 0;
+}
+template <> LightNode* GetComponent<>()
+{
+	if (BoundEntity == 0) return 0;
+	HexEntity* entity = BoundEntity;
+	for (uint i = 0; i < Lights.length(); i++)
+	{
+		LightNode* node = Lights[i];
+		if (node == 0) continue;
+		if (node->root == entity) return node;
+	}
+	return 0;
+}
+template <> SkyboxNode* GetComponent<>()
+{
+	if (BoundEntity == 0) return 0;
+	HexEntity* entity = BoundEntity;
+	for (uint i = 0; i < Skyboxes.length(); i++)
+	{
+		SkyboxNode* node = Skyboxes[i];
+		if (node == 0) continue;
+		if (node->root == entity) return node;
+	}
+	return 0;
+}
+template <> ControlNode* GetComponent<>()
+{
+	if (BoundEntity == 0) return 0;
+	HexEntity* entity = BoundEntity;
+	for (uint i = 0; i < Controllers.length(); i++)
+	{
+		ControlNode* node = Controllers[i];
+		if (node == 0) continue;
+		if (node->root == entity) return node;
+	}
+	return 0;
 }
 
 HEX_END

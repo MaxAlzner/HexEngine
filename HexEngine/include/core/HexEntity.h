@@ -24,8 +24,6 @@ public:
 
 	void makeStatic(bool v);
 
-	template <typename T> T* getComponent();
-
 	void parentTo(HexEntity* entity);
 
 	TransformNode* transform;

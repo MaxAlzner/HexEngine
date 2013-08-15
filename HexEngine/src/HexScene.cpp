@@ -17,15 +17,26 @@ HEX_BEGIN
 #define COMMAND_DIFFUSE "diffuse"
 #define COMMAND_NORMAL "normal"
 #define COMMAND_SPECULAR "specular"
-
+	
+#define COMMAND_UNITSIZE "UNIT_SIZE"
+#define COMMAND_CREATEPREFAB "prefab"
 #define COMMAND_PARENT "parent"
 #define COMMAND_LOAD "load"
 	
 typedef struct Scene
 {
+	~Scene()
+	{
+		this->prefabs.clear();
+		this->commands.clear();
+		this->loadOrder.clear();
+		if (this->file != 0) MALib::FreeTextFile(&this->file);
+	}
 	float unitSize;
-	MALib::ARRAY<Prefab> prefabs;
+	MALib::ARRAY<Prefab*> prefabs;
 	MALib::ARRAY<string> commands;
+	MALib::ARRAY<string> loadOrder;
+	MALib::TEXTFILE* file;
 } Scene;
 typedef struct Prefab
 {
@@ -42,28 +53,46 @@ typedef struct Prefab
 		string normal;
 		string specular;
 	} data;
-	uint bufferSize;
+	uint filepathBufferSize;
 	MALib::ARRAY<string> commands;
 	MALib::ARRAY<Prefab> children;
 } Prefab;
 
-void CreatePrefab(string str, Prefab* prefab)
+Prefab* GetPrefab(string name, Scene* scene)
 {
-	if (prefab == 0) return;
-	
+	if (name == 0 || scene == 0) return 0;
+
+	for (uint i = 0; i < scene->prefabs.length(); i++)
+	{
+		Prefab* prefab = scene->prefabs[i];
+		if (prefab == 0) continue;
+		if (strcmp(prefab->name, name) == 0) return prefab;
+	}
+	return 0;
+}
+Scene* CreateScene(string filepath)
+{
+}
+Prefab* CreatePrefab(string name)
+{
+	Prefab* prefab = new Prefab;
 	memset(prefab, 0, sizeof(Prefab));
-	prefab->bufferSize = 64;
-	prefab->name = new char[prefab->bufferSize];
-	prefab->data.mesh = new char[prefab->bufferSize];
-	prefab->data.diffuse = new char[prefab->bufferSize];
-	prefab->data.normal = new char[prefab->bufferSize];
-	prefab->data.specular = new char[prefab->bufferSize];
-	memset(prefab->data.mesh, 0, sizeof(char) * prefab->bufferSize);
-	memset(prefab->data.diffuse, 0, sizeof(char) * prefab->bufferSize);
-	memset(prefab->data.normal, 0, sizeof(char) * prefab->bufferSize);
-	memset(prefab->data.specular, 0, sizeof(char) * prefab->bufferSize);
+
+	prefab->name = name;
+
+	prefab->filepathBufferSize = 64;
+	prefab->data.mesh = new char[prefab->filepathBufferSize];
+	prefab->data.diffuse = new char[prefab->filepathBufferSize];
+	prefab->data.normal = new char[prefab->filepathBufferSize];
+	prefab->data.specular = new char[prefab->filepathBufferSize];
+	memset(prefab->data.mesh, 0, sizeof(char) * prefab->filepathBufferSize);
+	memset(prefab->data.diffuse, 0, sizeof(char) * prefab->filepathBufferSize);
+	memset(prefab->data.normal, 0, sizeof(char) * prefab->filepathBufferSize);
+	memset(prefab->data.specular, 0, sizeof(char) * prefab->filepathBufferSize);
 	prefab->commands.resize(8);
 	prefab->children.resize(8);
+
+	return prefab;
 }
 
 bool ParseFilepath(string str, string buffer, uint size)
@@ -290,6 +319,54 @@ bool IsCommand(string str)
 	}
 	return false;
 }
+bool ParseLine(string str, Scene* scene)
+{
+	if (str == 0 || scene == 0) return false;
+	string check = 0;
+	static Prefab* currentPrefab = 0;
+	static bool insidePrefab = false;
+	check = strstr(str, COMMAND_UNITSIZE);
+	if (check != 0)
+	{
+		check += strlen(COMMAND_UNITSIZE) + 1;
+		sscanf(check, "%f", &scene->unitSize);
+		return true;
+	}
+	check = 0;
+	check = strstr(str, COMMAND_CREATEPREFAB);
+	if (check != 0)
+	{
+		check += strlen(COMMAND_CREATEPREFAB) + 1;
+		CreatePrefab(str, currentPrefab);
+		return true;
+	}
+	check = 0;
+	check = strchr(str, '{');
+	if (check != 0)
+	{
+		if (currentPrefab == 0) return false;
+		insidePrefab = true;
+		return true;
+	}
+	check = 0;
+	check = strchr(str, '}');
+	if (check != 0)
+	{
+		if (!insidePrefab) return false;
+		insidePrefab = false;
+		currentPrefab = 0;
+		return true;
+	}
+	check = 0;
+	check = strstr(str, COMMAND_LOAD);
+	if (check != 0)
+	{
+		check += strlen(COMMAND_LOAD) + 1;
+		scene->loadOrder.add(check);
+		return true;
+	}
+	return false;
+}
 
 HEX_API bool LoadScene(const string filepath)
 {
@@ -297,58 +374,24 @@ HEX_API bool LoadScene(const string filepath)
 	if (GetFiletype(filepath) != FILETYPE_SCENE) return false;
 	MALib::TEXTFILE* file = 0;
 	if (!MALib::ImportTextFile(filepath, &file)) return false;
-	bool result = LoadScene(file);
-	MALib::FreeTextFile(&file);
-	return result;
-}
-HEX_API bool LoadScene(MALib::TEXTFILE* file)
-{
-	if (file == 0) return false;
+
 	Scene scene;
 	scene.unitSize = 1.0f;
 	scene.prefabs.resize(64);
 	scene.commands.resize(64);
+	scene.loadOrder.resize(64);
+	scene.file = file;
 
 	bool foundError = false;
-	bool foundPrefab = false;
-	bool enteredPrefab = false;
-	Prefab* currentPrefab = 0;
-	static char scratch[256];
-	memset(scratch, 0, sizeof(char) * 256);
 	for (uint i = 0; i < file->lines.length(); i++)
 	{
-		memset(scratch, 0, sizeof(char) * 256);
 		string line = file->lines[i];
 
 		if (strlen(line) < 1) continue;
-		sscanf(line, "%s", scratch);
 
-		if (strcmp(scratch, "UNIT_SIZE") == 0)
-		{
-			sscanf(line, "UNIT_SIZE %f", &scene.unitSize);
-		}
-		else if (strcmp(scratch, "prefab") == 0)
-		{
-			foundPrefab = true;
-			CreatePrefab(line, currentPrefab);
-			scene.prefabs.add(*currentPrefab);
-		}
-		else if (strcmp(scratch, "{") == 0)
-		{
-			if (currentPrefab == 0)
-			{
-				foundError = true;
-				break;
-			}
-			enteredPrefab = true;
-		}
-		else if (strcmp(scratch, "}") == 0)
-		{
-			currentPrefab = 0;
-			enteredPrefab = false;
-		}
+		foundError = !ParseLine(line, &scene);
+		if (foundError) break;
 	}
-	delete [] scratch;
 	return !foundError;
 }
 

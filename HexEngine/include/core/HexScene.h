@@ -8,7 +8,6 @@ struct Prefab;
 typedef struct Prefab Prefab;
 
 HEX_API extern bool LoadScene(const string filepath);
-HEX_API extern bool LoadScene(MALib::TEXTFILE* file);
 	
 HEX_END
 #endif
