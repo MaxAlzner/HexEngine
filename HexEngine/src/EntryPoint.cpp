@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 	HEX::LoadScene("data/test.scene");
 #endif
 
-	HEX::OnStart();
+	//HEX::OnStart();
 	
 	HEX::Unitialize();
 	return 0;

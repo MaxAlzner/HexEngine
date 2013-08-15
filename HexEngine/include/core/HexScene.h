@@ -4,8 +4,6 @@ HEX_BEGIN
 	
 struct Scene;
 typedef struct Scene Scene;
-struct Prefab;
-typedef struct Prefab Prefab;
 
 HEX_API extern bool LoadScene(const string filepath);
 	
