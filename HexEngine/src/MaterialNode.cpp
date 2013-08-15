@@ -77,6 +77,48 @@ void MaterialNode::setSpecularMap(uint texture)
 	this->specularTexture = texture;
 }
 
+void MaterialNode::setOverlay(float r, float g, float b)
+{
+	this->overlay.r = r;
+	this->overlay.g = g;
+	this->overlay.b = b;
+}
+void MaterialNode::setSpecular(float r, float g, float b)
+{
+	this->specular.r = r;
+	this->specular.g = g;
+	this->specular.b = b;
+}
+void MaterialNode::setRoughness(float v)
+{
+	this->roughness = v;
+}
+void MaterialNode::setRefractionIndex(float v)
+{
+	this->refIndex = v;
+}
+
+void MaterialNode::repeatUV(float u, float v)
+{
+	this->uvRepeat.x *= u;
+	this->uvRepeat.y *= v;
+}
+void MaterialNode::offsetUV(float u, float v)
+{
+	this->uvOffset.x *= u;
+	this->uvOffset.y *= v;
+}
+
+void MaterialNode::makeCaster(bool v)
+{
+	this->shadowCaster = v;
+	Casters.remove(this->root);
+	if (this->shadowCaster)
+	{
+		Casters.add(this->root);
+	}
+}
+
 void MaterialNode::BuildTexture(GLuint* outID, MALib::SURFACE* texture)
 {
 	if (outID == NULL || texture == NULL) return;

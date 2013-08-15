@@ -20,6 +20,16 @@ public:
 	void setNormalMap(uint texture);
 	void setSpecularMap(uint texture);
 
+	void setOverlay(float r, float g, float b);
+	void setSpecular(float r, float g, float b);
+	void setRoughness(float v);
+	void setRefractionIndex(float v);
+
+	void repeatUV(float u, float v);
+	void offsetUV(float u, float v);
+
+	void makeCaster(bool v);
+
 	uint colorTexture;
 	uint normalTexture;
 	uint specularTexture;

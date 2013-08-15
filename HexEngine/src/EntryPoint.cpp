@@ -138,8 +138,8 @@ void Build_SkyLine()
 	HEX::TransformEntity(0.0f, 4.8f, 0.0f, 0.0f, 90.0f, 0.0f);
 	HEX::AddShape(meshes[3]);
 	HEX::AddMaterial(textures[7], textures[8], textures[9]);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_SCALE_XYZ, 0.2f, 0.2f, 0.2f);
-	HEX::SetParameter(HEX::PARAMETER_MATERIAL_SHADOW_CASTER, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_SCALE_XYZ, 0.2f, 0.2f, 0.2f);
+	HEX::ChangeParameter(HEX::PARAMETER_MATERIAL_SHADOW_CASTER, true);
 #endif
 #if 0
 	HEX::BindEntity(entities[i]);i++;
@@ -204,62 +204,62 @@ void Build_Dungeon()
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[1]);
 	HEX::AddMaterial(textures[1], textures[2], textures[3]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[2]);
 	HEX::AddMaterial(textures[4], textures[5], textures[6]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, 0.0f, 0.0f, UNIT);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, 0.0f, 0.0f, UNIT);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[2]);
 	HEX::AddMaterial(textures[4], textures[5], textures[6]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, UNIT, 0.0f, 0.0f);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_ROTATION_Y, 90.0f);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, UNIT, 0.0f, 0.0f);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_ROTATE_Y, 90.0f);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[2]);
 	HEX::AddMaterial(textures[4], textures[5], textures[6]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, -UNIT, 0.0f, 0.0f);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_ROTATION_Y, 270.0f);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, -UNIT, 0.0f, 0.0f);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_ROTATE_Y, 270.0f);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[3]);
 	HEX::AddMaterial(textures[7], textures[8], textures[9]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, UNIT, 0.0f, UNIT);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, UNIT, 0.0f, UNIT);
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[3]);
 	HEX::AddMaterial(textures[7], textures[8], textures[9]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, -UNIT, 0.0f, UNIT);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, -UNIT, 0.0f, UNIT);
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[3]);
 	HEX::AddMaterial(textures[7], textures[8], textures[9]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, UNIT, 0.0f, -UNIT);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, UNIT, 0.0f, -UNIT);
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[3]);
 	HEX::AddMaterial(textures[7], textures[8], textures[9]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
-	HEX::SetParameter(HEX::PARAMETER_TRANSFORM_TRANSLATION_XYZ, -UNIT, 0.0f, -UNIT);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_TRANSFORM_TRANSLATE_XYZ, -UNIT, 0.0f, -UNIT);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[6]);
 	HEX::AddMaterial(textures[16], textures[17], textures[18]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
 	
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[4]);
 	HEX::AddMaterial(textures[10], textures[11], textures[12]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
 	HEX::BindEntity(entities[i]);i++;
 	HEX::AddShape(meshes[5]);
 	HEX::AddMaterial(textures[13], textures[14], textures[15]);
-	HEX::SetParameter(HEX::PARAMETER_STATIC, true);
+	HEX::ChangeParameter(HEX::PARAMETER_STATIC, true);
 }
 
 int main(int argc, char **argv)
@@ -276,6 +276,8 @@ int main(int argc, char **argv)
 #else
 	HEX::LoadScene("data/test.scene");
 #endif
+
+	HEX::ChangeParameter(HEX::PARAMETER_LIGHT_COLOR_RGB, 0.0f, 0.0f, 0.0f);
 
 	HEX::OnStart();
 	

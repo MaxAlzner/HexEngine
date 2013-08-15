@@ -5,20 +5,18 @@ HEX_BEGIN
 HEX_API typedef enum PARAMETER
 {
 	PARAMETER_NONE                                             = 0x00000000, 
-	
-	PARAMETER_STATIC                                           = 0xF0000001, 
 
-	PARAMETER_TRANSFORM_TRANSLATION_X                          = 0x00000001, 
-	PARAMETER_TRANSFORM_TRANSLATION_Y                          = 0x00000002, 
-	PARAMETER_TRANSFORM_TRANSLATION_Z                          = 0x00000003, 
-	PARAMETER_TRANSFORM_ROTATION_X                             = 0x00000004, 
-	PARAMETER_TRANSFORM_ROTATION_Y                             = 0x00000005, 
-	PARAMETER_TRANSFORM_ROTATION_Z                             = 0x00000006, 
+	PARAMETER_TRANSFORM_TRANSLATE_X                            = 0x00000001, 
+	PARAMETER_TRANSFORM_TRANSLATE_Y                            = 0x00000002, 
+	PARAMETER_TRANSFORM_TRANSLATE_Z                            = 0x00000003, 
+	PARAMETER_TRANSFORM_ROTATE_X                               = 0x00000004, 
+	PARAMETER_TRANSFORM_ROTATE_Y                               = 0x00000005, 
+	PARAMETER_TRANSFORM_ROTATE_Z                               = 0x00000006, 
 	PARAMETER_TRANSFORM_SCALE_X                                = 0x00000007, 
 	PARAMETER_TRANSFORM_SCALE_Y                                = 0x00000008, 
 	PARAMETER_TRANSFORM_SCALE_Z                                = 0x00000009, 
-	PARAMETER_TRANSFORM_TRANSLATION_XYZ                        = 0x0000000A, 
-	PARAMETER_TRANSFORM_ROTATION_XYZ                           = 0x0000000B, 
+	PARAMETER_TRANSFORM_TRANSLATE_XYZ                          = 0x0000000A, 
+	PARAMETER_TRANSFORM_ROTATE_XYZ                             = 0x0000000B, 
 	PARAMETER_TRANSFORM_SCALE_XYZ                              = 0x0000000C, 
 	
 	PARAMETER_MATERIAL_OVERLAY_R                               = 0x00000100, 
@@ -48,15 +46,21 @@ HEX_API typedef enum PARAMETER
 	PARAMETER_LIGHT_FALLOFF_XYZ                                = 0x1000000B, 
 	
 	PARAMETER_CAMERA_FOV_ANGLE                                 = 0x10000010, 
-	PARAMETER_CAMERA_ASPECT_RATION                             = 0x10000020, 
+	PARAMETER_CAMERA_ASPECT_RATIO                              = 0x10000020, 
 	PARAMETER_CAMERA_NEARZ                                     = 0x10000030, 
 	PARAMETER_CAMERA_FARZ                                      = 0x10000040, 
+	
+	PARAMETER_CONTROL_SENSITIVITY                              = 0x10001001, 
+	PARAMETER_CONTROL_MOVESPEED_X                              = 0x10001003, 
+	PARAMETER_CONTROL_MOVESPEED_Y                              = 0x10001004, 
+	
+	PARAMETER_STATIC                                           = 0xF0000001, 
 };
 
-HEX_API extern void SetParameter(PARAMETER parameter, float value);
-HEX_API extern void SetParameter(PARAMETER parameter, float v0, float v1, float v2);
-HEX_API extern void SetParameter(PARAMETER parameter, uint value);
-HEX_API extern void SetParameter(PARAMETER parameter, bool value);
+HEX_API extern void ChangeParameter(PARAMETER parameter, float value);
+HEX_API extern void ChangeParameter(PARAMETER parameter, float v0, float v1, float v2);
+HEX_API extern void ChangeParameter(PARAMETER parameter, uint value);
+HEX_API extern void ChangeParameter(PARAMETER parameter, bool value);
 	
 HEX_END
 #endif

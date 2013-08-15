@@ -113,8 +113,19 @@ void HexEntity::addComponent(ComponentNode* node)
 	node->parentTo(this);
 }
 
+void HexEntity::makeStatic(bool v)
+{
+	this->isStatic = v;
+}
+
 template <typename T> T* HexEntity::getComponent()
 {
+	return 0;
+}
+	
+template <typename LightNode*> LightNode* HexEntity::getComponent()
+{
+	return 0;
 }
 
 void HexEntity::parentTo(HexEntity* entity)

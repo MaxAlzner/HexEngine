@@ -3,29 +3,29 @@
 #ifdef _HEX_PARAMETER_H_
 HEX_BEGIN
 	
-HEX_API void SetParameter(PARAMETER parameter, float value)
+HEX_API void ChangeParameter(PARAMETER parameter, float value)
 {
 	if (BoundEntity == NULL) return;
 
 	switch (parameter)
 	{
-	case PARAMETER_TRANSFORM_TRANSLATION_X:
-		BoundEntity->transform->translation.x = value;
+	case PARAMETER_TRANSFORM_TRANSLATE_X:
+		BoundEntity->transform->translate(value, 0.0f, 0.0f);
 		break;
-	case PARAMETER_TRANSFORM_TRANSLATION_Y:
-		BoundEntity->transform->translation.y = value;
+	case PARAMETER_TRANSFORM_TRANSLATE_Y:
+		BoundEntity->transform->translate(0.0f, value, 0.0f);
 		break;
-	case PARAMETER_TRANSFORM_TRANSLATION_Z:
-		BoundEntity->transform->translation.z = value;
+	case PARAMETER_TRANSFORM_TRANSLATE_Z:
+		BoundEntity->transform->translate(0.0f, 0.0f, value);
 		break;
-	case PARAMETER_TRANSFORM_ROTATION_X:
-		BoundEntity->transform->rotation.x = MALib::Module(value, 360.0f);
+	case PARAMETER_TRANSFORM_ROTATE_X:
+		BoundEntity->transform->rotate(value, 0.0f, 0.0f);
 		break;
-	case PARAMETER_TRANSFORM_ROTATION_Y:
-		BoundEntity->transform->rotation.y = MALib::Module(value, 360.0f);
+	case PARAMETER_TRANSFORM_ROTATE_Y:
+		BoundEntity->transform->rotate(0.0f, value, 0.0f);
 		break;
-	case PARAMETER_TRANSFORM_ROTATION_Z:
-		BoundEntity->transform->rotation.z = MALib::Module(value, 360.0f);
+	case PARAMETER_TRANSFORM_ROTATE_Z:
+		BoundEntity->transform->rotate(0.0f, 0.0f, value);
 		break;
 	case PARAMETER_TRANSFORM_SCALE_X:
 		BoundEntity->transform->scaled.x = value;
@@ -78,21 +78,24 @@ HEX_API void SetParameter(PARAMETER parameter, float value)
 		break;
 	}
 }
-HEX_API void SetParameter(PARAMETER parameter, float v0, float v1, float v2)
+HEX_API void ChangeParameter(PARAMETER parameter, float v0, float v1, float v2)
 {
 	if (BoundEntity == NULL) return;
 
+	LightNode* node = 0;
 	switch (parameter)
 	{
-	case PARAMETER_TRANSFORM_TRANSLATION_XYZ:
+	case PARAMETER_TRANSFORM_TRANSLATE_XYZ:
 		BoundEntity->transform->translation.x = v0;
 		BoundEntity->transform->translation.y = v1;
 		BoundEntity->transform->translation.z = v2;
+		BoundEntity->transform->translate(v0, v1, v2);
 		break;
-	case PARAMETER_TRANSFORM_ROTATION_XYZ:
+	case PARAMETER_TRANSFORM_ROTATE_XYZ:
 		BoundEntity->transform->rotation.x = v0;
 		BoundEntity->transform->rotation.y = v1;
 		BoundEntity->transform->rotation.z = v2;
+		BoundEntity->transform->rotate(v0, v1, v2);
 		break;
 	case PARAMETER_TRANSFORM_SCALE_XYZ:
 		BoundEntity->transform->scaled.x = v0;
@@ -112,6 +115,7 @@ HEX_API void SetParameter(PARAMETER parameter, float v0, float v1, float v2)
 		break;
 
 	case PARAMETER_LIGHT_COLOR_RGB:
+		node = BoundEntity->getComponent<LightNode>();
 		break;
 	case PARAMETER_LIGHT_FALLOFF_XYZ:
 		break;
@@ -120,10 +124,10 @@ HEX_API void SetParameter(PARAMETER parameter, float v0, float v1, float v2)
 		break;
 	}
 }
-HEX_API void SetParameter(PARAMETER parameter, uint value)
+HEX_API void ChangeParameter(PARAMETER parameter, uint value)
 {
 }
-HEX_API void SetParameter(PARAMETER parameter, bool value)
+HEX_API void ChangeParameter(PARAMETER parameter, bool value)
 {
 	if (BoundEntity == NULL) return;
 

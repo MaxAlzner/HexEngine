@@ -22,8 +22,9 @@ public:
 	void setShape(ShapeNode* node);
 	void addComponent(ComponentNode* node);
 
+	void makeStatic(bool v);
+
 	template <typename T> T* getComponent();
-	//template <typename T> void getComponents(ARRAY<T*>& list);
 
 	void parentTo(HexEntity* entity);
 
