@@ -1,0 +1,74 @@
+
+UNIT_SIZE 150.0
+
+prefab BaseFloor
+{
+	vertexMap "data/dungeon_floor_01.vmp"
+
+	diffuse "data/dungeon_floor_dif.bmp"
+	normal "data/dungeon_floor_normal.bmp"
+	specular "data/dungeon_floor_spec.bmp"
+	
+	static true
+}
+prefab BaseCeiling
+{
+	vertexMap "data/dungeon_ceiling.vmp"
+
+	diffuse "data/dungeon_ceiling_dif.bmp"
+	normal "data/dungeon_ceiling_normal.bmp"
+	specular "data/dungeon_ceiling_spec.bmp"
+	
+	static true
+}
+prefab Wall
+{
+	vertexMap "data/dungeon_wall_01.vmp"
+
+	diffuse "data/brickwall_stone_root_dif.bmp"
+	normal "data/brickwall_stone_root_normal.bmp"
+	specular "data/brickwall_stone_root_spec.bmp"
+	
+	static true
+}
+
+prefab Cove
+{
+	static true
+
+	parent BaseFloor
+	parent BaseCeiling
+	parent Wall
+	translate 0.0 0.0 1.0
+	parent Wall
+	rotate 0.0 90.0 0.0
+	translate 1.0 0.0 0.0
+	parent Wall
+	rotate 0.0 270.0 0.0
+	translate -1.0 0.0 0.0
+}
+
+prefab CameraDolly
+{
+	controller 30.0 0.8
+	camera 45.0 1.0 24.0
+}
+
+load CameraDolly
+translate 0.0 1.25 -2.0
+
+load CameraDolly
+
+load BaseFloor
+load Cove
+translate 0.0 0.0 2.0
+
+load
+light directional 0.9
+rotate -60.0 30.0 0.0
+
+load
+light point 1.0
+light -color 0.1 0.4 1.0
+light -falloff 8.0 24.0 64.0
+translate 0.0 2.0 0.0
