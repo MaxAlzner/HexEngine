@@ -85,8 +85,8 @@ HEX_API extern void SetUniform(UNIFORM uniform);
 HEX_API extern void SetTextureSlot(UNIFORM uniform, GLuint texture);
 HEX_API extern void ResetUniforms();
 	
-HEX_API extern bool CompileShader(const string filepath, GLenum type, GLint* outShader);
-HEX_API extern bool BuildProgram(const string vert_filepath, const string frag_filepath);
+HEX_API extern bool CompileShader(const string source, GLenum type, GLint* outShader);
+HEX_API extern bool BuildProgram();
 	
 HEX_END
 #endif

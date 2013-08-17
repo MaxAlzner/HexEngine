@@ -5,10 +5,20 @@ HEX_BEGIN
 
 bool AppRunning = true;
 bool Paused = false;
+bool EnableShadow = false;
+bool EnableLuminance = true;
+bool EnableAmbientOcclusion = false;
 float DeltaTime = 0.0f;
-float AspectRatio = 128.0f / 72.0f;
+float AspectRatio = 4.0f / 3.0f;
+float Gamma = 2.2f;
+float AOFilterRadius = 6.4f;
+float EyeBridgeWidth = 8.0f;
+uint RandomFilterSize = 36;
+uint MaxPointLights = 4;
 MALib::RECT RenderRect(1280, 720);
 MALib::RECT ScreenRect(1280, 720);
+MALib::RECT LuminanceRect(128, 128);
+MALib::RECT ShadowRect(1024, 1024);
 SDL_Surface* RenderSurface = NULL;
 
 MALib::ARRAY<HexEntity*> Renderable;
@@ -21,6 +31,7 @@ MALib::ARRAY<SkyboxNode*> Skyboxes;
 MALib::ARRAY<ControlNode*> Controllers;
 CameraNode* MainCamera = NULL;
 	
+MALib::ARRAY<Scene*> Scenes;
 MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
 MALib::ARRAY<MALib::SURFACE*> Textures;
 MALib::ARRAY<HexEntity*> Entities;
@@ -29,6 +40,8 @@ HexEntity* BoundEntity = NULL;
 
 HEX_API void InitializeData()
 {
+	UninitializeData();
+
 	Casters.resize(32);
 	Renderable.resize(32);
 	Shapes.resize(32);
@@ -38,6 +51,7 @@ HEX_API void InitializeData()
 	Skyboxes.resize(8);
 	Controllers.resize(8);
 
+	Scenes.resize(8);
 	Meshes.resize(24);
 	Textures.resize(48);
 	Entities.resize(32);
@@ -45,11 +59,8 @@ HEX_API void InitializeData()
 }
 HEX_API void UninitializeData()
 {
-	for (unsigned i = 0; i < Nodes.length(); i++) Nodes[i]->destroy();
-	for (unsigned i = 0; i < Meshes.length(); i++) MALib::FreeVertexBuffer(&Meshes[i]);
-	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);
-	for (unsigned i = 0; i < Entities.length(); i++) delete Entities[i];
-	for (unsigned i = 0; i < Nodes.length(); i++) delete Nodes[i];
+	ClearData();
+
 	Casters.clear();
 	Renderable.clear();
 	Shapes.clear();
@@ -58,10 +69,36 @@ HEX_API void UninitializeData()
 	Lights.clear();
 	Skyboxes.clear();
 	Controllers.clear();
+
+	Scenes.clear();
 	Meshes.clear();
 	Textures.clear();
 	Entities.clear();
 	Nodes.clear();
+}
+HEX_API void ClearData()
+{
+	for (unsigned i = 0; i < Nodes.length(); i++) Nodes[i]->destroy();
+	for (unsigned i = 0; i < Scenes.length(); i++) delete Scenes[i];
+	for (unsigned i = 0; i < Meshes.length(); i++) MALib::FreeVertexBuffer(&Meshes[i]);
+	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);
+	for (unsigned i = 0; i < Entities.length(); i++) delete Entities[i];
+	for (unsigned i = 0; i < Nodes.length(); i++) delete Nodes[i];
+
+	Casters.zero();
+	Renderable.zero();
+	Shapes.zero();
+	Materials.zero();
+	Cameras.zero();
+	Lights.zero();
+	Skyboxes.zero();
+	Controllers.zero();
+
+	Scenes.zero();
+	Meshes.zero();
+	Textures.zero();
+	Entities.zero();
+	Nodes.zero();
 }
 
 HEX_API bool IsRunning()
@@ -200,14 +237,14 @@ HEX_API void AddController(float lookSensitivity, float moveSpeed)
 	Nodes.add(node);
 	Controllers.add(node);
 }
-HEX_API void AddSkybox(uint skyMesh, uint skyMap)
+HEX_API void AddSkybox(/*uint skyMesh, uint skyMap*/)
 {
 	if (BoundEntity == NULL) return;
-	if (skyMesh == 0 || skyMap == 0) return;
+	//if (skyMesh == 0 || skyMap == 0) return;
 	SkyboxNode* node = new SkyboxNode;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
-
+	/*
 	ShapeNode* box = new ShapeNode;
 	box->setMesh(skyMesh);
 	BoundEntity->setShape(box);
@@ -219,33 +256,36 @@ HEX_API void AddSkybox(uint skyMesh, uint skyMap)
 	BoundEntity->setMaterial(mat);
 	Nodes.add(mat);
 	Materials.add(mat);
-
+	*/
 	Skyboxes.add(node);
 }
+HEX_API void AddTurnTable(float turnSpeed)
+{
+	if (BoundEntity == NULL) return;
+	TurnTableNode* node = new TurnTableNode;
+	node->turnSpeed = turnSpeed;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+}
 
-HEX_API void AddDirectionalLight(float intensity, MALib::COLOR& color)
+HEX_API void AddDirectionalLight(float intensity)
 {
 	if (BoundEntity == NULL) return;
 	LightNode* node = new LightNode;
 	node->mode = LIGHTMODE_DIRECTIONAL;
 	node->intensity = intensity;
-	node->color = color;
 	node->color.a = intensity;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 	Lights.add(node);
 }
-HEX_API void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff, float linearFalloff, float quadFalloff)
+HEX_API void AddPointLight(float intensity)
 {
 	if (BoundEntity == NULL) return;
 	LightNode* node = new LightNode;
 	node->mode = LIGHTMODE_POINT;
 	node->intensity = intensity;
-	node->color = color;
 	node->color.a = intensity;
-	node->falloff.x = constantFalloff;
-	node->falloff.y = linearFalloff;
-	node->falloff.z = quadFalloff;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
 	Lights.add(node);

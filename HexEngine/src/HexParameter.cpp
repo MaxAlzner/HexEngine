@@ -169,32 +169,20 @@ HEX_API void ChangeParameter(PARAMETER parameter, float v0, float v1, float v2)
 	switch (parameter)
 	{
 	case PARAMETER_TRANSFORM_TRANSLATE_XYZ:
-		BoundEntity->transform->translation.x = v0;
-		BoundEntity->transform->translation.y = v1;
-		BoundEntity->transform->translation.z = v2;
 		BoundEntity->transform->translate(v0, v1, v2);
 		break;
 	case PARAMETER_TRANSFORM_ROTATE_XYZ:
-		BoundEntity->transform->rotation.x = v0;
-		BoundEntity->transform->rotation.y = v1;
-		BoundEntity->transform->rotation.z = v2;
 		BoundEntity->transform->rotate(v0, v1, v2);
 		break;
 	case PARAMETER_TRANSFORM_SCALE_XYZ:
-		BoundEntity->transform->scaled.x = v0;
-		BoundEntity->transform->scaled.y = v1;
-		BoundEntity->transform->scaled.z = v2;
+		BoundEntity->transform->scale(v0, v1, v2);
 		break;
 
 	case PARAMETER_MATERIAL_OVERLAY_RGB:
-		BoundEntity->material->overlay.r = v0;
-		BoundEntity->material->overlay.g = v1;
-		BoundEntity->material->overlay.b = v2;
+		BoundEntity->material->setOverlay(v0, v1, v2);
 		break;
 	case PARAMETER_MATERIAL_SPECULAR_RGB:
-		BoundEntity->material->specular.r = v0;
-		BoundEntity->material->specular.g = v1;
-		BoundEntity->material->specular.b = v2;
+		BoundEntity->material->setSpecular(v0, v1, v2);
 		break;
 
 	case PARAMETER_LIGHT_COLOR_RGB:

@@ -121,7 +121,7 @@ HEX_API void UninitializeInput()
 	
 HEX_API void PollEvents()
 {
-	SDL_Event event;
+	static SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)

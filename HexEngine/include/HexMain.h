@@ -34,6 +34,7 @@
 #include "nodes\LightNode.h"
 #include "nodes\ControlNode.h"
 #include "nodes\SkyboxNode.h"
+#include "nodes\TurnTableNode.h"
 
 #include "core\HexEntity.h"
 #include "core\HexScene.h"
@@ -42,4 +43,5 @@
 #include "core\HexRender.h"
 #include "core\HexDraw.h"
 #include "core\HexData.h"
+#include "core\HexPref.h"
 #include "core\HexCore.h"

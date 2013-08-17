@@ -29,6 +29,7 @@ void ControlNode::onStart()
 {
 	this->rotation.x = this->root->transform->rotation.y;
 	this->rotation.y = this->root->transform->rotation.x;
+	SDL_ShowCursor(0);
 }
 void ControlNode::onFrameUpdate()
 {
@@ -65,9 +66,9 @@ void ControlNode::onFixedUpdate()
 
 			this->rotation.x = this->root->transform->rotation.y + (mx * this->sensitivity.x);// * DeltaTime);
 			this->rotation.y += my * this->sensitivity.y;// * DeltaTime;
-		}
 		
-		SDL_WarpMouse(ScreenRect.width / 2, ScreenRect.height / 2);
+			SDL_WarpMouse(ScreenRect.width / 2, ScreenRect.height / 2);
+		}
 	}
 
 	f *= this->moveSpeed.y * DeltaTime;

@@ -16,10 +16,20 @@ HEX_API typedef enum FILETYPE
 
 extern bool AppRunning;
 extern bool Paused;
+extern bool EnableShadow;
+extern bool EnableLuminance;
+extern bool EnableAmbientOcclusion;
 extern float DeltaTime;
 extern float AspectRatio;
+extern float Gamma;
+extern float AOFilterRadius;
+extern float EyeBridgeWidth;
+extern uint RandomFilterSize;
+extern uint MaxPointLights;
 extern MALib::RECT RenderRect;
 extern MALib::RECT ScreenRect;
+extern MALib::RECT LuminanceRect;
+extern MALib::RECT ShadowRect;
 extern SDL_Surface* RenderSurface;
 
 extern MALib::ARRAY<HexEntity*> Renderable;
@@ -32,6 +42,7 @@ extern MALib::ARRAY<SkyboxNode*> Skyboxes;
 extern MALib::ARRAY<ControlNode*> Controllers;
 extern CameraNode* MainCamera;
 	
+extern MALib::ARRAY<Scene*> Scenes;
 extern MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
 extern MALib::ARRAY<MALib::SURFACE*> Textures;
 extern MALib::ARRAY<HexEntity*> Entities;
@@ -40,6 +51,7 @@ extern HexEntity* BoundEntity;
 
 HEX_API extern void InitializeData();
 HEX_API extern void UninitializeData();
+HEX_API extern void ClearData();
 
 HEX_API extern bool IsRunning();
 HEX_API extern bool ToggleRunning();
@@ -59,10 +71,11 @@ HEX_API extern void ParentEntity(uint parent, uint child);
 
 HEX_API extern void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ);
 HEX_API extern void AddController(float lookSensitivity, float moveSpeed);
-HEX_API extern void AddSkybox(uint skyMesh, uint skyMap);
+HEX_API extern void AddSkybox();
+HEX_API extern void AddTurnTable(float turnSpeed);
 
-HEX_API extern void AddDirectionalLight(float intensity, MALib::COLOR& color);
-HEX_API extern void AddPointLight(float intensity, MALib::COLOR& color, float constantFalloff = 0.0f, float linearFalloff = 0.0f, float quadFalloff = 0.0f);
+HEX_API extern void AddDirectionalLight(float intensity);
+HEX_API extern void AddPointLight(float intensity);
 
 HEX_API extern void AddShape(uint mesh);
 HEX_API extern void AddMaterial(uint color, uint normal = 0, uint specular = 0);

@@ -37,7 +37,7 @@ void LightNode::load()
 void LightNode::unload()
 {
 	if (this->mode == LIGHTMODE_DIRECTIONAL && CurrentFlag == UNIFORM_FLAG_SHADOW_RENDER && MainCamera != NULL) 
-SetUniform(UNIFORM_WS_TO_CS, glm::value_ptr(MainCamera->viewSpace));
+		SetUniform(UNIFORM_WS_TO_CS, glm::value_ptr(MainCamera->viewSpace));
 }
 void LightNode::destroy()
 {
@@ -49,8 +49,9 @@ void LightNode::onStart()
 void LightNode::onFrameUpdate()
 {
 	if (MainCamera == NULL) return;
-	glm::vec3 eye = this->root->transform->position;
-	glm::vec3 focus = glm::vec3(0.0f, 0.0f, 0.0f);//eye + (this->root->transform->forward);
+	glm::vec3 eye = this->root->transform->position + (this->root->transform->forward * -8.0f);
+	glm::vec3 focus = glm::vec3(0.0f, 0.0f, 0.0f);
+	//focus = eye + (this->root->transform->forward);
 
 	//glm::mat4 view = glm::mat4(1.0f);
 	//view *= glm::translate(glm::vec3(0.5f, 0.5f, 0.5f));
@@ -79,7 +80,6 @@ void LightNode::onFrameUpdate()
 		glm::translate(glm::vec3(0.5f, 0.5f, 0.5f)) * 
 		glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * 
 		MainCamera->perspective * 
-		//glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -10.0f, 20.0f) * 
 		this->lightSpace;
 }
 void LightNode::onFixedUpdate()

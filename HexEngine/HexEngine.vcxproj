@@ -102,6 +102,7 @@
     <ClInclude Include="include\core\HexInput.h" />
     <ClInclude Include="include\core\HexInputDef.h" />
     <ClInclude Include="include\core\HexParameter.h" />
+    <ClInclude Include="include\core\HexPref.h" />
     <ClInclude Include="include\core\HexRender.h" />
     <ClInclude Include="include\core\HexScene.h" />
     <ClInclude Include="include\HexMain.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="include\nodes\ShapeNode.h" />
     <ClInclude Include="include\nodes\SkyboxNode.h" />
     <ClInclude Include="include\nodes\TransformNode.h" />
+    <ClInclude Include="include\nodes\TurnTableNode.h" />
     <ClInclude Include="libraries\glm\core\func_common.hpp" />
     <ClInclude Include="libraries\glm\core\func_exponential.hpp" />
     <ClInclude Include="libraries\glm\core\func_geometric.hpp" />
@@ -248,6 +250,7 @@
     <ClCompile Include="src\HexInput.cpp" />
     <ClCompile Include="src\HexMain.cpp" />
     <ClCompile Include="src\HexParameter.cpp" />
+    <ClCompile Include="src\HexPref.cpp" />
     <ClCompile Include="src\HexRender.cpp" />
     <ClCompile Include="src\HexScene.cpp" />
     <ClCompile Include="src\HexShader.cpp" />
@@ -259,6 +262,7 @@
     <ClCompile Include="src\ShapeNode.cpp" />
     <ClCompile Include="src\SkyboxNode.cpp" />
     <ClCompile Include="src\TransformNode.cpp" />
+    <ClCompile Include="src\TurnTableNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\glm\core\func_common.inl" />

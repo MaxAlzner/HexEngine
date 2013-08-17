@@ -11,6 +11,8 @@ HexRender DeferredPositions;
 HexRender DeferredNormals;
 HexRender AmbientOcclusion;
 HexRender AmbientOcclusionBilateral;
+HexRender LeftEye;
+HexRender RightEye;
 	
 HEX_API bool InitializeDraw()
 {
@@ -50,7 +52,7 @@ HEX_API bool InitializeDraw()
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 
-#if 0
+#if 1
 	MALib::LOG_Message("GL VENDOR                  ", (char*)glGetString(GL_VENDOR));
 	MALib::LOG_Message("GL RENDERER                ", (char*)glGetString(GL_RENDERER));
 	MALib::LOG_Message("GL VERSION                 ", (char*)glGetString(GL_VERSION));
@@ -61,7 +63,7 @@ HEX_API bool InitializeDraw()
 #endif
 	
 	MALib::LOG_Message("START SHADER");
-	if (!BuildProgram("data/gl_shader.vert", "data/gl_shader.frag"))
+	if (!BuildProgram())
 	{
 		MALib::LOG_Message("Could not build shaders.");
 		return false;
@@ -89,6 +91,10 @@ HEX_API bool InitializeDraw()
 	AmbientOcclusion.setClearColor(1.0f, 1.0f, 1.0f);
 	AmbientOcclusionBilateral.build(RenderRect.width, RenderRect.height, true, false);
 	AmbientOcclusionBilateral.setClearColor(1.0f, 1.0f, 1.0f);
+	LeftEye.build(RenderRect.width, RenderRect.height, true, true);
+	LeftEye.setClearColor(0.3f, 0.3f, 0.3f);
+	RightEye.build(RenderRect.width, RenderRect.height, true, true);
+	RightEye.setClearColor(0.3f, 0.3f, 0.3f);
 
 	MALib::LOG_Message("END DRAW INITIALIZATION");
 	return true;
@@ -97,7 +103,8 @@ HEX_API bool UninitializeDraw()
 {
 	return true;
 }
-HEX_API void StartDrawing()
+
+void StartDrawing()
 {
 	MALib::LOG_Message("START BUILDING SHAPES");
 	MALib::LOG_Out1i("NUM OF SHAPES", Shapes.length());
@@ -105,6 +112,134 @@ HEX_API void StartDrawing()
 	MALib::LOG_Message("START BUILDING MATERIALS");
 	MALib::LOG_Out1i("NUM OF MATERIALS", Materials.length());
 	for (uint i = 0; i < Materials.length(); i++) Materials[i]->build();
+}
+
+void RenderMain()
+{
+	ResetUniforms();
+	MainRender.load();
+
+	SetUniform(UNIFORM_FLAG_NORMAL);
+	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap.colorMap);
+	
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
+	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->root->render();
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
+
+	MainRender.unload();
+}
+void RenderShadowMap()
+{
+	ResetUniforms();
+	ShadowMap.load();
+	if (!EnableShadow)
+	{
+		ShadowMap.unload();
+		return;
+	}
+
+	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
+
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
+	for (unsigned i = 0; i < Casters.length(); i++) Casters[i]->render();
+	//for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
+
+	ShadowMap.unload();
+}
+void RenderLuminance()
+{
+	if (EnableLuminance == 0)
+	{
+		BrightPass.load();
+		BrightPass.unload();
+		Luminance.load();
+		Luminance.unload();
+		return;
+	}
+	BrightPass.load();
+	
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
+
+	BrightPass.unload();
+	Luminance.load();
+
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+
+	Luminance.unload();
+#if 1
+	BrightPass.load();
+	
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, Luminance.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+
+	BrightPass.unload();
+	Luminance.load();
+
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+
+	Luminance.unload();
+#endif
+}
+void RenderDeferredPositions()
+{
+	DeferredPositions.load();
+	
+	SetUniform(UNIFORM_FLAG_DEFER_POSITIONS);
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	DeferredPositions.unload();
+}
+void RenderDeferredNormals()
+{
+	DeferredNormals.load();
+	
+	SetUniform(UNIFORM_FLAG_DEFER_NORMALS);
+	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+
+	DeferredNormals.unload();
+}
+void RenderAmbientOcclusion()
+{
+	AmbientOcclusion.load();
+	
+	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
+	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_POSITIONS, DeferredPositions.colorMap);
+	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_NORMALS, DeferredNormals.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION);
+	
+	AmbientOcclusion.unload();
+#if 1
+	AmbientOcclusionBilateral.load();
+
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, AmbientOcclusion.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN);
+
+	AmbientOcclusionBilateral.unload();
+	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
+#else
+	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
+#endif
+}
+
+void FinalRender()
+{
+#if 0
+	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
+#if 1
+	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
+#else
+	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
+#endif
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
+#else
+	MainRender.blit();
+#endif
 }
 
 HEX_END

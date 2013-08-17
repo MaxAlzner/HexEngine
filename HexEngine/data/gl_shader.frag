@@ -339,33 +339,13 @@ vec4 bilateral_gaussian_blur()
 
 float shadow_intensity()
 {
-	return textureProj(shadow_map, vertex_ls).r;
 #if 0
 	vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
 	tex_shadow.z -= 0.02;
 	return texture(shadow_map, tex_shadow);
 	return 0.;
-#if 0
-	float s = 1.0;
-	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.y * 0.71));
-	vec2 incr = vec2(r / shadow_size);
-	float sum = 0.;
-	for (int i = 0; i < random_filter.length(); i++)
-	{
-		vec2 sample_coord = incr;
-#if 0
-		sample_coord = vec2(
-			(sample_coord.x * filter.x) - (sample_coord.y * filter.y), 
-			(sample_coord.x * filter.y) + (sample_coord.y * filter.x)
-		);
 #endif
-		sample_coord *= random_filter[i];
-		sum += texture(shadow_map, tex_shadow + vec3(sample_coord, 0.));
-	}
-	float sample_shadow = sum / float(random_filter.length());
-	return clamp(sample_shadow, 0., 1.);
-#endif
-#endif
+	return textureProj(shadow_map, vertex_ls).r;
 }
 
 #define ATTENUATION \
@@ -476,10 +456,10 @@ vec4 main_render()
 	if (numOfPointLights > 2) pointLight_albedo(albedo, n, v, specular_intensity, 2);
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, 3);
 #endif
-
-	//float shadow = shadow_intensity();
 	
-	return vec4(color * albedo, 1.);
+	float shadow = shadow_intensity();
+	
+	return vec4(color * albedo * shadow, 1.);
 }
 vec4 final_render()
 {

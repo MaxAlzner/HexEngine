@@ -417,28 +417,20 @@ HEX_API void ResetUniforms()
 	glUniform1i(Uniforms.flag, 0);
 }
 
-HEX_API bool CompileShader(const string filepath, GLenum type, GLint* outShader)
+HEX_API bool CompileShader(const string source, GLenum type, GLint* outShader)
 {
-	MALib::TEXTFILE* file = NULL;
-	if (!MALib::ImportTextFile(filepath, &file))
-	{
-		MALib::LOG_Message("Could not load shader file.", filepath);
-		return false;
-	}
-
 	GLint compile_status = GL_FALSE;
 	GLuint shader = glCreateShader(type);
 
-	glShaderSource(shader, 1, (const char**)&file->data, 0);
+	glShaderSource(shader, 1, (const char**)&source, 0);
 	glCompileShader(shader);
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 	
 	GLint log_length = 0;
 	char* buffer = new char[512];
+	memset(buffer, '\0', sizeof(char) * 512);
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
 	glGetShaderInfoLog(shader, 512, &log_length, buffer);
-
-	MALib::LOG_Message("Compiled shader", filepath);
 	if (buffer[0] != '\0') MALib::LOG_Message(buffer);
 
 	delete [] buffer;
@@ -448,19 +440,40 @@ HEX_API bool CompileShader(const string filepath, GLenum type, GLint* outShader)
 		return false;
 	}
 
+	if      (type == GL_VERTEX_SHADER) MALib::LOG_Message("Compiled shader", "vertex");
+	else if (type == GL_FRAGMENT_SHADER) MALib::LOG_Message("Compiled shader", "fragment");
+
 	*outShader = shader;
-	MALib::FreeTextFile(&file);
 	return true;
 }
-HEX_API bool BuildProgram(const string vert_filepath, const string frag_filepath)
+HEX_API bool BuildProgram()
 {
-	if (vert_filepath == NULL || frag_filepath == NULL) return false;
-	
-	GLint link_status = GL_FALSE;
+#if 1
+	static string vertFilepath = "data/gl_shader.vert";
+	static string fragFilepath = "data/gl_shader.frag";
+	MALib::TEXTFILE* vertFile = 0;
+	MALib::TEXTFILE* fragFile = 0;
+	if (!MALib::ImportTextFile(vertFilepath, &vertFile))
+	{
+		MALib::LOG_Message("Could not find vertex shader.", vertFilepath);
+		return false;
+	}
+	if (!MALib::ImportTextFile(fragFilepath, &fragFile))
+	{
+		MALib::LOG_Message("Could not find fragment shader.", fragFilepath);
+		return false;
+	}
 
 	GLint vs, fs;
-	if (!CompileShader(vert_filepath, GL_VERTEX_SHADER, &vs) || !CompileShader(frag_filepath, GL_FRAGMENT_SHADER, &fs)) 
+	if (!CompileShader(vertFile->data, GL_VERTEX_SHADER, &vs) || !CompileShader(fragFile->data, GL_FRAGMENT_SHADER, &fs)) 
 		return false;
+	MALib::FreeTextFile(&vertFile);
+	MALib::FreeTextFile(&fragFile);
+#else
+	GLint vs, fs;
+	if (!CompileShader(VertexShader, GL_VERTEX_SHADER, &vs) || !CompileShader(FragmentShader, GL_FRAGMENT_SHADER, &fs)) 
+		return false;
+#endif
 
 	ShaderProgram = glCreateProgram();
 	glAttachShader(ShaderProgram, vs);
@@ -471,13 +484,15 @@ HEX_API bool BuildProgram(const string vert_filepath, const string frag_filepath
 	glBindAttribLocation(ShaderProgram, 2, "normal");
 	glBindAttribLocation(ShaderProgram, 3, "tangent");
 	glBindAttribLocation(ShaderProgram, 4, "binormal");
-
+	
+	GLint link_status = GL_FALSE;
 	glLinkProgram(ShaderProgram);
 	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &link_status);
 	if (!link_status)
 	{
 		GLint log_length = 0;
 		char* buffer = new char[256];
+		memset(buffer, '\0', sizeof(char) * 256);
 		glGetProgramiv(ShaderProgram, GL_INFO_LOG_LENGTH, &log_length);
 		glGetProgramInfoLog(ShaderProgram, 256, &log_length, buffer);
 

@@ -1,0 +1,103 @@
+
+prefab Catwalk
+{
+	mesh "data/EV_Catwalk.vmp"
+	diffuse "data/EV_Catwalk_D.tga"
+	normal "data/EV_Catwalk_N.tga"
+	specular "data/EV_Catwalk_S.tga"
+	
+	static true
+}
+prefab LandingStraight
+{
+	mesh "data/EV_Landing_Straight.vmp"
+	diffuse "data/EV_Landing_Straight_D.tga"
+	normal "data/EV_Landing_Straight_N.tga"
+	specular "data/EV_Landing_Straight_S.tga"
+	
+	static true
+}
+prefab BasePlatform
+{
+	mesh "data/EV_Platform.vmp"
+	diffuse "data/EV_Platform_D.tga"
+	normal "data/EV_Platform_N.tga"
+	specular "data/EV_Platform_S.tga"
+	
+	static true
+}
+prefab Stairs
+{
+	mesh "data/EV_Stairs.vmp"
+	diffuse "data/EV_Stairs_D.tga"
+	normal "data/EV_Stairs_N.tga"
+	specular "data/EV_Stairs_S.tga"
+	
+	static true
+}
+
+prefab Platform
+{
+	static true
+
+	parent BasePlatform
+	parent Catwalk
+	translate -x 2.5
+	parent LandingStraight
+	translate -x 2.5
+	parent LandingStraight
+	translate -x 8.331
+	rotate -y 180
+	parent Catwalk
+	translate -x -2.5
+	rotate -y 180
+	parent LandingStraight
+	translate -x -2.5
+	rotate -y 180
+	parent LandingStraight
+	translate -x -8.331
+	parent Stairs
+	translate -z -5
+	rotate -y 90
+	parent Stairs
+	translate -z 5
+	rotate -y 270
+}
+
+load
+mesh "data/SkySphere.vmp"
+diffuse "data/NightSkyBox.bmp"
+skybox
+
+load
+translate 8.0 2.4 0
+rotate -y 90
+controller 30 1
+camera 45 0.01 256
+
+load
+light directional 0.9
+translate -y 8
+translate -x 4
+rotate -80 60 0
+
+load
+light point 1.0
+light -color 1.0 0.25 0.1
+light -falloff 1.2 0.25 0.01
+translate 0 2 4
+load
+light point 1.0
+light -color 0.0 1.0 0.2
+light -falloff 0.7 0.25 0.01
+translate 0 2 -4
+
+load Platform
+
+load BasePlatform
+translate -y 4
+rotate -y 90
+scale 0.5 0.5 0.5
+turntable 4
+caster true
+static false

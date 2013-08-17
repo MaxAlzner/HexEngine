@@ -10,7 +10,7 @@ typedef struct Scene Scene;
 extern bool BuildPrefab(Prefab* prefab, uint* outEntity);
 extern bool BuildScene(Scene* scene);
 
-HEX_API extern bool LoadScene(const string filepath);
+HEX_API extern Scene* LoadScene(const string filepath);
 	
 HEX_END
 #endif

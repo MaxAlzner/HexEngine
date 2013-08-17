@@ -14,7 +14,16 @@ extern HexRender AmbientOcclusionBilateral;
 HEX_API extern bool InitializeDraw();
 HEX_API extern bool UninitializeDraw();
 
-HEX_API extern void StartDrawing();
+extern void StartDrawing();
+
+extern void RenderMain();
+extern void RenderShadowMap();
+extern void RenderLuminance();
+extern void RenderDeferredPositions();
+extern void RenderDeferredNormals();
+extern void RenderAmbientOcclusion();
+
+extern void FinalRender();
 	
 HEX_END
 #endif

@@ -10,7 +10,6 @@ void UpdateDeltaTime()
 	if (Ping == 0) Ping = NewPing;
 	DeltaTime = float((NewPing - Ping) % 1000) / 1000.0f;
 	Ping = NewPing;
-	//MALib::LOG_Out1f("DELTA TIME", DeltaTime);
 }
 void UpdateFrameCount()
 {
@@ -21,7 +20,6 @@ void UpdateFrameCount()
 	if (SecondCount != CurrentTime)
 	{
 		SecondCount = CurrentTime;
-		//MALib::LOG_Out1i("SECOND COUNT", SecondCount);
 		MALib::LOG_Out1i("FRAME COUNT", FrameCount);
 		FrameCount = 0;
 	}
@@ -31,15 +29,15 @@ bool ToggleBlitBrightPass = false;
 bool ToggleBlitLuminance = false;
 bool ToggleBlitAmbientOcclusion = false;
 bool ToggleBlitDeferredNormals = false;
-bool ToggleLuminance = true;
-bool ToggleAmbientOcclusion = false;
-float Gamma = 2.2f;
+bool ToggleBlitShadow = false;
 
 int EventThread(void* data)
 {
 	while (AppRunning)
 	{
 		PollEvents();
+	
+		PollControllers();
 	}
 	return 0;
 }
@@ -57,148 +55,55 @@ int FixedUpdateThread(void* data)
 	}
 	return 0;
 }
-
-HEX_API void OnStart()
+int FrameUpdateThread(void* data)
 {
-	MALib::LOG_Message("START SCENE");
-	
-	StartDrawing();
-
-	for (unsigned i = 0; i < Entities.length(); i++)
-	{
-		Entities[i]->start();
-	}
-
-#if 0
-	SDL_Thread* eventThread = SDL_CreateThread(EventThread, 0);
-	SDL_Thread* fixedUpdateThread = SDL_CreateThread(FixedUpdateThread, 0);
-
 	while (AppRunning)
 	{
+		UpdateFrameCount();
+		PollEvents();
+
 		OnFrameUpdate();
 		OnFrameDraw();
 	}
+	return 0;
+}
 
-	SDL_KillThread(eventThread);
+HEX_API void OnStart()
+{
+	if (!AppRunning) return;
+	MALib::LOG_Message("START SCENE");
+
+	InitializeLoadOrder();
+	
+	StartDrawing();
+
+	for (unsigned i = 0; i < Entities.length(); i++) Entities[i]->start();
+
+	SDL_Thread* fixedUpdateThread = SDL_CreateThread(FixedUpdateThread, 0);
+
+	FrameUpdateThread(0);
+	
 	SDL_KillThread(fixedUpdateThread);
-#else
-	Uint32 FramePing = ~0;
-	Uint32 UpdatePing = ~0;
-	while (AppRunning)
-	{
-		PollEvents();
-		
-		Uint32 NewPing = SDL_GetTicks();
-		if (NewPing - FramePing > 16)
-		{
-			OnFrameUpdate();
-			OnFrameDraw();
-			FramePing = NewPing;
-		}
-		if (NewPing - UpdatePing > 24)
-		{
-			OnFixedUpdate();
-			UpdatePing = NewPing;
-		}
-	}
-#endif
 }
 HEX_API void OnFrameDraw()
 {
 	if (Cameras.length() < 1) return;
 	
 	Cameras[0]->load();
-#if 0
-	ResetUniforms();
-	ShadowMap.load();
-
-	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
-
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
-	for (unsigned i = 0; i < Casters.length(); i++) Casters[i]->render();
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
-
-	ShadowMap.unload();
-#endif
-	ResetUniforms();
-	MainRender.load();
-
-	SetUniform(UNIFORM_FLAG_NORMAL);
-	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowMap.colorMap);
 	
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
-	for (unsigned i = 0; i < Skyboxes.length(); i++) Skyboxes[i]->root->render();
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
-	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
-
-	MainRender.unload();
-#if 1
-	DeferredNormals.load();
+	if (EnableShadow) RenderShadowMap();
+	RenderMain();
+	if (EnableLuminance) RenderLuminance();
+	if (EnableAmbientOcclusion) RenderDeferredNormals();
+	if (EnableAmbientOcclusion) RenderAmbientOcclusion();
 	
-	SetUniform(UNIFORM_FLAG_DEFER_NORMALS);
-	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
-
-	DeferredNormals.unload();
-	AmbientOcclusion.load();
-	
-	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
-	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_POSITIONS, DeferredPositions.colorMap);
-	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_NORMALS, DeferredNormals.colorMap);
-	if (ToggleAmbientOcclusion) PostProcess(UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION);
-	
-	AmbientOcclusion.unload();
-#if 1
-	AmbientOcclusionBilateral.load();
-
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, AmbientOcclusion.colorMap);
-	if (ToggleAmbientOcclusion) PostProcess(UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN);
-
-	AmbientOcclusionBilateral.unload();
-	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
-#else
-	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
-#endif
-#endif
-#if 1
-	BrightPass.load();
-	
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
-	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
-
-	BrightPass.unload();
-	Luminance.load();
-
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
-
-	Luminance.unload();
-#if 1
-	BrightPass.load();
-	
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, Luminance.colorMap);
-	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
-
-	BrightPass.unload();
-	Luminance.load();
-
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-	if (ToggleLuminance) PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
-
-	Luminance.unload();
-#endif
-	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
-#endif
-#if 1
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
-#else
-	MainRender.blit();
-#endif
+	FinalRender();
 	
 	if (ToggleBlitBrightPass) BrightPass.blit();
 	if (ToggleBlitLuminance) Luminance.blit();
 	if (ToggleBlitAmbientOcclusion) AmbientOcclusionBilateral.blit();
 	if (ToggleBlitDeferredNormals) DeferredNormals.blit();
+	if (ToggleBlitShadow) ShadowMap.blit();
 
 	Cameras[0]->unload();
 
@@ -218,7 +123,6 @@ HEX_API void OnFrameUpdate()
 	static float screenSize[2] = {float(ScreenRect.width), float(ScreenRect.height)};
 	SetUniform(UNIFORM_SCREEN_SIZE, screenSize);
 
-	UpdateFrameCount();
 	UpdateDeltaTime();
 }
 HEX_API void OnFixedUpdate()
@@ -228,13 +132,16 @@ HEX_API void OnFixedUpdate()
 		ToggleBlitLuminance = false;
 		ToggleBlitAmbientOcclusion = false;
 		ToggleBlitDeferredNormals = false;
+		ToggleBlitShadow = false;
 	}
 	if (Input::GetKey(KEY_2, true)) ToggleBlitLuminance = !ToggleBlitLuminance;
 	if (Input::GetKey(KEY_3, true)) ToggleBlitAmbientOcclusion = !ToggleBlitAmbientOcclusion;
 	if (Input::GetKey(KEY_4, true)) ToggleBlitDeferredNormals = !ToggleBlitDeferredNormals;
 
-	if (Input::GetKey(KEY_5, true)) ToggleLuminance = !ToggleLuminance;
-	if (Input::GetKey(KEY_6, true)) ToggleAmbientOcclusion = !ToggleAmbientOcclusion;
+	if (Input::GetKey(KEY_5, true)) EnableLuminance = !EnableLuminance;
+	if (Input::GetKey(KEY_6, true)) EnableAmbientOcclusion = !EnableAmbientOcclusion;
+	
+	if (Input::GetKey(KEY_7, true)) ToggleBlitShadow = !ToggleBlitShadow;
 
 	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
 	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
@@ -247,8 +154,6 @@ HEX_API void OnFixedUpdate()
 	{
 		Entities[i]->fixedUpdate();
 	}
-	
-	PollControllers();
 }
 
 HEX_API bool Reshape(uint width, uint height)
@@ -257,11 +162,13 @@ HEX_API bool Reshape(uint width, uint height)
 	if (RenderSurface == NULL) 
 		return false;
 	
+#if 0
 	SDL_Surface* icon = SDL_LoadBMP("data/icon.bmp");
 	Uint8 iconKey = SDL_MapRGB(icon->format, 255, 255, 255);
 	SDL_SetColorKey(icon, SDL_SRCCOLORKEY, iconKey);
 	SDL_WM_SetIcon(icon, 0);
 	SDL_FreeSurface(icon);
+#endif
 	
 	ScreenRect = MALib::RECT(width, height);
 	OnMouseMove(width / 2, height / 2);
@@ -270,6 +177,8 @@ HEX_API bool Reshape(uint width, uint height)
 }
 HEX_API bool Initialize(uint argc, string* argv)
 {
+	InitializePreferences();
+
 	MALib::LOG_Initialize(true);
 	MALib::RANDOM_Initialize();
 
@@ -292,10 +201,12 @@ HEX_API bool Initialize(uint argc, string* argv)
 }
 HEX_API bool Unitialize()
 {
+	UninitializeLoadOrder();
 	UninitializeDraw();
 	UninitializePostProcess();
 	UninitializeData();
 	UninitializeInput();
+	UninitializePreferences();
 	SDL_Quit();
 	MALib::LOG_Unitialize();
 	return true;
