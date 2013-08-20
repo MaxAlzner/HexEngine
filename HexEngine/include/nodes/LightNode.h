@@ -30,6 +30,9 @@ public:
 	MALib::COLOR color;
 	glm::vec3 falloff;
 	
+	uint framebuffer;
+	uint shadowMap;
+	
 	glm::mat4 lightPerspective;
 	glm::mat4 lightSpace;
 };

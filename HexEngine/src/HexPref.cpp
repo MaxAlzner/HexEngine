@@ -3,23 +3,6 @@
 #ifdef _HEX_PREF_H_
 HEX_BEGIN
 
-#define HEX_PREFERENCE_SCREENWIDTH "ScreenWidth"
-#define HEX_PREFERENCE_SCREENHEIGHT "ScreenHeight"
-#define HEX_PREFERENCE_RENDERWIDTH "RenderWidth"
-#define HEX_PREFERENCE_RENDERHEIGHT "RenderHeight"
-#define HEX_PREFERENCE_LUMINANCEWIDTH "LuminanceWidth"
-#define HEX_PREFERENCE_LUMINANCEHEIGHT "LuminanceHeight"
-#define HEX_PREFERENCE_SHADOWMAPWIDTH "ShadowMapWidth"
-#define HEX_PREFERENCE_SHADOWMAPHEIGHT "ShadowMapHeight"
-#define HEX_PREFERENCE_AOFILTERRADIUS "AOFilterRadius"
-#define HEX_PREFERENCE_EYEBRIDGEWIDTH "EyeBridgeWidth"
-#define HEX_PREFERENCE_GAMMA "Gamma"
-#define HEX_PREFERENCE_RANDOMFILTERSIZE "RandomFilterSize"
-#define HEX_PREFERENCE_MAXPOINTLIGHTS "MaxPointLights"
-#define HEX_PREFERENCE_ENABLESHADOW "EnableShadow"
-#define HEX_PREFERENCE_ENABLELUMINANCE "EnableLuminance"
-#define HEX_PREFERENCE_ENABLEAMBIENTOCCLUSION "EnableAmbientOcclusion"
-
 FILE* PrefrencesFile = NULL;
 
 void OutputDefaultPreferences()
@@ -31,10 +14,8 @@ void OutputDefaultPreferences()
 	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_SCREENHEIGHT, ScreenRect.height);
 	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_RENDERWIDTH, RenderRect.width);
 	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_RENDERHEIGHT, RenderRect.height);
-	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_LUMINANCEWIDTH, LuminanceRect.width);
-	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_LUMINANCEHEIGHT, LuminanceRect.height);
-	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_SHADOWMAPWIDTH, ShadowRect.width);
-	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_SHADOWMAPHEIGHT, ShadowRect.height);
+	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_LUMINANCESIZE, LuminanceRect.width);
+	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_SHADOWMAPSIZE, ShadowRect.width);
 	fprintf(PrefrencesFile, "\n");
 	fprintf(PrefrencesFile, "%s = %f\n", HEX_PREFERENCE_AOFILTERRADIUS, AOFilterRadius);
 	fprintf(PrefrencesFile, "%s = %f\n", HEX_PREFERENCE_EYEBRIDGEWIDTH, EyeBridgeWidth);
@@ -61,10 +42,8 @@ HEX_API bool InitializePreferences()
 	uint screenHeight = ScreenRect.height;
 	uint renderWidth = RenderRect.width;
 	uint renderHeight = RenderRect.height;
-	uint luminanceWidth = LuminanceRect.width;
-	uint luminanceHeight = LuminanceRect.height;
-	uint shadowWidth = ShadowRect.width;
-	uint shadowHeight = ShadowRect.height;
+	uint luminanceSize = LuminanceRect.width;
+	uint shadowSize = ShadowRect.width;
 	float aoFilterRadius = AOFilterRadius;
 	float eyeBridgeWidth = EyeBridgeWidth;
 	float gamma = Gamma;
@@ -98,25 +77,25 @@ HEX_API bool InitializePreferences()
 			string check = strpbrk(line, "0123456789");
 			sscanf(check, "%d", &renderHeight);
 		}
-		else if (strstr(line, HEX_PREFERENCE_LUMINANCEWIDTH) != 0)
+		else if (strstr(line, HEX_PREFERENCE_LUMINANCESIZE) != 0)
 		{
 			string check = strpbrk(line, "0123456789");
-			sscanf(check, "%d", &luminanceWidth);
+			sscanf(check, "%d", &luminanceSize);
 		}
-		else if (strstr(line, HEX_PREFERENCE_LUMINANCEHEIGHT) != 0)
+		else if (strstr(line, HEX_PREFERENCE_LUMINANCESIZE) != 0)
 		{
 			string check = strpbrk(line, "0123456789");
-			sscanf(check, "%d", &luminanceHeight);
+			sscanf(check, "%d", &luminanceSize);
 		}
-		else if (strstr(line, HEX_PREFERENCE_SHADOWMAPWIDTH) != 0)
+		else if (strstr(line, HEX_PREFERENCE_SHADOWMAPSIZE) != 0)
 		{
 			string check = strpbrk(line, "0123456789");
-			sscanf(check, "%d", &shadowWidth);
+			sscanf(check, "%d", &shadowSize);
 		}
-		else if (strstr(line, HEX_PREFERENCE_SHADOWMAPHEIGHT) != 0)
+		else if (strstr(line, HEX_PREFERENCE_SHADOWMAPSIZE) != 0)
 		{
 			string check = strpbrk(line, "0123456789");
-			sscanf(check, "%d", &shadowHeight);
+			sscanf(check, "%d", &shadowSize);
 		}
 		else if (strstr(line, HEX_PREFERENCE_AOFILTERRADIUS) != 0)
 		{
@@ -163,8 +142,8 @@ HEX_API bool InitializePreferences()
 	AspectRatio = float(screenWidth) / float(screenHeight);
 	ScreenRect = MALib::RECT(screenWidth, screenHeight);
 	RenderRect = MALib::RECT(renderWidth, renderHeight);
-	LuminanceRect = MALib::RECT(luminanceWidth, luminanceHeight);
-	ShadowRect = MALib::RECT(shadowWidth, shadowHeight);
+	LuminanceRect = MALib::RECT(luminanceSize, luminanceSize);
+	ShadowRect = MALib::RECT(shadowSize, shadowSize);
 	AOFilterRadius = aoFilterRadius;
 	EyeBridgeWidth = eyeBridgeWidth;
 	Gamma = gamma;
@@ -173,6 +152,31 @@ HEX_API bool InitializePreferences()
 	EnableShadow = enableShadow != 0;
 	EnableLuminance = enableLuminance != 0;
 	EnableAmbientOcclusion = enableAmbientOcclusion != 0;
+
+	if (VertexShader != NULL)
+	{
+		VertexShaderSource = new char[VertexShader->size];
+		memset(VertexShaderSource, 0, sizeof(char) * VertexShader->size);
+#if 1
+		memcpy(VertexShaderSource, VertexShader->data, sizeof(char) * VertexShader->size);
+#else
+#endif
+
+		//MALib::LOG_Message(VertexShader->data);
+		//MALib::LOG_Message(VertexShaderSource);
+	}
+	if (FragmentShader != NULL)
+	{
+		FragmentShaderSource = new char[FragmentShader->size];
+		memset(FragmentShaderSource, 0, sizeof(char) * FragmentShader->size);
+#if 1
+		memcpy(FragmentShaderSource, FragmentShader->data, sizeof(char) * FragmentShader->size);
+#else
+#endif
+
+		//MALib::LOG_Message(FragmentShader->data);
+		//MALib::LOG_Message(FragmentShaderSource);
+	}
 
 	return true;
 }

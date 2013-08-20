@@ -431,7 +431,10 @@ HEX_API bool CompileShader(const string source, GLenum type, GLint* outShader)
 	memset(buffer, '\0', sizeof(char) * 512);
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
 	glGetShaderInfoLog(shader, 512, &log_length, buffer);
-	if (buffer[0] != '\0') MALib::LOG_Message(buffer);
+
+	if      (type == GL_VERTEX_SHADER) MALib::LOG_Message("Compiled shader", "vertex");
+	else if (type == GL_FRAGMENT_SHADER) MALib::LOG_Message("Compiled shader", "fragment");
+	if (log_length > 0) MALib::LOG_Message("Error log", buffer);
 
 	delete [] buffer;
 
@@ -440,40 +443,25 @@ HEX_API bool CompileShader(const string source, GLenum type, GLint* outShader)
 		return false;
 	}
 
-	if      (type == GL_VERTEX_SHADER) MALib::LOG_Message("Compiled shader", "vertex");
-	else if (type == GL_FRAGMENT_SHADER) MALib::LOG_Message("Compiled shader", "fragment");
-
 	*outShader = shader;
 	return true;
 }
 HEX_API bool BuildProgram()
 {
-#if 1
-	static string vertFilepath = "data/gl_shader.vert";
-	static string fragFilepath = "data/gl_shader.frag";
-	MALib::TEXTFILE* vertFile = 0;
-	MALib::TEXTFILE* fragFile = 0;
-	if (!MALib::ImportTextFile(vertFilepath, &vertFile))
+	if (VertexShaderSource == NULL)
 	{
-		MALib::LOG_Message("Could not find vertex shader.", vertFilepath);
+		MALib::LOG_Message("Could not location vertex shader source.");
 		return false;
 	}
-	if (!MALib::ImportTextFile(fragFilepath, &fragFile))
+	if (FragmentShaderSource == NULL)
 	{
-		MALib::LOG_Message("Could not find fragment shader.", fragFilepath);
+		MALib::LOG_Message("Could not location fragment shader source.");
 		return false;
 	}
 
 	GLint vs, fs;
-	if (!CompileShader(vertFile->data, GL_VERTEX_SHADER, &vs) || !CompileShader(fragFile->data, GL_FRAGMENT_SHADER, &fs)) 
+	if (!CompileShader(VertexShaderSource, GL_VERTEX_SHADER, &vs) || !CompileShader(FragmentShaderSource, GL_FRAGMENT_SHADER, &fs)) 
 		return false;
-	MALib::FreeTextFile(&vertFile);
-	MALib::FreeTextFile(&fragFile);
-#else
-	GLint vs, fs;
-	if (!CompileShader(VertexShader, GL_VERTEX_SHADER, &vs) || !CompileShader(FragmentShader, GL_FRAGMENT_SHADER, &fs)) 
-		return false;
-#endif
 
 	ShaderProgram = glCreateProgram();
 	glAttachShader(ShaderProgram, vs);

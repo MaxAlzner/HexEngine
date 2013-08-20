@@ -254,8 +254,6 @@
     <ClCompile Include="src\HexRender.cpp" />
     <ClCompile Include="src\HexScene.cpp" />
     <ClCompile Include="src\HexShader.cpp" />
-    <ClCompile Include="src\HexShaderFragment.cpp" />
-    <ClCompile Include="src\HexShaderVertex.cpp" />
     <ClCompile Include="src\LightNode.cpp" />
     <ClCompile Include="src\MaterialNode.cpp" />
     <ClCompile Include="src\NodeBase.cpp" />

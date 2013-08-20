@@ -40,6 +40,7 @@ extern MALib::ARRAY<CameraNode*> Cameras;
 extern MALib::ARRAY<LightNode*> Lights;
 extern MALib::ARRAY<SkyboxNode*> Skyboxes;
 extern MALib::ARRAY<ControlNode*> Controllers;
+extern LightNode* ShadowCaster;
 extern CameraNode* MainCamera;
 	
 extern MALib::ARRAY<Scene*> Scenes;
@@ -49,9 +50,15 @@ extern MALib::ARRAY<HexEntity*> Entities;
 extern MALib::ARRAY<NodeBase*> Nodes;
 extern HexEntity* BoundEntity;
 
+extern MALib::TEXTFILE* VertexShader;
+extern MALib::TEXTFILE* FragmentShader;
+extern string VertexShaderSource;
+extern string FragmentShaderSource;
+
 HEX_API extern void InitializeData();
 HEX_API extern void UninitializeData();
-HEX_API extern void ClearData();
+
+HEX_API extern void ClearGame();
 
 HEX_API extern bool IsRunning();
 HEX_API extern bool ToggleRunning();

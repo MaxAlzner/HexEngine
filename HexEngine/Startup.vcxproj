@@ -83,7 +83,6 @@ del SDL.dll
 del MALib.dll
 del *.exp
 del *.ilk
-del *.lib
 xcopy "$(SolutionDir)libraries\GL\glew32.dll" "$(SolutionDir)bin"
 xcopy "$(SolutionDir)libraries\SDL\SDL.dll" "$(SolutionDir)bin"
 xcopy "$(USERPROFILE)\My Documents\GitHub\MALib\MALib\bin\MALib.dll" "$(SolutionDir)bin"
@@ -114,7 +113,6 @@ del SDL.dll
 del MALib.dll
 del *.exp
 del *.ilk
-del *.lib
 xcopy "$(SolutionDir)libraries\GL\glew32.dll" "$(SolutionDir)bin"
 xcopy "$(SolutionDir)libraries\SDL\SDL.dll" "$(SolutionDir)bin"
 xcopy "$(USERPROFILE)\My Documents\GitHub\MALib\MALib\bin\MALib.dll" "$(SolutionDir)bin"

@@ -3,7 +3,6 @@
 HEX_BEGIN
 
 extern HexRender MainRender;
-extern HexRender ShadowMap;
 extern HexRender BrightPass;
 extern HexRender Luminance;
 extern HexRender DeferredPositions;
@@ -14,7 +13,7 @@ extern HexRender AmbientOcclusionBilateral;
 HEX_API extern bool InitializeDraw();
 HEX_API extern bool UninitializeDraw();
 
-extern void StartDrawing();
+HEX_API extern bool StartDrawing();
 
 extern void RenderMain();
 extern void RenderShadowMap();

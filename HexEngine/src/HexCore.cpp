@@ -31,6 +31,8 @@ bool ToggleBlitAmbientOcclusion = false;
 bool ToggleBlitDeferredNormals = false;
 bool ToggleBlitShadow = false;
 
+SDL_mutex* Lock = 0;
+
 int EventThread(void* data)
 {
 	while (AppRunning)
@@ -47,23 +49,34 @@ int FixedUpdateThread(void* data)
 	while (AppRunning)
 	{
 		Uint32 NewPing = SDL_GetTicks();
-		if (NewPing - LastPing > 24)
+		if (NewPing - LastPing >= 24)
 		{
+			SDL_LockMutex(Lock);
 			OnFixedUpdate();
+			SDL_UnlockMutex(Lock);
 			LastPing = NewPing;
+			UpdateDeltaTime();
 		}
 	}
 	return 0;
 }
 int FrameUpdateThread(void* data)
 {
+	Uint32 StartFrame = ~0;
 	while (AppRunning)
 	{
-		UpdateFrameCount();
 		PollEvents();
 
-		OnFrameUpdate();
-		OnFrameDraw();
+		Uint32 Current = SDL_GetTicks();
+		if (Current - StartFrame >= 16)
+		{
+			StartFrame = SDL_GetTicks();
+			SDL_LockMutex(Lock);
+			OnFrameUpdate();
+			OnFrameDraw();
+			SDL_UnlockMutex(Lock);
+			UpdateFrameCount();
+		}
 	}
 	return 0;
 }
@@ -73,17 +86,26 @@ HEX_API void OnStart()
 	if (!AppRunning) return;
 	MALib::LOG_Message("START SCENE");
 
-	InitializeLoadOrder();
-	
-	StartDrawing();
+	if (!StartDrawing())
+	{
+		ToggleRunning();
+		return;
+	}
+	if (Entities.length() < 1)
+	{
+		ToggleRunning();
+		return;
+	}
 
 	for (unsigned i = 0; i < Entities.length(); i++) Entities[i]->start();
 
+	Lock = SDL_CreateMutex();
 	SDL_Thread* fixedUpdateThread = SDL_CreateThread(FixedUpdateThread, 0);
 
 	FrameUpdateThread(0);
 	
 	SDL_KillThread(fixedUpdateThread);
+	SDL_UnlockMutex(Lock);
 }
 HEX_API void OnFrameDraw()
 {
@@ -93,9 +115,9 @@ HEX_API void OnFrameDraw()
 	
 	if (EnableShadow) RenderShadowMap();
 	RenderMain();
-	if (EnableLuminance) RenderLuminance();
+	RenderLuminance();
 	if (EnableAmbientOcclusion) RenderDeferredNormals();
-	if (EnableAmbientOcclusion) RenderAmbientOcclusion();
+	RenderAmbientOcclusion();
 	
 	FinalRender();
 	
@@ -103,7 +125,7 @@ HEX_API void OnFrameDraw()
 	if (ToggleBlitLuminance) Luminance.blit();
 	if (ToggleBlitAmbientOcclusion) AmbientOcclusionBilateral.blit();
 	if (ToggleBlitDeferredNormals) DeferredNormals.blit();
-	if (ToggleBlitShadow) ShadowMap.blit();
+	//if (ToggleBlitShadow) ShadowMap.blit();
 
 	Cameras[0]->unload();
 
@@ -118,12 +140,10 @@ HEX_API void OnFrameUpdate()
 		Entities[i]->frameUpdate();
 	}
 	
-	SetUniform(UNIFORM_SHADOW_MAP_SIZE, 1024.0f);
+	SetUniform(UNIFORM_SHADOW_MAP_SIZE, float(ShadowRect.width));
 	SetUniform(UNIFORM_GAMMA, Gamma);
 	static float screenSize[2] = {float(ScreenRect.width), float(ScreenRect.height)};
 	SetUniform(UNIFORM_SCREEN_SIZE, screenSize);
-
-	UpdateDeltaTime();
 }
 HEX_API void OnFixedUpdate()
 {
@@ -177,24 +197,30 @@ HEX_API bool Reshape(uint width, uint height)
 }
 HEX_API bool Initialize(uint argc, string* argv)
 {
-	InitializePreferences();
-
 	MALib::LOG_Initialize(true);
 	MALib::RANDOM_Initialize();
 
+	MALib::LOG_Message("START INTIALIZING");
 	for (unsigned i = 0; i < argc; i++)
 	{
 		MALib::LOG_Message(argv[i]);
 	}
-	MALib::LOG_Message("START INTIALIZING");
 
 	MALib::LOG_Message("START INPUT");
 	InitializeInput();
 	MALib::LOG_Message("START DATA");
 	InitializeData();
+	MALib::LOG_Message("START PREFERENCES");
+	if (!InitializePreferences()) 
+		return false;
+	MALib::LOG_Message("START LOAD ORDER");
+	if (!InitializeLoadOrder()) 
+		return false;
 	
+	MALib::LOG_Message("START DRAW INITIALIZING");
 	if (!InitializeDraw()) 
 		return false;
+	MALib::LOG_Message("END DRAW INITIALIZATION");
 	
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;

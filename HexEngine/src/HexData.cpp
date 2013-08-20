@@ -29,6 +29,7 @@ MALib::ARRAY<CameraNode*> Cameras;
 MALib::ARRAY<LightNode*> Lights;
 MALib::ARRAY<SkyboxNode*> Skyboxes;
 MALib::ARRAY<ControlNode*> Controllers;
+LightNode* ShadowCaster = NULL;
 CameraNode* MainCamera = NULL;
 	
 MALib::ARRAY<Scene*> Scenes;
@@ -37,6 +38,11 @@ MALib::ARRAY<MALib::SURFACE*> Textures;
 MALib::ARRAY<HexEntity*> Entities;
 MALib::ARRAY<NodeBase*> Nodes;
 HexEntity* BoundEntity = NULL;
+
+MALib::TEXTFILE* VertexShader = NULL;
+MALib::TEXTFILE* FragmentShader = NULL;
+string VertexShaderSource = NULL;
+string FragmentShaderSource = NULL;
 
 HEX_API void InitializeData()
 {
@@ -56,10 +62,19 @@ HEX_API void InitializeData()
 	Textures.resize(48);
 	Entities.resize(32);
 	Nodes.resize(128);
+	
+	if (!MALib::ImportTextFile(HEX_VERTEXSHADER_FILEPATH, &VertexShader))
+	{
+		MALib::LOG_Message("Could not find vertex shader file.", HEX_VERTEXSHADER_FILEPATH);
+	}
+	if (!MALib::ImportTextFile(HEX_FRAGMENTSHADER_FILEPATH, &FragmentShader))
+	{
+		MALib::LOG_Message("Could not find fragment shader file.", HEX_FRAGMENTSHADER_FILEPATH);
+	}
 }
 HEX_API void UninitializeData()
 {
-	ClearData();
+	ClearGame();
 
 	Casters.clear();
 	Renderable.clear();
@@ -75,11 +90,17 @@ HEX_API void UninitializeData()
 	Textures.clear();
 	Entities.clear();
 	Nodes.clear();
+	
+	MALib::FreeTextFile(&VertexShader);
+	MALib::FreeTextFile(&FragmentShader);
+	if (VertexShaderSource != NULL) delete [] VertexShaderSource;
+	if (FragmentShaderSource != NULL) delete [] FragmentShaderSource;
 }
-HEX_API void ClearData()
+
+HEX_API void ClearGame()
 {
 	for (unsigned i = 0; i < Nodes.length(); i++) Nodes[i]->destroy();
-	for (unsigned i = 0; i < Scenes.length(); i++) delete Scenes[i];
+	for (unsigned i = 0; i < Scenes.length(); i++) DestroyScene(&Scenes[i]);
 	for (unsigned i = 0; i < Meshes.length(); i++) MALib::FreeVertexBuffer(&Meshes[i]);
 	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);
 	for (unsigned i = 0; i < Entities.length(); i++) delete Entities[i];

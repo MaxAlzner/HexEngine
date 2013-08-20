@@ -61,9 +61,6 @@ HEX_API typedef enum UNIFORM
 
 typedef struct UniformLocations UniformLocations;
 
-extern string VertexShader;
-extern string FragmentShader;
-
 extern UNIFORM LastFlag;
 extern UNIFORM CurrentFlag;
 

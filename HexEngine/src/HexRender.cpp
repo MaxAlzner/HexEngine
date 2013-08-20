@@ -59,11 +59,13 @@ void HexRender::build(uint width, uint height, bool attachColor, bool attachDept
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
 	}
 
+#if 1
 	if (!attachColor)
 	{
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	}
+#endif
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) MALib::LOG_Message("Framebuffer Failed");
 	

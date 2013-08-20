@@ -21,6 +21,7 @@ uniform sampler2D luminance_map;
 uniform sampler2D depth_map;
 uniform sampler2D position_map;
 uniform sampler2D ao_map;
+
 uniform sampler2D shadow_map;
 
 uniform sampler2D leftEye_map;
@@ -86,6 +87,11 @@ float luminance(vec3 color)
 float gr(float a, float b)
 {
 	return exp(1. - abs(a - b));
+}
+float linearize_depth(float v)
+{
+	float d = (2.0 * nearZ) / ((farZ + nearZ) - (v * (farZ - nearZ)));
+	return clamp(d, 0., 1.);
 }
 
 vec3 unpack_normal(in vec2 coord)
@@ -339,56 +345,17 @@ vec4 bilateral_gaussian_blur()
 
 float shadow_intensity()
 {
-#if 0
-	vec3 tex_shadow = vec3(vertex_ls.xyz / vertex_ls.w);
-	tex_shadow.z -= 0.02;
-	return texture(shadow_map, tex_shadow);
-	return 0.;
-#endif
-	return textureProj(shadow_map, vertex_ls).r;
+	vec3 coord = vec3(vertex_ls.xyz / vertex_ls.w);
+	vec2 incr = vec2(r / shadow_size, r / shadow_size);
+	float sum = 0.;
+	for (int i = 0; i < random_filter.length(); i++)
+	{
+		vec3 tex_shadow = coord + vec3(random_filter[i] * incr, 0.);
+		sum += average(textureProj(shadow_map, tex_shadow).rgb);
+	}
+	return clamp(sum / float(random_filter.length()), 0., 1.);
 }
 
-#define ATTENUATION \
-	float dist = distance(light_position, vertex_ss);\
-	float atten = 1. / (light_falloff.x + (light_falloff.y * dist) + (light_falloff.z * dist * dist));
-#define SPECULAR \
-	float n_dot_h = dot(n, h);\
-	float n_dot_v = dot(n, v);\
-	float h_dot_v = dot(h, v);\
-	float h_dot_l = dot(h, l);\
-	float g1 = (2. * n_dot_h * n_dot_v) / h_dot_v;\
-	float g2 = (2. * n_dot_h * n_dot_l) / h_dot_v;\
-	float g = 1.;\
-	if (g1 < g) g = g1;\
-	if (g2 < g) g = g2;\
-	float m = roughness * roughness;\
-	float r = (1. / (m * pow(n_dot_h, 4.))) * exp((pow(n_dot_h, 2.) - 1.) / (m * pow(n_dot_h, 2.)));\
-	float f = (ref_index + pow(1. - h_dot_v, 5.)) * (1. - ref_index);\
-	float specular = max((abs(f * r * g) / n_dot_v), 0.) * specular_intensity;
-#define LAMBERT \
-	float n_dot_l = dot(n, l);\
-	float lambert = max(n_dot_l, 0.);
-
-#define POINTLIGHT_ALBEDO(x) \
-do {\
-	vec3 light_position = pointLight4_ss[x];\
-	vec4 light_color = pointLight4_color[x];\
-	vec3 light_falloff = pointLight4_falloff[x];\
-	vec3 l = normalize(light_position - vertex_ss);\
-	vec3 h = normalize(l + v);\
-	ATTENUATION;\
-	LAMBERT;\
-	SPECULAR;\
-	vec3 diffuse = (light_color.rgb * lambert) + vec3(specular * lambert);\
-	albedo += (diffuse * atten * light_color.a);\
-} while (false)
-#define DIRECTIONAL_ALBEDO \
-do {\
-	vec3 l = normalize(directionalLight_ss);\
-	LAMBERT;\
-	vec3 diffuse = (directionalLight_color.rgb * lambert);\
-	albedo += diffuse * directionalLight_color.a;\
-} while (false)
 void directionalLight_albedo(inout vec3 albedo, in vec3 n, in vec3 v)
 {
 	vec3 l = normalize(directionalLight_ss);
@@ -457,20 +424,26 @@ vec4 main_render()
 	if (numOfPointLights > 3) pointLight_albedo(albedo, n, v, specular_intensity, 3);
 #endif
 	
-	float shadow = shadow_intensity();
+	float shadow = 1.;
+#if 1
+	shadow = max(shadow_intensity(), 0.2);
+#endif
 	
-	return vec4(color * albedo * shadow, 1.);
+#if 0
+	return vec4(shadow);
+#endif
+	return vec4(color * (albedo * shadow), 1.);
 }
 vec4 final_render()
 {
-	vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.x * 0.71));
-	vec2 coord = vec2(0.5 / 128.);
-	coord = vec2((coord.x * filter.x) - (coord.y * filter.y), (coord.x * filter.y) + (coord.y * filter.x));
+	//vec2 filter = vec2(cos(gl_PointCoord.x * 1.33), sin(gl_PointCoord.x * 0.71));
+	//vec2 coord = vec2(0.5 / 128.);
+	//coord = vec2((coord.x * filter.x) - (coord.y * filter.y), (coord.x * filter.y) + (coord.y * filter.x));
 
-	vec4 luminance = texture(luminance_map, tex_coord + coord);
+	vec4 luminance = texture(luminance_map, tex_coord);// + coord);
 	vec4 ao = texture(ao_map, tex_coord);
 	vec4 base = texture(color_map, tex_coord);
-	return (base + luminance) * ao;
+	return (base * ao) + luminance;
 }
 
 void main()

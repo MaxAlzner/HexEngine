@@ -162,20 +162,17 @@ Prefab* CreatePrefab(string name)
 
 	return prefab;
 }
-Prefab* GetPrefab(string name, MALib::ARRAY<Prefab*>& list)
+void DestroyScene(Scene** scene)
 {
-	if (name == 0 || list.length() < 1) return 0;
-
-	for (uint i = 0; i < list.length(); i++)
-	{
-		Prefab* prefab = list[i];
-		if (prefab->name == 0) continue;
-		if (strcmp(prefab->name, name) == 0)
-		{
-			return prefab;
-		}
-	}
-	return 0;
+	if (scene == 0) return;
+	delete *scene;
+	*scene = 0;
+}
+void DestroyPrefab(Prefab** prefab)
+{
+	if (prefab == 0) return;
+	delete *prefab;
+	*prefab = 0;
 }
 void CopyPrefab(Prefab* dest, Prefab* src)
 {
@@ -199,6 +196,21 @@ void CopyPrefab(Prefab* dest, Prefab* src)
 		CopyPrefab(destChild, srcChild);
 		dest->children.add(destChild);
 	}
+}
+Prefab* GetPrefab(string name, MALib::ARRAY<Prefab*>& list)
+{
+	if (name == 0 || list.length() < 1) return 0;
+
+	for (uint i = 0; i < list.length(); i++)
+	{
+		Prefab* prefab = list[i];
+		if (prefab->name == 0) continue;
+		if (strcmp(prefab->name, name) == 0)
+		{
+			return prefab;
+		}
+	}
+	return 0;
 }
 
 void RemoveWhitespace(string* str)

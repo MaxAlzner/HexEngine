@@ -72,18 +72,18 @@ skybox
 load
 translate 8.0 2.4 0
 rotate -y 90
-controller 30 1
+controller 30 3.2
 camera 45 0.01 256
 
 load
 light directional 0.9
 translate -y 8
-translate -x 4
+translate -x 0
 rotate -80 60 0
 
 load
 light point 1.0
-light -color 1.0 0.25 0.1
+light -color 1.0 0.1 0.4
 light -falloff 1.2 0.25 0.01
 translate 0 2 4
 load
@@ -95,9 +95,10 @@ translate 0 2 -4
 load Platform
 
 load BasePlatform
-translate -y 4
+translate -y 8
 rotate -y 90
+rotate -x 15
 scale 0.5 0.5 0.5
-turntable 4
+turntable 24
 caster true
 static false
