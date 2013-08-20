@@ -9,7 +9,7 @@ in vec4 vertex_def;
 in vec3 normal_def;
 
 in vec3 directionalLight_ss;
-in vec3 pointLight4_ss[4];
+in vec3 pointLight4_ss[%MaxPointLights%];
 
 out vec4 outColor;
 
@@ -28,16 +28,17 @@ uniform sampler2D leftEye_map;
 uniform sampler2D rightEye_map;
 
 uniform vec4 directionalLight_color;
-uniform vec4 pointLight4_color[4];
-uniform vec3 pointLight4_falloff[4];
+uniform vec4 pointLight4_color[%MaxPointLights%];
+uniform vec3 pointLight4_falloff[%MaxPointLights%];
 uniform int numOfPointLights;
 
 uniform vec2 screen_size;
 uniform float shadow_size;
-uniform vec2[36] random_filter;
-uniform float gamma;
+uniform vec2[%RandomFilterSize%] random_filter;
+uniform float filter_radius;
 uniform vec4 leftEye_color;
 uniform vec4 rightEye_color;
+uniform float gamma;
 
 uniform int flag;
 
@@ -101,7 +102,6 @@ vec3 unpack_normal(in vec2 coord)
 float read_depth(in vec2 coord)
 {
 	float depth = average(texture(depth_map, coord).rgb);
-	//return depth;
 	float d = (2.0 * nearZ) / ((farZ + nearZ) - (depth * (farZ - nearZ)));
 	return clamp(d, 0., 1.);
 }
@@ -128,22 +128,12 @@ vec4 anaglyphic_3d()
 	return g;
 }
 
-#define OCCLUSION(x, y) \
-do {\
-	vec2 coord = tex_coord + (incr * vec2(x, y));\
-	float d = read_depth(coord);\
-	vec3 r = unpack_normal(coord);\
-	vec3 v = vec3(coord, d) - vec3(tex_coord, depth);\
-	float atten = 1. / (1. + length(v));\
-	ao += max(dot(r, normal), 0.) * atten;\
-	k += 1.;\
-} while (false)
 vec4 ambient_occlusion()
 {
 	float depth = read_depth(tex_coord);
 	vec3 normal = unpack_normal(tex_coord);
 
-	vec2 incr = 6.4 / screen_size;
+	vec2 incr = filter_radius / screen_size;
 	vec3 p = vec3(tex_coord, depth);
 	
 	float ao = 0.;

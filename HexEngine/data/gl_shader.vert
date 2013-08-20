@@ -15,7 +15,7 @@ out vec4 vertex_def;
 out vec3 normal_def;
 
 out vec3 directionalLight_ss;
-out vec3 pointLight4_ss[4];
+out vec3 pointLight4_ss[%MaxPointLights%];
 
 uniform mat4 os_to_ws;
 uniform mat4 ws_to_cs;
@@ -24,7 +24,7 @@ uniform mat4 billboard;
 uniform mat4 projection;
 
 uniform vec3 directionalLight_ws;
-uniform vec4 pointLight4_ws[4];
+uniform vec4 pointLight4_ws[%MaxPointLights%];
 uniform int numOfPointLights;
 
 uniform vec2 uv_repeat;

@@ -20,6 +20,7 @@ struct UniformLocations
 	int screen_size;
 	int shadow_size;
 	int random_filter;
+	int filter_radius;
 	int gamma;
 	int leftEye_color;
 	int rightEye_color;
@@ -36,9 +37,9 @@ struct UniformLocations
 	int flag;
 };
 
-float pointLight4position_buffer[16];
-float pointLight4color_buffer[16];
-float pointLight4falloff_buffer[16];
+float* pointLight4position_buffer = NULL;
+float* pointLight4color_buffer = NULL;
+float* pointLight4falloff_buffer = NULL;
 uint numOfPointLights = 0;
 UNIFORM LastFlag = UNIFORM_FLAG_NORMAL;
 UNIFORM CurrentFlag = UNIFORM_FLAG_NORMAL;
@@ -57,6 +58,9 @@ HEX_API void InitializeAttributes()
 	Attributes.add(glGetAttribLocation(ShaderProgram, "tangent"));
 	Attributes.add(glGetAttribLocation(ShaderProgram, "binormal"));
 }
+HEX_API void UninitializeAttributes()
+{
+}
 HEX_API void InitializeUniforms()
 {
 	Uniforms.os_to_ws = glGetUniformLocation(ShaderProgram, "os_to_ws");
@@ -74,6 +78,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.screen_size = glGetUniformLocation(ShaderProgram, "screen_size");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
+	Uniforms.filter_radius = glGetUniformLocation(ShaderProgram, "filter_radius");
 	Uniforms.gamma = glGetUniformLocation(ShaderProgram, "gamma");
 	Uniforms.leftEye_color = glGetUniformLocation(ShaderProgram, "leftEye_color");
 	Uniforms.rightEye_color = glGetUniformLocation(ShaderProgram, "rightEye_color");
@@ -90,7 +95,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.flag = glGetUniformLocation(ShaderProgram, "flag");
 	NumOfUniforms = sizeof(Uniforms) / sizeof(int);
 	
-	uint filter_size = 36 * 2;
+	uint filter_size = RandomFilterSize * 2;
 	float* randoms = new float[filter_size];
 	for (unsigned i = 0; i < filter_size; i += 2)
 	{
@@ -101,11 +106,20 @@ HEX_API void InitializeUniforms()
 		randoms[i + 0] = x;
 		randoms[i + 1] = y;
 	}
-	//MALib::LOG_Outvf("RANDOM FILTER", randoms, filter_size);
 	SetUniform(UNIFORM_RANDOM_FILTER, filter_size / 2, randoms);
 	delete [] randoms;
+	
+	pointLight4position_buffer = new float[MaxPointLights * 4];
+	pointLight4color_buffer = new float[MaxPointLights * 4];
+	pointLight4falloff_buffer = new float[MaxPointLights * 4];
 
 	CurrentFlag = UNIFORM_FLAG_NORMAL;
+}
+HEX_API void UninitializeUniforms()
+{
+	if (pointLight4position_buffer != NULL) delete [] pointLight4position_buffer;
+	if (pointLight4color_buffer != NULL) delete [] pointLight4color_buffer;
+	if (pointLight4falloff_buffer != NULL) delete [] pointLight4falloff_buffer;
 }
 
 HEX_API void DebugError(const string action)
@@ -230,6 +244,9 @@ HEX_API void SetUniform(UNIFORM uniform, float value)
 		glUniform1f(Uniforms.shadow_size, (const GLfloat)value);
 		break;
 
+	case UNIFORM_FILTER_RADIUS:
+		glUniform1f(Uniforms.filter_radius, (const GLfloat)value);
+		break;
 	case UNIFORM_GAMMA:
 		glUniform1f(Uniforms.gamma, (const GLfloat)value);
 		break;
@@ -254,9 +271,9 @@ HEX_API void SetUniform(UNIFORM uniform)
 	switch (uniform)
 	{
 	case UNIFORM_ADD_POINT_LIGHT:
-		if (numOfPointLights >= 4)
+		if (numOfPointLights >= MaxPointLights)
 		{
-			numOfPointLights = 4;
+			numOfPointLights = MaxPointLights;
 			break;
 		}
 		numOfPointLights++;

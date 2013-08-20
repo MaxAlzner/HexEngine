@@ -123,30 +123,8 @@ void LightNode::onFrameUpdate()
 	if (MainCamera == NULL) return;
 	glm::vec3 eye = this->root->transform->position + (this->root->transform->forward * -8.0f);
 	glm::vec3 focus = glm::vec3(0.0f, 0.0f, 0.0f);
-	//focus = eye + (this->root->transform->forward);
-
-	//glm::mat4 view = glm::mat4(1.0f);
-	//view *= glm::translate(glm::vec3(0.5f, 0.5f, 0.5f));
-	//view *= glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-	//view *= MainCamera->perspective;
-
-	//view *= glm::lookAt(glm::vec3(2.0f, 3.2f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//view *= glm::lookAt(eye, focus, this->root->transform->up);
-	//view *= glm::lookAt(eye, focus, glm::vec3(0.0f, 1.0f, 0.0f));
-	//view *= glm::translate(glm::vec3(0.0f, 0.0f, -1.0f));
-	//view *= glm::mat4(this->root->transform->space);
-
-	/*view = 
-		glm::translate(glm::vec3(0.5f, 0.5f, 0.5f)) * 
-		glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * 
-		glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -10.0f, 20.0f) * 
-		glm::lookAt(eye, focus, glm::vec3(0.0f, 1.0f, 0.0f));*/
-	//	glm::lookAt(this->root->transform->forward * -10.0f, focus, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	this->lightSpace = glm::lookAt(eye, focus, glm::vec3(0.0f, 1.0f, 0.0f));
-	//this->lightSpace = glm::lookAt(this->root->transform->forward * -10.0f, focus, glm::vec3(0.0f, 1.0f, 0.0f));
-	//this->lightSpace = glm::lookAt(glm::vec3(2.0f, 3.2f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//this->lightSpace = this->root->transform->space;
 
 	this->lightPerspective = 
 		glm::translate(glm::vec3(0.5f, 0.5f, 0.5f)) * 

@@ -27,9 +27,10 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_SCREEN_SIZE                                        = 0x00000201, 
 	UNIFORM_SHADOW_MAP_SIZE                                    = 0x00000202, 
 	UNIFORM_RANDOM_FILTER                                      = 0x00000210, 
-	UNIFORM_GAMMA                                              = 0x00000211, 
-	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000221, 
-	UNIFORM_RIGHT_EYE_COLOR                                    = 0x00000222, 
+	UNIFORM_FILTER_RADIUS                                      = 0x00000211, 
+	UNIFORM_GAMMA                                              = 0x00000221, 
+	UNIFORM_LEFT_EYE_COLOR                                     = 0x00000231, 
+	UNIFORM_RIGHT_EYE_COLOR                                    = 0x00000232, 
 	
 	UNIFORM_TEXTURE_COLOR_MAP                                  = 0x00010000, 
 	UNIFORM_TEXTURE_NORMAL_MAP                                 = 0x00020000, 
@@ -70,7 +71,9 @@ extern uint NumOfUniforms;
 extern GLuint ShaderProgram;
 
 HEX_API extern void InitializeAttributes();
+HEX_API extern void UninitializeAttributes();
 HEX_API extern void InitializeUniforms();
+HEX_API extern void UninitializeUniforms();
 
 HEX_API extern void DebugError(const string action);
 

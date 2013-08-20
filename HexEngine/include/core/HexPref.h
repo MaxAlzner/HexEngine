@@ -5,6 +5,8 @@ HEX_BEGIN
 #define HEX_VERTEXSHADER_FILEPATH "data/gl_shader.vert"
 #define HEX_FRAGMENTSHADER_FILEPATH "data/gl_shader.frag"
 
+#define HEX_SHADER_PREFERENCE_FORMAT '%'
+
 #define HEX_PREFERENCES_FILEPATH "preferences.ini"
 #define HEX_LOADORDER_FILEPATH "loadorder.ini"
 
@@ -22,6 +24,9 @@ HEX_BEGIN
 #define HEX_PREFERENCE_ENABLESHADOW "EnableShadow"
 #define HEX_PREFERENCE_ENABLELUMINANCE "EnableLuminance"
 #define HEX_PREFERENCE_ENABLEAMBIENTOCCLUSION "EnableAmbientOcclusion"
+
+extern bool InsertPreference(string dest, string preference);
+extern bool FormatShader(string* src, string* dest);
 
 HEX_API extern bool InitializePreferences();
 HEX_API extern bool UninitializePreferences();
