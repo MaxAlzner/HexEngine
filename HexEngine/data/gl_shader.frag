@@ -133,6 +133,8 @@ vec4 ambient_occlusion()
 	float depth = read_depth(tex_coord);
 	vec3 normal = unpack_normal(tex_coord);
 
+	return vec4(depth);
+
 	vec2 incr = filter_radius / screen_size;
 	vec3 p = vec3(tex_coord, depth);
 	

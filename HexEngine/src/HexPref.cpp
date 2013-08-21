@@ -29,7 +29,7 @@ void OutputDefaultPreferences()
 	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_ENABLEAMBIENTOCCLUSION, EnableAmbientOcclusion);
 }
 
-bool InsertPreference(string dest, string preference)
+bool InsertPreference(string* dest, string preference)
 {
 	if (dest == NULL || preference == NULL) return false;
 
@@ -37,17 +37,20 @@ bool InsertPreference(string dest, string preference)
 	memset(scratch, 0, sizeof(char) * 4);
 	if (strcmp(preference, HEX_PREFERENCE_RANDOMFILTERSIZE) == 0)
 	{
-		sprintf(scratch, "%d", &RandomFilterSize);
+		sprintf(scratch, "%d", RandomFilterSize);
 	}
-	else if (strcmp(preference, HEX_PREFERENCE_RANDOMFILTERSIZE) == 0)
+	else if (strcmp(preference, HEX_PREFERENCE_MAXPOINTLIGHTS) == 0)
 	{
-		sprintf(scratch, "%d", &MaxPointLights);
+		sprintf(scratch, "%d", MaxPointLights);
 	}
 	else return false;
 	
 	for (uint i = 0; i < 4; i++)
 	{
-		dest[i] = scratch[i];
+		char ch = scratch[i];
+		if (ch == '\0') break;
+		*(*dest) = ch;
+		*dest += 1;
 	}
 	return true;
 }
@@ -58,18 +61,30 @@ bool FormatShader(string* src, string* dest)
 	string output = *dest;
 	string read = *src;
 	uint index = 0;
+	static char scratch[32];
 	while (index < FragmentShader->size)
 	{
-		char ch = *src;
+		char ch = *read;
 		if (ch == '\0') break;
+		read++;
 		if (ch == HEX_SHADER_PREFERENCE_FORMAT)
 		{
+			memset(scratch, 0, sizeof(char) * 32);
+			for (uint i = 0; i < 32; i++)
+			{
+				ch = read[i];
+				if (ch == '\0' || ch == HEX_SHADER_PREFERENCE_FORMAT) break;
+				scratch[i] = ch;
+			}
 			string end = strchr(read + 1, HEX_SHADER_PREFERENCE_FORMAT);
-			end += 1;
+			if (!InsertPreference(&output, scratch)) return false;
+			read = end + 1;
 		}
-		*output = ch;
-		output++;
-		read++;
+		else
+		{
+			*output = ch;
+			output++;
+		}
 	}
 
 	return true;
@@ -206,11 +221,11 @@ HEX_API bool InitializePreferences()
 #if 0
 		memcpy(VertexShaderSource, VertexShader->data, sizeof(char) * VertexShader->size);
 #else
-		if (!FormatShader(&VertexShaderSource, &VertexShader->data)) return false;
+		if (!FormatShader(&VertexShader->data, &VertexShaderSource)) return false;
 #endif
 
-		MALib::LOG_Message(VertexShader->data);
-		MALib::LOG_Message(VertexShaderSource);
+		//MALib::LOG_Message(VertexShader->data);
+		//MALib::LOG_Message(VertexShaderSource);
 	}
 	if (FragmentShader != NULL)
 	{
@@ -219,11 +234,11 @@ HEX_API bool InitializePreferences()
 #if 0
 		memcpy(FragmentShaderSource, FragmentShader->data, sizeof(char) * FragmentShader->size);
 #else
-		if (!FormatShader(&FragmentShaderSource, &FragmentShader->data)) return false;
+		if (!FormatShader(&FragmentShader->data, &FragmentShaderSource)) return false;
 #endif
 
-		MALib::LOG_Message(FragmentShader->data);
-		MALib::LOG_Message(FragmentShaderSource);
+		//MALib::LOG_Message(FragmentShader->data);
+		//MALib::LOG_Message(FragmentShaderSource);
 	}
 
 	return true;

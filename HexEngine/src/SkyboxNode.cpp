@@ -12,13 +12,13 @@ SkyboxNode::~SkyboxNode()
 		
 void SkyboxNode::load()
 {
-	SetUniform(UNIFORM_FLAG_BASECOLOR_RENDER);
+	/*if (CurrentFlag == UNIFORM_FLAG_NORMAL) */SetUniform(UNIFORM_FLAG_BASECOLOR_RENDER);
 	//glDisable(GL_DEPTH_TEST);
 }
 void SkyboxNode::unload()
 {
 	//glEnable(GL_DEPTH_TEST);
-	SetUniform(UNIFORM_FLAG_PREVIOUS);
+	/*if (CurrentFlag == UNIFORM_FLAG_NORMAL) */SetUniform(UNIFORM_FLAG_PREVIOUS);
 }
 void SkyboxNode::destroy()
 {

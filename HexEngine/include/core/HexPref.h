@@ -25,9 +25,6 @@ HEX_BEGIN
 #define HEX_PREFERENCE_ENABLELUMINANCE "EnableLuminance"
 #define HEX_PREFERENCE_ENABLEAMBIENTOCCLUSION "EnableAmbientOcclusion"
 
-extern bool InsertPreference(string dest, string preference);
-extern bool FormatShader(string* src, string* dest);
-
 HEX_API extern bool InitializePreferences();
 HEX_API extern bool UninitializePreferences();
 

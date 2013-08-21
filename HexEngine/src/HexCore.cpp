@@ -216,7 +216,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	MALib::LOG_Message("START LOAD ORDER");
 	if (!InitializeLoadOrder()) 
 		return false;
-	
+
 	MALib::LOG_Message("START DRAW INITIALIZING");
 	if (!InitializeDraw()) 
 		return false;

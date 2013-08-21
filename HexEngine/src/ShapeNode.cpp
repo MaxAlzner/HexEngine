@@ -64,8 +64,8 @@ void ShapeNode::build()
 }
 void ShapeNode::destroy()
 {
-	glDeleteVertexArrays(1, &this->vao);
-	glDeleteBuffers(1, &this->buffer);
+	if (this->vao != 0) glDeleteVertexArrays(1, &this->vao);
+	if (this->buffer != 0) glDeleteBuffers(1, &this->buffer);
 	this->count = 0;
 	this->built = false;
 }

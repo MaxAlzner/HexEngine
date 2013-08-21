@@ -258,26 +258,14 @@ HEX_API void AddController(float lookSensitivity, float moveSpeed)
 	Nodes.add(node);
 	Controllers.add(node);
 }
-HEX_API void AddSkybox(/*uint skyMesh, uint skyMap*/)
+HEX_API void AddSkybox()
 {
 	if (BoundEntity == NULL) return;
-	//if (skyMesh == 0 || skyMap == 0) return;
+
 	SkyboxNode* node = new SkyboxNode;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
-	/*
-	ShapeNode* box = new ShapeNode;
-	box->setMesh(skyMesh);
-	BoundEntity->setShape(box);
-	Nodes.add(box);
-	Shapes.add(box);
-
-	MaterialNode* mat = new MaterialNode;
-	mat->setColorMap(skyMap);
-	BoundEntity->setMaterial(mat);
-	Nodes.add(mat);
-	Materials.add(mat);
-	*/
+	Renderable.remove(BoundEntity);
 	Skyboxes.add(node);
 }
 HEX_API void AddTurnTable(float turnSpeed)

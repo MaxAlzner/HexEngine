@@ -85,9 +85,9 @@ void HexRender::unload()
 }
 void HexRender::destroy()
 {
-	glDeleteTextures(1, &this->colorMap);
-	glDeleteTextures(1, &this->depthMap);
-	glDeleteFramebuffers(1, &this->framebuffer);
+	if (this->colorMap != 0) glDeleteTextures(1, &this->colorMap);
+	if (this->depthMap != 0) glDeleteTextures(1, &this->depthMap);
+	if (this->framebuffer != 0) glDeleteFramebuffers(1, &this->framebuffer);
 }
 
 void HexRender::setClearColor(float r, float g, float b)
@@ -153,8 +153,8 @@ void InitializePostProcess()
 }
 void UninitializePostProcess()
 {
-	glDeleteBuffers(1, &ScreenBuffer);
-	glDeleteVertexArrays(1, &ScreenVAO);
+	if (ScreenBuffer != 0) glDeleteBuffers(1, &ScreenBuffer);
+	if (ScreenVAO != 0) glDeleteVertexArrays(1, &ScreenVAO);
 }
 
 void PostProcess(UNIFORM flag)
