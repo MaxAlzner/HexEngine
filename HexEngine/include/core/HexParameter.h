@@ -46,15 +46,17 @@ HEX_API typedef enum PARAMETER
 	PARAMETER_LIGHT_FALLOFF_XYZ                                = 0x1000000B, 
 	
 	PARAMETER_CAMERA_FOV_ANGLE                                 = 0x10000010, 
-	PARAMETER_CAMERA_ASPECT_RATIO                              = 0x10000020, 
 	PARAMETER_CAMERA_NEARZ                                     = 0x10000030, 
 	PARAMETER_CAMERA_FARZ                                      = 0x10000040, 
 	
-	PARAMETER_CONTROL_SENSITIVITY                              = 0x10001001, 
-	PARAMETER_CONTROL_MOVESPEED_X                              = 0x10001003, 
-	PARAMETER_CONTROL_MOVESPEED_Y                              = 0x10001004, 
-	PARAMETER_CONTROL_RANGE_X                                  = 0x10001005, 
-	PARAMETER_CONTROL_RANGE_Y                                  = 0x10001006, 
+	PARAMETER_FIRSTPERSON_SENSITIVITY                          = 0x10001001, 
+	PARAMETER_FIRSTPERSON_MOVESPEED_X                          = 0x10001003, 
+	PARAMETER_FIRSTPERSON_MOVESPEED_Y                          = 0x10001004, 
+	PARAMETER_FIRSTPERSON_RANGE_X                              = 0x10001005, 
+	PARAMETER_FIRSTPERSON_RANGE_Y                              = 0x10001006, 
+	PARAMETER_THIRDPERSON_SENSITIVITY                          = 0x10001007, 
+	PARAMETER_THIRDPERSON_MOVESPEED_X                          = 0x10001008, 
+	PARAMETER_THIRDPERSON_MOVESPEED_Y                          = 0x10001009, 
 	
 	PARAMETER_STATIC                                           = 0xF0000001, 
 };

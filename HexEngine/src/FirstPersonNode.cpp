@@ -1,40 +1,41 @@
 #include "..\include\HexMain.h"
 
-#ifdef _CONTROLNODE_H_
+#ifdef _FIRSTPERSONNODE_H_
 HEX_BEGIN
 
-ControlNode::ControlNode()
+FirstPersonNode::FirstPersonNode()
 {
+	this->type = COMPONENT_FIRSTPERSON;
 	this->rotation = glm::vec2(0.0f, 0.0f);
 	this->sensitivity = glm::vec2(30.0f);
 	this->moveSpeed = glm::vec2(1.0f);
 	this->rangeX = glm::vec2(-360.0f, 360.0f);
 	this->rangeY = glm::vec2(-60.0f, 60.0f);
 }
-ControlNode::~ControlNode()
+FirstPersonNode::~FirstPersonNode()
 {
 }
 		
-void ControlNode::load()
+void FirstPersonNode::load()
 {
 }
-void ControlNode::unload()
+void FirstPersonNode::unload()
 {
 }
-void ControlNode::destroy()
+void FirstPersonNode::destroy()
 {
 }
 	
-void ControlNode::onStart()
+void FirstPersonNode::onStart()
 {
 	this->rotation.x = this->root->transform->rotation.y;
 	this->rotation.y = this->root->transform->rotation.x;
 	SDL_ShowCursor(0);
 }
-void ControlNode::onFrameUpdate()
+void FirstPersonNode::onFrameUpdate()
 {
 }
-void ControlNode::onFixedUpdate()
+void FirstPersonNode::onFixedUpdate()
 {
 	glm::vec3 f;
 	glm::vec3 r;

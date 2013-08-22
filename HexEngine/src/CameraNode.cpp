@@ -5,8 +5,8 @@ HEX_BEGIN
 
 CameraNode::CameraNode()
 {
+	this->type = COMPONENT_CAMERA;
 	this->fovAngle = 45.0f;
-	this->aspectRatio = 4.0f / 3.0f;
 	this->nearZ = 0.01f;
 	this->farZ = 100.0f;
 	this->perspective = glm::mat4(1.0f);
@@ -38,10 +38,11 @@ void CameraNode::onStart()
 }
 void CameraNode::onFrameUpdate()
 {
+	float aspect = float(ScreenRect.width) / float(ScreenRect.height);
 	glm::vec3 eye = this->root->transform->position;
 	glm::vec3 focus = eye + (this->root->transform->forward);
 	this->viewSpace = glm::lookAt(eye, focus, this->root->transform->up);
-	this->perspective = glm::perspective(this->fovAngle, this->aspectRatio, this->nearZ, this->farZ);
+	this->perspective = glm::perspective(this->fovAngle, aspect, this->nearZ, this->farZ);
 }
 void CameraNode::onFixedUpdate()
 {

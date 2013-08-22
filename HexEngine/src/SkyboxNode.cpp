@@ -5,6 +5,7 @@ HEX_BEGIN
 
 SkyboxNode::SkyboxNode()
 {
+	this->type = COMPONENT_SKYBOX;
 }
 SkyboxNode::~SkyboxNode()
 {

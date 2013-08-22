@@ -72,8 +72,9 @@ skybox
 load
 translate 8.0 2.4 0
 rotate -y 90
-controller 30 3.2
 camera 45 0.01 256
+controller firstperson
+30 3.2
 
 load
 light directional 0.9
@@ -99,6 +100,6 @@ translate -y 8
 rotate -y 90
 rotate -x 15
 scale 0.5 0.5 0.5
-turntable 24
+controller turntable 24
 caster true
 static false

@@ -38,10 +38,9 @@ extern MALib::ARRAY<ShapeNode*> Shapes;
 extern MALib::ARRAY<MaterialNode*> Materials;
 extern MALib::ARRAY<CameraNode*> Cameras;
 extern MALib::ARRAY<LightNode*> Lights;
-extern MALib::ARRAY<SkyboxNode*> Skyboxes;
-extern MALib::ARRAY<ControlNode*> Controllers;
 extern LightNode* ShadowCaster;
 extern CameraNode* MainCamera;
+extern SkyboxNode* MainSkybox;
 	
 extern MALib::ARRAY<Scene*> Scenes;
 extern MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -71,30 +70,7 @@ HEX_API extern void RegisterTGA(uint* texture, const string filepath);
 HEX_API extern MALib::VERTEXBUFFER* GetMesh(uint mesh);
 HEX_API extern MALib::SURFACE* GetTexture(uint texture);
 
-HEX_API extern void GenEntities(uint size, uint* entities);
-HEX_API extern void BindEntity(uint entity);
-HEX_API extern void TransformEntity(float x, float y, float z, float rx = 0.0f, float ry = 0.0f, float rz = 0.0f);
-HEX_API extern void ParentEntity(uint parent, uint child);
-
-HEX_API extern void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ);
-HEX_API extern void AddController(float lookSensitivity, float moveSpeed);
-HEX_API extern void AddSkybox();
-HEX_API extern void AddTurnTable(float turnSpeed);
-
-HEX_API extern void AddDirectionalLight(float intensity);
-HEX_API extern void AddPointLight(float intensity);
-
-HEX_API extern void AddShape(uint mesh);
-HEX_API extern void AddMaterial(uint color, uint normal = 0, uint specular = 0);
-
 extern FILETYPE GetFiletype(const string filepath);
-
-template <typename T> extern T* GetComponent();
-
-template <> extern CameraNode*  GetComponent<>();
-template <> extern LightNode*   GetComponent<>();
-template <> extern SkyboxNode*  GetComponent<>();
-template <> extern ControlNode* GetComponent<>();
 	
 HEX_END
 #endif

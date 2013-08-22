@@ -1,13 +1,13 @@
-#ifndef _CONTROLNODE_H_
-#define _CONTROLNODE_H_
+#ifndef _THIRDPERSONNODE_H_
+#define _THIRDPERSONNODE_H_
 HEX_BEGIN
 	
-class ControlNode : public ComponentNode
+class ThirdPersonNode : public ComponentNode
 {
 public:
 
-	ControlNode();
-	~ControlNode();
+	ThirdPersonNode();
+	~ThirdPersonNode();
 		
 	void load();
 	void unload();
@@ -17,11 +17,8 @@ public:
 	void onFrameUpdate();
 	void onFixedUpdate();
 
-	glm::vec2 rotation;
 	glm::vec2 sensitivity;
 	glm::vec2 moveSpeed;
-	glm::vec2 rangeX;
-	glm::vec2 rangeY;
 };
 
 HEX_END

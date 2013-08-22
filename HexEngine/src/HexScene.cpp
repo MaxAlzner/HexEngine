@@ -28,13 +28,17 @@ HEX_BEGIN
 #define COMMAND_LIGHTNODE "light"
 #define COMMAND_CONTROLNODE "controller"
 #define COMMAND_SKYBOXNODE "skybox"
-#define COMMAND_TURNTABLENODE "turntable"
 
 #define COMMAND_PARAMETER_LIGHTMODE_DIRECTIONAL "directional"
 #define COMMAND_PARAMETER_LIGHTMODE_POINT "point"
 #define COMMAND_PARAMETER_LIGHT_INTENSITY "-intensity"
 #define COMMAND_PARAMETER_LIGHT_COLOR "-color"
 #define COMMAND_PARAMETER_LIGHT_FALLOFF "-falloff"
+#define COMMAND_PARAMETER_CONTROLLERTYPE_FIRSTPERSON "firstperson"
+#define COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON "thirdperson"
+#define COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE "turntable"
+#define COMMAND_PARAMETER_CONTROLLER_SENSITIVITY "-sensitivity"
+#define COMMAND_PARAMETER_CONTROLLER_MOVESPEED "-moveSpeed"
 	
 #define COMMAND_MESH "mesh"
 #define COMMAND_DIFFUSE "diffuse"
@@ -311,9 +315,6 @@ bool IsCommand(string str)
 	check = strstr(str, COMMAND_SKYBOXNODE);
 	if (check != 0)
 	if (check != 0) return true;
-	check = strstr(str, COMMAND_TURNTABLENODE);
-	if (check != 0)
-	if (check != 0) return true;
 	return false;
 }
 bool ParseLine(string str, Scene* scene)
@@ -517,7 +518,7 @@ bool ParseCameraCommand(string str)
 	float nearZ = 0.0f;
 	float farZ = 0.0f;
 	if (!ParseVector(str, &fovAngle, &nearZ, &farZ)) return false;
-	AddCamera(fovAngle, 4.0f / 3.0f, nearZ * UnitSize, farZ * UnitSize);
+	AddCamera(fovAngle, nearZ * UnitSize, farZ * UnitSize);
 
 	return true;
 }
@@ -580,11 +581,46 @@ bool ParseLightCommand(string str)
 bool ParseControllerCommand(string str)
 {
 	if (str == 0 || BoundEntity == 0) return false;
+
+	static char type[256];
+	memset(type, 0, sizeof(char) * 256);
+	sscanf(str, "%s", type);
 	
-	float sensitivity = 0.0f;
-	float moveSpeed = 0.0f;
-	if (!ParseVector(str, &sensitivity, &moveSpeed)) return false;
-	AddController(sensitivity, moveSpeed * UnitSize);
+	if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_FIRSTPERSON) == 0)
+	{
+		str += strlen(COMMAND_PARAMETER_CONTROLLERTYPE_FIRSTPERSON) + 1;
+
+		float sensitivity = 0.0f;
+		float moveSpeed = 0.0f;
+		if (!ParseVector(str, &sensitivity, &moveSpeed)) return false;
+		FirstPersonNode* controller = AddComponent<FirstPersonNode>();
+		controller->sensitivity.x = sensitivity;
+		controller->sensitivity.y = sensitivity;
+		controller->moveSpeed.x = moveSpeed;
+		controller->moveSpeed.y = moveSpeed;
+	}
+	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON) == 0)
+	{
+		str += strlen(COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON) + 1;
+		
+		float sensitivity = 0.0f;
+		float moveSpeed = 0.0f;
+		if (!ParseVector(str, &sensitivity, &moveSpeed)) return false;
+		ThirdPersonNode* controller = AddComponent<ThirdPersonNode>();
+		controller->sensitivity.x = sensitivity;
+		controller->sensitivity.y = sensitivity;
+		controller->moveSpeed.x = moveSpeed;
+		controller->moveSpeed.y = moveSpeed;
+	}
+	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE) == 0)
+	{
+		str += strlen(COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE) + 1;
+		
+		float turnSpeed = 0.0f;
+		if (!ParseValue(str, &turnSpeed)) return false;
+		TurnTableNode* controller = AddComponent<TurnTableNode>();
+		controller->turnSpeed = turnSpeed;
+	}
 
 	return true;
 }
@@ -592,7 +628,7 @@ bool ParseSkyboxCommand(string str)
 {
 	if (str == 0 || BoundEntity == 0) return false;
 	
-	AddSkybox();
+	SkyboxNode* skybox = AddComponent<SkyboxNode>();
 
 	return true;
 }
@@ -809,16 +845,6 @@ bool ParseCommand(string str)
 	{
 		check += strlen(COMMAND_SKYBOXNODE) + 1;
 		return ParseSkyboxCommand(check);
-	}
-	check = 0;
-	check = strstr(str, COMMAND_TURNTABLENODE);
-	if (check != 0)
-	{
-		check += strlen(COMMAND_TURNTABLENODE) + 1;
-		float v = 0.0f;
-		if (!ParseValue(check, &v)) return false;
-		AddTurnTable(v);
-		return true;
 	}
 	return false;
 }

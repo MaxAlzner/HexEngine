@@ -13,6 +13,8 @@ HEX_BEGIN
 
 MaterialNode::MaterialNode()
 {
+	this->type = COMPONENT_MATERIAL;
+
 	this->colorTexture = 0;
 	this->normalTexture = 0;
 	this->specularTexture = 0;

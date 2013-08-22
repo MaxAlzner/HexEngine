@@ -5,7 +5,10 @@
 
 #define HEX_BEGIN namespace HEX\
 	{\
-		class HexEntity;
+		class HexEntity;\
+		HEX_API enum PARAMETER;\
+		HEX_API enum COMPONENT;\
+		HEX_API enum UNIFORM;
 #define HEX_END }
 
 #endif

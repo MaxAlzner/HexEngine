@@ -5,6 +5,8 @@ HEX_BEGIN
 
 ShapeNode::ShapeNode()
 {
+	this->type = COMPONENT_SHAPE;
+
 	this->mesh = 0;
 	this->vao = 0;
 	this->buffer = 0;

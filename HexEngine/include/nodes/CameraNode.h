@@ -18,7 +18,6 @@ public:
 	void onFixedUpdate();
 
 	float fovAngle;
-	float aspectRatio;
 	float nearZ;
 	float farZ;
 

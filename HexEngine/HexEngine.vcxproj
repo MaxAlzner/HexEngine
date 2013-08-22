@@ -94,6 +94,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\HexNode.h" />
     <ClInclude Include="include\core\HexCore.h" />
     <ClInclude Include="include\core\HexData.h" />
     <ClInclude Include="include\core\HexDef.h" />
@@ -109,12 +110,13 @@
     <ClInclude Include="include\core\HexShader.h" />
     <ClInclude Include="include\nodes\CameraNode.h" />
     <ClInclude Include="include\nodes\ComponentNode.h" />
-    <ClInclude Include="include\nodes\ControlNode.h" />
+    <ClInclude Include="include\nodes\FirstPersonNode.h" />
     <ClInclude Include="include\nodes\LightNode.h" />
     <ClInclude Include="include\nodes\MaterialNode.h" />
     <ClInclude Include="include\nodes\NodeBase.h" />
     <ClInclude Include="include\nodes\ShapeNode.h" />
     <ClInclude Include="include\nodes\SkyboxNode.h" />
+    <ClInclude Include="include\nodes\ThirdPersonNode.h" />
     <ClInclude Include="include\nodes\TransformNode.h" />
     <ClInclude Include="include\nodes\TurnTableNode.h" />
     <ClInclude Include="libraries\glm\core\func_common.hpp" />
@@ -242,13 +244,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CameraNode.cpp" />
-    <ClCompile Include="src\ControlNode.cpp" />
+    <ClCompile Include="src\FirstPersonNode.cpp" />
     <ClCompile Include="src\HexCore.cpp" />
     <ClCompile Include="src\HexData.cpp" />
     <ClCompile Include="src\HexDraw.cpp" />
     <ClCompile Include="src\HexEntity.cpp" />
     <ClCompile Include="src\HexInput.cpp" />
     <ClCompile Include="src\HexMain.cpp" />
+    <ClCompile Include="src\HexNode.cpp" />
     <ClCompile Include="src\HexParameter.cpp" />
     <ClCompile Include="src\HexPref.cpp" />
     <ClCompile Include="src\HexRender.cpp" />
@@ -259,6 +262,7 @@
     <ClCompile Include="src\NodeBase.cpp" />
     <ClCompile Include="src\ShapeNode.cpp" />
     <ClCompile Include="src\SkyboxNode.cpp" />
+    <ClCompile Include="src\ThirdPersonNode.cpp" />
     <ClCompile Include="src\TransformNode.cpp" />
     <ClCompile Include="src\TurnTableNode.cpp" />
   </ItemGroup>

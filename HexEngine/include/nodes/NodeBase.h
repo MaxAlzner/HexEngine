@@ -12,6 +12,7 @@ public:
 
 	virtual void parentTo(HexEntity* obj);
 
+	COMPONENT type;
 	HexEntity* root;
 };
 

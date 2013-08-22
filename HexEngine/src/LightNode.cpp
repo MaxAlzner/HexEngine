@@ -5,6 +5,7 @@ HEX_BEGIN
 
 LightNode::LightNode()
 {
+	this->type = COMPONENT_LIGHT;
 	this->mode = LIGHTMODE_NONE;
 	this->intensity = 1.0f;
 	this->color = MALib::COLOR();

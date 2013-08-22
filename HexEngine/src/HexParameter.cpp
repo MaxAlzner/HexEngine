@@ -19,7 +19,8 @@ HEX_API void ChangeParameter(PARAMETER parameter, float value)
 	
 	LightNode* light = 0;
 	CameraNode* camera = 0;
-	ControlNode* control = 0;
+	FirstPersonNode* firstPerson = 0;
+	ThirdPersonNode* thirdPerson = 0;
 	switch (parameter)
 	{
 	case PARAMETER_TRANSFORM_TRANSLATE_X:
@@ -120,10 +121,6 @@ HEX_API void ChangeParameter(PARAMETER parameter, float value)
 		GET_CAMERANODE;
 		camera->fovAngle = value;
 		break;
-	case PARAMETER_CAMERA_ASPECT_RATIO:
-		GET_CAMERANODE;
-		camera->aspectRatio = value;
-		break;
 	case PARAMETER_CAMERA_NEARZ:
 		GET_CAMERANODE;
 		camera->nearZ = value;
@@ -133,28 +130,49 @@ HEX_API void ChangeParameter(PARAMETER parameter, float value)
 		camera->farZ = value;
 		break;
 		
-	case PARAMETER_CONTROL_SENSITIVITY:
-		GET_CONTROLNODE;
-		control->sensitivity.x = value;
-		control->sensitivity.y = value;
+	case PARAMETER_FIRSTPERSON_SENSITIVITY:
+		firstPerson = GetComponent<FirstPersonNode>();
+		if (firstPerson == 0) break;
+		firstPerson->sensitivity.x = value;
+		firstPerson->sensitivity.y = value;
 		break;
-	case PARAMETER_CONTROL_MOVESPEED_X:
-		GET_CONTROLNODE;
-		control->moveSpeed.x = value;
+	case PARAMETER_FIRSTPERSON_MOVESPEED_X:
+		firstPerson = GetComponent<FirstPersonNode>();
+		if (firstPerson == 0) break;
+		firstPerson->moveSpeed.x = value;
 		break;
-	case PARAMETER_CONTROL_MOVESPEED_Y:
-		GET_CONTROLNODE;
-		control->moveSpeed.y = value;
+	case PARAMETER_FIRSTPERSON_MOVESPEED_Y:
+		firstPerson = GetComponent<FirstPersonNode>();
+		if (firstPerson == 0) break;
+		firstPerson->moveSpeed.y = value;
 		break;
-	case PARAMETER_CONTROL_RANGE_X:
-		GET_CONTROLNODE;
-		control->rangeX.x = -value;
-		control->rangeX.y = value;
+	case PARAMETER_FIRSTPERSON_RANGE_X:
+		firstPerson = GetComponent<FirstPersonNode>();
+		if (firstPerson == 0) break;
+		firstPerson->rangeX.x = -value;
+		firstPerson->rangeX.y = value;
 		break;
-	case PARAMETER_CONTROL_RANGE_Y:
-		GET_CONTROLNODE;
-		control->rangeY.x = -value;
-		control->rangeY.y = value;
+	case PARAMETER_FIRSTPERSON_RANGE_Y:
+		firstPerson = GetComponent<FirstPersonNode>();
+		if (firstPerson == 0) break;
+		firstPerson->rangeY.x = -value;
+		firstPerson->rangeY.y = value;
+		break;
+	case PARAMETER_THIRDPERSON_SENSITIVITY:
+		thirdPerson = GetComponent<ThirdPersonNode>();
+		if (thirdPerson == 0) break;
+		thirdPerson->sensitivity.x = value;
+		thirdPerson->sensitivity.y = value;
+		break;
+	case PARAMETER_THIRDPERSON_MOVESPEED_X:
+		thirdPerson = GetComponent<ThirdPersonNode>();
+		if (thirdPerson == 0) break;
+		thirdPerson->moveSpeed.x = value;
+		break;
+	case PARAMETER_THIRDPERSON_MOVESPEED_Y:
+		thirdPerson = GetComponent<ThirdPersonNode>();
+		if (thirdPerson == 0) break;
+		thirdPerson->moveSpeed.y = value;
 		break;
 
 	default:

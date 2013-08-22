@@ -5,6 +5,7 @@ HEX_BEGIN
 
 TurnTableNode::TurnTableNode()
 {
+	this->type = COMPONENT_TURNTABLE;
 	this->turnSpeed = 0.0f;
 }
 TurnTableNode::~TurnTableNode()

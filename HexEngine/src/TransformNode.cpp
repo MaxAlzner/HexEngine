@@ -5,6 +5,7 @@ HEX_BEGIN
 
 TransformNode::TransformNode()
 {
+	this->type = COMPONENT_TRANSFORM;
 	this->zero();
 }
 TransformNode::~TransformNode()

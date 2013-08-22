@@ -27,10 +27,9 @@ MALib::ARRAY<ShapeNode*> Shapes;
 MALib::ARRAY<MaterialNode*> Materials;
 MALib::ARRAY<CameraNode*> Cameras;
 MALib::ARRAY<LightNode*> Lights;
-MALib::ARRAY<SkyboxNode*> Skyboxes;
-MALib::ARRAY<ControlNode*> Controllers;
 LightNode* ShadowCaster = NULL;
 CameraNode* MainCamera = NULL;
+SkyboxNode* MainSkybox = NULL;
 	
 MALib::ARRAY<Scene*> Scenes;
 MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
@@ -54,8 +53,6 @@ HEX_API void InitializeData()
 	Materials.resize(32);
 	Cameras.resize(8);
 	Lights.resize(8);
-	Skyboxes.resize(8);
-	Controllers.resize(8);
 
 	Scenes.resize(8);
 	Meshes.resize(24);
@@ -82,8 +79,6 @@ HEX_API void UninitializeData()
 	Materials.clear();
 	Cameras.clear();
 	Lights.clear();
-	Skyboxes.clear();
-	Controllers.clear();
 
 	Scenes.clear();
 	Meshes.clear();
@@ -112,8 +107,6 @@ HEX_API void ClearGame()
 	Materials.zero();
 	Cameras.zero();
 	Lights.zero();
-	Skyboxes.zero();
-	Controllers.zero();
 
 	Scenes.zero();
 	Meshes.zero();
@@ -203,126 +196,6 @@ HEX_API MALib::SURFACE* GetTexture(uint texture)
 	return Textures[texture - 1];
 }
 
-HEX_API void GenEntities(uint size, uint* entities)
-{
-	for (uint i = 0; i < size; i++)
-	{
-		HexEntity* entity = new HexEntity;
-		Entities.add(entity);
-		TransformNode* node = new TransformNode;
-		entity->setTransform(node);
-		Nodes.add(node);
-		uint n = Entities.length();
-		entities[i] = n;
-	}
-}
-HEX_API void BindEntity(uint entity)
-{
-	if (entity == 0 || entity > Entities.length()) return;
-	BoundEntity = Entities[entity - 1];
-}
-HEX_API void TransformEntity(float x, float y, float z, float rx, float ry, float rz)
-{
-	if (BoundEntity == NULL) return;
-	BoundEntity->transform->translate(x, y, z);
-	BoundEntity->transform->rotate(rx, ry, rz);
-}
-HEX_API void ParentEntity(uint parent, uint child)
-{
-	if (parent == 0 || child == 0) return;
-	HexEntity* p = Entities[parent - 1];
-	HexEntity* c = Entities[child - 1];
-	c->parentTo(p);
-}
-
-HEX_API void AddCamera(float fovAngle, float aspectRatio, float nearZ, float farZ)
-{
-	if (BoundEntity == NULL) return;
-	CameraNode* node = new CameraNode;
-	node->fovAngle = fovAngle;
-	node->aspectRatio = aspectRatio;
-	node->nearZ = nearZ;
-	node->farZ = farZ;
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-	Cameras.add(node);
-	MainCamera = node;
-}
-HEX_API void AddController(float lookSensitivity, float moveSpeed)
-{
-	if (BoundEntity == NULL) return;
-	ControlNode* node = new ControlNode;
-	node->sensitivity = glm::vec2(lookSensitivity);
-	node->moveSpeed = glm::vec2(moveSpeed);
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-	Controllers.add(node);
-}
-HEX_API void AddSkybox()
-{
-	if (BoundEntity == NULL) return;
-
-	SkyboxNode* node = new SkyboxNode;
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-	Renderable.remove(BoundEntity);
-	Skyboxes.add(node);
-}
-HEX_API void AddTurnTable(float turnSpeed)
-{
-	if (BoundEntity == NULL) return;
-	TurnTableNode* node = new TurnTableNode;
-	node->turnSpeed = turnSpeed;
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-}
-
-HEX_API void AddDirectionalLight(float intensity)
-{
-	if (BoundEntity == NULL) return;
-	LightNode* node = new LightNode;
-	node->mode = LIGHTMODE_DIRECTIONAL;
-	node->intensity = intensity;
-	node->color.a = intensity;
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-	Lights.add(node);
-}
-HEX_API void AddPointLight(float intensity)
-{
-	if (BoundEntity == NULL) return;
-	LightNode* node = new LightNode;
-	node->mode = LIGHTMODE_POINT;
-	node->intensity = intensity;
-	node->color.a = intensity;
-	BoundEntity->addComponent(node);
-	Nodes.add(node);
-	Lights.add(node);
-}
-
-HEX_API void AddShape(uint mesh)
-{
-	if (BoundEntity == NULL || mesh == 0) return;
-	ShapeNode* node = new ShapeNode;
-	node->setMesh(mesh);
-	BoundEntity->setShape(node);
-	Nodes.add(node);
-	Shapes.add(node);
-	Renderable.add(BoundEntity);
-}
-HEX_API void AddMaterial(uint colorMap, uint normalMap, uint specularMap)
-{
-	if (BoundEntity == NULL) return;
-	if (colorMap == 0) return;
-	MaterialNode* node = new MaterialNode;
-	node->setColorMap(colorMap);
-	node->setNormalMap(normalMap);
-	node->setSpecularMap(specularMap);
-	BoundEntity->setMaterial(node);
-	Nodes.add(node);
-	Materials.add(node);
-}
-
 FILETYPE GetFiletype(const string filepath)
 {
 	if (filepath == 0) return FILETYPE_NONE;
@@ -340,60 +213,6 @@ FILETYPE GetFiletype(const string filepath)
 		if (filepath[l - 5] == 's' && filepath[l - 4] == 'c' && filepath[l - 3] == 'e' && filepath[l - 2] == 'n' && filepath[l - 1] == 'e') return FILETYPE_SCENE;
 	}
 	return FILETYPE_NONE;
-}
-
-template <typename T> T* GetComponent()
-{
-	return 0;
-}
-
-template <> CameraNode* GetComponent<>()
-{
-	if (BoundEntity == 0) return 0;
-	HexEntity* entity = BoundEntity;
-	for (uint i = 0; i < Cameras.length(); i++)
-	{
-		CameraNode* node = Cameras[i];
-		if (node == 0) continue;
-		if (node->root == entity) return node;
-	}
-	return 0;
-}
-template <> LightNode* GetComponent<>()
-{
-	if (BoundEntity == 0) return 0;
-	HexEntity* entity = BoundEntity;
-	for (uint i = 0; i < Lights.length(); i++)
-	{
-		LightNode* node = Lights[i];
-		if (node == 0) continue;
-		if (node->root == entity) return node;
-	}
-	return 0;
-}
-template <> SkyboxNode* GetComponent<>()
-{
-	if (BoundEntity == 0) return 0;
-	HexEntity* entity = BoundEntity;
-	for (uint i = 0; i < Skyboxes.length(); i++)
-	{
-		SkyboxNode* node = Skyboxes[i];
-		if (node == 0) continue;
-		if (node->root == entity) return node;
-	}
-	return 0;
-}
-template <> ControlNode* GetComponent<>()
-{
-	if (BoundEntity == 0) return 0;
-	HexEntity* entity = BoundEntity;
-	for (uint i = 0; i < Controllers.length(); i++)
-	{
-		ControlNode* node = Controllers[i];
-		if (node == 0) continue;
-		if (node->root == entity) return node;
-	}
-	return 0;
 }
 
 HEX_END
