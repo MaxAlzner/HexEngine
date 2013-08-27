@@ -117,6 +117,7 @@ template <> SkyboxNode* AddComponent<>()
 	SkyboxNode* node = new SkyboxNode;
 	BoundEntity->addComponent(node);
 	Nodes.add(node);
+	Renderable.remove(BoundEntity);
 	MainSkybox = node;
 	return node;
 }

@@ -73,6 +73,8 @@ HEX_API bool InitializeDraw()
 
 	MALib::LOG_Message("START FRAMEBUFFERS");
 	InitializePostProcess();
+	MALib::LOG_Message("START GUI");
+	InitializeGUI();
 	
 	MainRender.build(RenderRect.width, RenderRect.height, true, true);
 	MainRender.setClearColor(0.3f, 0.3f, 0.3f);
@@ -106,13 +108,22 @@ HEX_API bool UninitializeDraw()
 	AmbientOcclusionBilateral.destroy();
 	LeftEye.destroy();
 	RightEye.destroy();
-
+	
+	UninitializeUniforms();
+	UninitializeAttributes();
+	UninitializePostProcess();
+	UninitializeGUI();
+	SDL_Quit();
 	return true;
 }
 
 HEX_API bool StartDrawing()
 {
-	if (Shapes.length() < 1 || Materials.length() < 1) return false;
+	if (Shapes.length() < 1 || Materials.length() < 1)
+	{
+		MALib::LOG_Message("COULD NOT FIND ANY MATERIALS OR SHAPES");
+		return false;
+	}
 
 	MALib::LOG_Message("START BUILDING SHAPES");
 	MALib::LOG_Out1i("NUM OF SHAPES", Shapes.length());
@@ -147,8 +158,11 @@ void RenderShadowMap()
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
 
 	ShadowCaster->load();
+#if 1
 	if (EnableShadow) for (unsigned i = 0; i < Casters.length(); i++) Casters[i]->render();
-	//for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+#else
+	if (EnableShadow) for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
+#endif
 	ShadowCaster->unload();
 }
 void RenderLuminance()
@@ -216,8 +230,11 @@ void RenderAmbientOcclusion()
 		AmbientOcclusionBilateral.unload();
 		return;
 	}
+	ResetUniforms();
+
 	AmbientOcclusion.load();
 	
+	SetUniform(UNIFORM_FILTER_RADIUS, AOFilterRadius);
 	SetTextureSlot(UNIFORM_TEXTURE_DEPTH_MAP, MainRender.depthMap);
 	//SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_POSITIONS, DeferredPositions.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_DEFERRED_NORMALS, DeferredNormals.colorMap);
@@ -238,16 +255,19 @@ void FinalRender()
 {
 #if 1
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
-#if 1
 	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
-#else
-	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusion.colorMap);
-#endif
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
 #else
 	MainRender.blit();
 #endif
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, ShadowCaster->framebuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, ShadowRect.width, ShadowRect.height, 0, 0, 240, 240, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	DrawGUI();
 }
 
 HEX_END

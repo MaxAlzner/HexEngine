@@ -37,8 +37,8 @@ void main()
 {
 	if (flag > 10)
 	{
-		tex_coord = vertex.xy;
-		gl_Position = vec4((vertex.xy * 2.) - 1., 0., 1.);
+		tex_coord = (vertex.xy * uv_repeat) + uv_offset;
+		gl_Position = vec4((tex_coord * 2.) - 1., 0., 1.);
 		return;
 	}
 	

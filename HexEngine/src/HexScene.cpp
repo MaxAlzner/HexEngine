@@ -10,7 +10,9 @@ HEX_BEGIN
 #define COMMAND_SCALE "scale"
 #define COMMAND_STATIC "static"
 #define COMMAND_OVERLAY "overlay"
-#define COMMAND_SPECULAR "specular"
+#define COMMAND_HIGHLIGHT "highlight"
+#define COMMAND_ROUGHNESS "roughness"
+#define COMMAND_REF_INDEX "refindex"
 #define COMMAND_UVREPEAT "uvrepeat"
 #define COMMAND_UVOFFSET "uvoffset"
 #define COMMAND_CASTER "caster"
@@ -38,7 +40,7 @@ HEX_BEGIN
 #define COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON "thirdperson"
 #define COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE "turntable"
 #define COMMAND_PARAMETER_CONTROLLER_SENSITIVITY "-sensitivity"
-#define COMMAND_PARAMETER_CONTROLLER_MOVESPEED "-moveSpeed"
+#define COMMAND_PARAMETER_CONTROLLER_MOVESPEED "-movespeed"
 	
 #define COMMAND_MESH "mesh"
 #define COMMAND_DIFFUSE "diffuse"
@@ -285,7 +287,15 @@ bool IsCommand(string str)
 	if (check != 0)
 	if (check != 0) return true;
 	check = 0;
-	check = strstr(str, COMMAND_SPECULAR);
+	check = strstr(str, COMMAND_HIGHLIGHT);
+	if (check != 0)
+	if (check != 0) return true;
+	check = 0;
+	check = strstr(str, COMMAND_ROUGHNESS);
+	if (check != 0)
+	if (check != 0) return true;
+	check = 0;
+	check = strstr(str, COMMAND_REF_INDEX);
 	if (check != 0)
 	if (check != 0) return true;
 	check = 0;
@@ -782,15 +792,35 @@ bool ParseCommand(string str)
 		return true;
 	}
 	check = 0;
-	check = strstr(str, COMMAND_SPECULAR);
+	check = strstr(str, COMMAND_ROUGHNESS);
 	if (check != 0)
 	{
-		check += strlen(COMMAND_SPECULAR) + 1;
+		check += strlen(COMMAND_ROUGHNESS) + 1;
+		float v = 0.0f;
+		if (!ParseValue(check, &v)) return false;
+		BoundEntity->material->setRoughness(v);
+		return true;
+	}
+	check = 0;
+	check = strstr(str, COMMAND_REF_INDEX);
+	if (check != 0)
+	{
+		check += strlen(COMMAND_REF_INDEX) + 1;
+		float v = 0.0f;
+		if (!ParseValue(check, &v)) return false;
+		BoundEntity->material->setRefractionIndex(v);
+		return true;
+	}
+	check = 0;
+	check = strstr(str, COMMAND_HIGHLIGHT);
+	if (check != 0)
+	{
+		check += strlen(COMMAND_HIGHLIGHT) + 1;
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
 		if (!ParseColor(check, &x, &y, &z)) return false;
-		BoundEntity->material->setSpecular(x, y, z);
+		BoundEntity->material->setHighlight(x, y, z);
 		return true;
 	}
 	check = 0;

@@ -76,8 +76,8 @@ void LightNode::onStart()
 		glGenTextures(1, &this->shadowMap);
 		glBindTexture(GL_TEXTURE_2D, this->shadowMap);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
 #if 0
@@ -123,7 +123,7 @@ void LightNode::onFrameUpdate()
 {
 	if (MainCamera == NULL) return;
 	glm::vec3 eye = this->root->transform->position + (this->root->transform->forward * -8.0f);
-	glm::vec3 focus = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 focus = this->root->transform->position;
 
 	this->lightSpace = glm::lookAt(eye, focus, glm::vec3(0.0f, 1.0f, 0.0f));
 

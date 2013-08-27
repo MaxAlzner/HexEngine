@@ -33,16 +33,6 @@ bool ToggleBlitShadow = false;
 
 SDL_mutex* Lock = 0;
 
-int EventThread(void* data)
-{
-	while (AppRunning)
-	{
-		PollEvents();
-	
-		PollControllers();
-	}
-	return 0;
-}
 int FixedUpdateThread(void* data)
 {
 	Uint32 LastPing = ~0;
@@ -125,7 +115,6 @@ HEX_API void OnFrameDraw()
 	if (ToggleBlitLuminance) Luminance.blit();
 	if (ToggleBlitAmbientOcclusion) AmbientOcclusionBilateral.blit();
 	if (ToggleBlitDeferredNormals) DeferredNormals.blit();
-	//if (ToggleBlitShadow) ShadowMap.blit();
 
 	Cameras[0]->unload();
 
@@ -210,6 +199,7 @@ HEX_API bool Initialize(uint argc, string* argv)
 	InitializeInput();
 	MALib::LOG_Message("START DATA");
 	InitializeData();
+
 	MALib::LOG_Message("START PREFERENCES");
 	if (!InitializePreferences()) 
 		return false;
@@ -225,15 +215,13 @@ HEX_API bool Initialize(uint argc, string* argv)
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;
 }
-HEX_API bool Unitialize()
+HEX_API bool Uninitialize()
 {
-	UninitializeLoadOrder();
 	UninitializeDraw();
-	UninitializePostProcess();
+	UninitializeLoadOrder();
+	UninitializePreferences();
 	UninitializeData();
 	UninitializeInput();
-	UninitializePreferences();
-	SDL_Quit();
 	MALib::LOG_Unitialize();
 	return true;
 }

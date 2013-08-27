@@ -9,7 +9,7 @@ HEX_API extern void OnFixedUpdate();
 
 HEX_API extern bool Reshape(uint width, uint height);
 HEX_API extern bool Initialize(uint argc, string* argv);
-HEX_API extern bool Unitialize();
+HEX_API extern bool Uninitialize();
 
 HEX_END
 #endif

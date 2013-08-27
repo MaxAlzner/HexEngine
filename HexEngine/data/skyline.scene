@@ -5,6 +5,9 @@ prefab Catwalk
 	diffuse "data/EV_Catwalk_D.tga"
 	normal "data/EV_Catwalk_N.tga"
 	specular "data/EV_Catwalk_S.tga"
+
+	roughness 0.6
+	refindex 1.2
 	
 	static true
 }
@@ -15,6 +18,9 @@ prefab LandingStraight
 	normal "data/EV_Landing_Straight_N.tga"
 	specular "data/EV_Landing_Straight_S.tga"
 	
+	roughness 0.25
+	refindex 1.2
+
 	static true
 }
 prefab BasePlatform
@@ -23,6 +29,10 @@ prefab BasePlatform
 	diffuse "data/EV_Platform_D.tga"
 	normal "data/EV_Platform_N.tga"
 	specular "data/EV_Platform_S.tga"
+
+	highlight 0.8 1 0.1
+	roughness 0.25
+	refindex 0.1
 	
 	static true
 }
@@ -32,6 +42,10 @@ prefab Stairs
 	diffuse "data/EV_Stairs_D.tga"
 	normal "data/EV_Stairs_N.tga"
 	specular "data/EV_Stairs_S.tga"
+
+	highlight 0.8 1 0.1
+	roughness 0.25
+	refindex 1.2
 	
 	static true
 }
@@ -70,7 +84,7 @@ diffuse "data/NightSkyBox.bmp"
 skybox
 
 load
-translate 8.0 2.4 0
+translate 8 3.2 0
 rotate -y 90
 camera 45 0.01 256
 controller firstperson
@@ -79,19 +93,18 @@ controller firstperson
 load
 light directional 0.9
 translate -y 8
-translate -x 0
 rotate -80 60 0
 
 load
+translate 0 3.2 4
 light point 1.0
 light -color 1.0 0.1 0.4
 light -falloff 1.2 0.25 0.01
-translate 0 2 4
 load
+translate 0 3.2 -4
 light point 1.0
 light -color 0.0 1.0 0.2
 light -falloff 0.7 0.25 0.01
-translate 0 2 -4
 
 load Platform
 

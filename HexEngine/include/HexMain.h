@@ -46,6 +46,7 @@
 #include "core\HexShader.h"
 #include "core\HexParameter.h"
 #include "core\HexRender.h"
+#include "core\HexGUI.h"
 #include "core\HexDraw.h"
 #include "core\HexData.h"
 

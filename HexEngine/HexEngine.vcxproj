@@ -94,6 +94,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\HexGUI.h" />
     <ClInclude Include="include\core\HexNode.h" />
     <ClInclude Include="include\core\HexCore.h" />
     <ClInclude Include="include\core\HexData.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="src\HexData.cpp" />
     <ClCompile Include="src\HexDraw.cpp" />
     <ClCompile Include="src\HexEntity.cpp" />
+    <ClCompile Include="src\HexGUI.cpp" />
     <ClCompile Include="src\HexInput.cpp" />
     <ClCompile Include="src\HexMain.cpp" />
     <ClCompile Include="src\HexNode.cpp" />

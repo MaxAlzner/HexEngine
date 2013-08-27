@@ -59,7 +59,7 @@ void HexRender::build(uint width, uint height, bool attachColor, bool attachDept
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
 	}
 
-#if 1
+#if 0
 	if (!attachColor)
 	{
 		glDrawBuffer(GL_NONE);
@@ -125,9 +125,6 @@ void HexRender::blit(HexRender* dest)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-uint ScreenVAO = 0;
-uint ScreenBuffer = 0;
-
 void InitializePostProcess()
 {
 	static float ScreenPlane[24] = 
@@ -159,7 +156,6 @@ void UninitializePostProcess()
 
 void PostProcess(UNIFORM flag)
 {
-	//glViewport(0, 0, ScreenRect.width, ScreenRect.height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	SetUniform(flag);
 

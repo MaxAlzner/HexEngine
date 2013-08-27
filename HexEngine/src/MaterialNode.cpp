@@ -22,8 +22,8 @@ MaterialNode::MaterialNode()
 	this->normalMap = 0;
 	this->specularMap = 0;
 
-	this->overlay = MALib::COLOR();
-	this->specular = MALib::COLOR();
+	this->overlay = MALib::COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	this->highlight = MALib::COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	this->roughness = 0.8f;
 	this->refIndex = 1.4f;
 	this->uvRepeat = MALib::VEC2(1.0f, 1.0f);
@@ -37,11 +37,15 @@ MaterialNode::~MaterialNode()
 		
 void MaterialNode::load()
 {
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, this->colorMap);
-	SetTextureSlot(UNIFORM_TEXTURE_NORMAL_MAP, this->normalMap);
-	SetTextureSlot(UNIFORM_TEXTURE_SPECULAR_MAP, this->specularMap);
+	if (this->colorMap != 0) SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, this->colorMap);
+	if (this->normalMap != 0) SetTextureSlot(UNIFORM_TEXTURE_NORMAL_MAP, this->normalMap);
+	if (this->specularMap != 0) SetTextureSlot(UNIFORM_TEXTURE_SPECULAR_MAP, this->specularMap);
 	SetUniform(UNIFORM_UV_REPEAT, &this->uvRepeat);
 	SetUniform(UNIFORM_UV_OFFSET, &this->uvOffset);
+	SetUniform(UNIFORM_OVERLAY_COLOR, &this->overlay);
+	SetUniform(UNIFORM_HIGHLIGHT_COLOR, &this->highlight);
+	SetUniform(UNIFORM_ROUGHNESS, this->roughness);
+	SetUniform(UNIFORM_REFRACTION_INDEX, this->refIndex);
 }
 void MaterialNode::unload()
 {
@@ -60,9 +64,9 @@ void MaterialNode::build()
 }
 void MaterialNode::destroy()
 {
-	glDeleteTextures(1, &this->colorMap);
-	glDeleteTextures(1, &this->normalMap);
-	glDeleteTextures(1, &this->specularMap);
+	if (this->colorMap != 0) glDeleteTextures(1, &this->colorMap);
+	if (this->normalMap != 0) glDeleteTextures(1, &this->normalMap);
+	if (this->specularMap != 0) glDeleteTextures(1, &this->specularMap);
 	this->built = false;
 }
 
@@ -85,11 +89,11 @@ void MaterialNode::setOverlay(float r, float g, float b)
 	this->overlay.g = g;
 	this->overlay.b = b;
 }
-void MaterialNode::setSpecular(float r, float g, float b)
+void MaterialNode::setHighlight(float r, float g, float b)
 {
-	this->specular.r = r;
-	this->specular.g = g;
-	this->specular.b = b;
+	this->highlight.r = r;
+	this->highlight.g = g;
+	this->highlight.b = b;
 }
 void MaterialNode::setRoughness(float v)
 {

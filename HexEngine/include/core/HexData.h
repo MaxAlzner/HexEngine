@@ -1,18 +1,6 @@
 #ifndef _HEX_DATA_H_
 #define _HEX_DATA_H_
 HEX_BEGIN
-	
-HEX_API typedef enum FILETYPE
-{
-	FILETYPE_NONE              = 0x00000000, 
-
-	FILETYPE_OBJ               = 0x00000011, 
-	FILETYPE_VMP               = 0x00000012, 
-	FILETYPE_BMP               = 0x00000101, 
-	FILETYPE_TGA               = 0x00000102, 
-	
-	FILETYPE_SCENE             = 0x00001001, 
-};
 
 extern bool AppRunning;
 extern bool Paused;
@@ -43,6 +31,7 @@ extern CameraNode* MainCamera;
 extern SkyboxNode* MainSkybox;
 	
 extern MALib::ARRAY<Scene*> Scenes;
+extern MALib::ARRAY<GUI*> ActiveGUI;
 extern MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
 extern MALib::ARRAY<MALib::SURFACE*> Textures;
 extern MALib::ARRAY<HexEntity*> Entities;
@@ -53,6 +42,18 @@ extern MALib::TEXTFILE* VertexShader;
 extern MALib::TEXTFILE* FragmentShader;
 extern string VertexShaderSource;
 extern string FragmentShaderSource;
+
+extern UNIFORM LastFlag;
+extern UNIFORM CurrentFlag;
+
+extern MALib::ARRAY<int> Attributes;
+extern uint NumOfUniforms;
+extern uint ShaderProgram;
+
+extern uint ScreenVAO;
+extern uint ScreenBuffer;
+extern uint GUIVAO;
+extern uint GUIBuffer;
 
 HEX_API extern void InitializeData();
 HEX_API extern void UninitializeData();

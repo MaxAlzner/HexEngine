@@ -11,9 +11,9 @@ bool EnableAmbientOcclusion = false;
 float DeltaTime = 0.0f;
 float AspectRatio = 4.0f / 3.0f;
 float Gamma = 2.2f;
-float AOFilterRadius = 6.4f;
+float AOFilterRadius = 24.0f;
 float EyeBridgeWidth = 8.0f;
-uint RandomFilterSize = 36;
+uint RandomFilterSize = 64;
 uint MaxPointLights = 4;
 MALib::RECT RenderRect(1280, 720);
 MALib::RECT ScreenRect(1280, 720);
@@ -32,6 +32,7 @@ CameraNode* MainCamera = NULL;
 SkyboxNode* MainSkybox = NULL;
 	
 MALib::ARRAY<Scene*> Scenes;
+MALib::ARRAY<GUI*> ActiveGUI;
 MALib::ARRAY<MALib::VERTEXBUFFER*> Meshes;
 MALib::ARRAY<MALib::SURFACE*> Textures;
 MALib::ARRAY<HexEntity*> Entities;
@@ -42,6 +43,18 @@ MALib::TEXTFILE* VertexShader = NULL;
 MALib::TEXTFILE* FragmentShader = NULL;
 string VertexShaderSource = NULL;
 string FragmentShaderSource = NULL;
+
+UNIFORM LastFlag = UNIFORM_FLAG_NORMAL;
+UNIFORM CurrentFlag = UNIFORM_FLAG_NORMAL;
+
+MALib::ARRAY<int> Attributes;
+uint NumOfUniforms = 0;
+uint ShaderProgram = 0;
+
+uint ScreenVAO = 0;
+uint ScreenBuffer = 0;
+uint GUIVAO = 0;
+uint GUIBuffer = 0;
 
 HEX_API void InitializeData()
 {
@@ -55,6 +68,7 @@ HEX_API void InitializeData()
 	Lights.resize(8);
 
 	Scenes.resize(8);
+	ActiveGUI.resize(24);
 	Meshes.resize(24);
 	Textures.resize(48);
 	Entities.resize(32);
@@ -81,6 +95,7 @@ HEX_API void UninitializeData()
 	Lights.clear();
 
 	Scenes.clear();
+	ActiveGUI.clear();
 	Meshes.clear();
 	Textures.clear();
 	Entities.clear();
@@ -95,6 +110,7 @@ HEX_API void UninitializeData()
 HEX_API void ClearGame()
 {
 	for (unsigned i = 0; i < Nodes.length(); i++) Nodes[i]->destroy();
+	for (unsigned i = 0; i < ActiveGUI.length(); i++) DestroyGUI(&ActiveGUI[i]);
 	for (unsigned i = 0; i < Scenes.length(); i++) DestroyScene(&Scenes[i]);
 	for (unsigned i = 0; i < Meshes.length(); i++) MALib::FreeVertexBuffer(&Meshes[i]);
 	for (unsigned i = 0; i < Textures.length(); i++) MALib::FreeSurface(&Textures[i]);

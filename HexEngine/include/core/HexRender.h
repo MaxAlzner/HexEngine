@@ -29,9 +29,6 @@ public:
 	MALib::COLOR clear;
 };
 
-extern uint ScreenVAO;
-extern uint ScreenBuffer;
-
 extern void InitializePostProcess();
 extern void UninitializePostProcess();
 

@@ -60,14 +60,14 @@ HEX_API void ChangeParameter(PARAMETER parameter, float value)
 	case PARAMETER_MATERIAL_OVERLAY_B:
 		BoundEntity->material->overlay.b = value;
 		break;
-	case PARAMETER_MATERIAL_SPECULAR_R:
-		BoundEntity->material->specular.r = value;
+	case PARAMETER_MATERIAL_HIGHLIGHT_R:
+		BoundEntity->material->highlight.r = value;
 		break;
-	case PARAMETER_MATERIAL_SPECULAR_G:
-		BoundEntity->material->specular.g = value;
+	case PARAMETER_MATERIAL_HIGHLIGHT_G:
+		BoundEntity->material->highlight.g = value;
 		break;
-	case PARAMETER_MATERIAL_SPECULAR_B:
-		BoundEntity->material->specular.b = value;
+	case PARAMETER_MATERIAL_HIGHLIGHT_B:
+		BoundEntity->material->highlight.b = value;
 		break;
 	case PARAMETER_MATERIAL_ROUGHNESS:
 		BoundEntity->material->roughness = value;
@@ -199,8 +199,8 @@ HEX_API void ChangeParameter(PARAMETER parameter, float v0, float v1, float v2)
 	case PARAMETER_MATERIAL_OVERLAY_RGB:
 		BoundEntity->material->setOverlay(v0, v1, v2);
 		break;
-	case PARAMETER_MATERIAL_SPECULAR_RGB:
-		BoundEntity->material->setSpecular(v0, v1, v2);
+	case PARAMETER_MATERIAL_HIGHLIGHT_RGB:
+		BoundEntity->material->setHighlight(v0, v1, v2);
 		break;
 
 	case PARAMETER_LIGHT_COLOR_RGB:

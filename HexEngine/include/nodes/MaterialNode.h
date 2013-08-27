@@ -21,7 +21,7 @@ public:
 	void setSpecularMap(uint texture);
 
 	void setOverlay(float r, float g, float b);
-	void setSpecular(float r, float g, float b);
+	void setHighlight(float r, float g, float b);
 	void setRoughness(float v);
 	void setRefractionIndex(float v);
 
@@ -38,7 +38,7 @@ public:
 	GLuint specularMap;
 
 	MALib::COLOR overlay;
-	MALib::COLOR specular;
+	MALib::COLOR highlight;
 	float roughness;
 	float refIndex;
 	MALib::VEC2 uvRepeat;
