@@ -24,6 +24,9 @@ HEX_API typedef enum UNIFORM
 	UNIFORM_UV_REPEAT                                          = 0x00000100, 
 	UNIFORM_UV_OFFSET                                          = 0x00000110, 
 	
+	UNIFORM_GUI_SCALE                                          = 0x00000111, 
+	UNIFORM_GUI_POSITION                                       = 0x00000112, 
+	
 	UNIFORM_OVERLAY_COLOR                                      = 0x00000121, 
 	UNIFORM_HIGHLIGHT_COLOR                                    = 0x00000122, 
 	UNIFORM_ROUGHNESS                                          = 0x00000123, 

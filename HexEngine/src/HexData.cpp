@@ -53,8 +53,10 @@ uint ShaderProgram = 0;
 
 uint ScreenVAO = 0;
 uint ScreenBuffer = 0;
+
 uint GUIVAO = 0;
 uint GUIBuffer = 0;
+uint FontTexture = 0;
 
 HEX_API void InitializeData()
 {

@@ -17,6 +17,8 @@ struct UniformLocations
 	int numOfPointLights;
 	int uv_repeat;
 	int uv_offset;
+	int gui_scale;
+	int gui_position;
 	int overlay;
 	int highlight;
 	int roughness;
@@ -78,6 +80,8 @@ HEX_API void InitializeUniforms()
 	Uniforms.ref_index = glGetUniformLocation(ShaderProgram, "ref_index");
 	Uniforms.uv_repeat = glGetUniformLocation(ShaderProgram, "uv_repeat");
 	Uniforms.uv_offset = glGetUniformLocation(ShaderProgram, "uv_offset");
+	Uniforms.gui_scale = glGetUniformLocation(ShaderProgram, "gui_scale");
+	Uniforms.gui_position = glGetUniformLocation(ShaderProgram, "gui_position");
 	Uniforms.screen_size = glGetUniformLocation(ShaderProgram, "screen_size");
 	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
@@ -206,6 +210,13 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 		break;
 	case UNIFORM_UV_OFFSET:
 		glUniform2fv(Uniforms.uv_offset, 1, (const GLfloat*)data);
+		break;
+
+	case UNIFORM_GUI_SCALE:
+		glUniform2fv(Uniforms.gui_scale, 1, (const GLfloat*)data);
+		break;
+	case UNIFORM_GUI_POSITION:
+		glUniform2fv(Uniforms.gui_position, 1, (const GLfloat*)data);
 		break;
 
 	case UNIFORM_OVERLAY_COLOR:
@@ -445,6 +456,12 @@ HEX_API void ResetUniforms()
 	glUniform1i(Uniforms.numOfPointLights, 0);
 	glUniform1f(Uniforms.filter_radius, 1.0f);
 	glUniform1i(Uniforms.flag, 0);
+	static float uv0[2] = {0.0f, 0.0f};
+	static float uv1[2] = {1.0f, 1.0f};
+	SetUniform(UNIFORM_UV_OFFSET, uv0);
+	SetUniform(UNIFORM_UV_REPEAT, uv1);
+	SetUniform(UNIFORM_GUI_POSITION, uv0);
+	SetUniform(UNIFORM_GUI_SCALE, uv1);
 }
 
 HEX_API bool CompileShader(const string source, GLenum type, GLint* outShader)

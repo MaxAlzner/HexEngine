@@ -12,6 +12,7 @@ HexRender AmbientOcclusion;
 HexRender AmbientOcclusionBilateral;
 HexRender LeftEye;
 HexRender RightEye;
+HexRender GUILayer;
 	
 HEX_API bool InitializeDraw()
 {
@@ -94,6 +95,8 @@ HEX_API bool InitializeDraw()
 	LeftEye.setClearColor(0.3f, 0.3f, 0.3f);
 	RightEye.build(RenderRect.width, RenderRect.height, true, true);
 	RightEye.setClearColor(0.3f, 0.3f, 0.3f);
+	GUILayer.build(RenderRect.width, RenderRect.height, true, false);
+	GUILayer.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	return true;
 }
@@ -250,9 +253,22 @@ void RenderAmbientOcclusion()
 	AmbientOcclusionBilateral.unload();
 #endif
 }
+void RenderGUILayer()
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ResetUniforms();
+	GUILayer.load();
+	
+	SetUniform(UNIFORM_FLAG_BLIT_RENDER);
+	
+	for (uint i = 0; i < ActiveGUI.length(); i++) DrawGUI(ActiveGUI[i]);
+
+	GUILayer.unload();
+}
 
 void FinalRender()
 {
+	ResetUniforms();
 #if 1
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
@@ -261,13 +277,26 @@ void FinalRender()
 #else
 	MainRender.blit();
 #endif
+#if 0
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, ShadowCaster->framebuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, ShadowRect.width, ShadowRect.height, 0, 0, 240, 240, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-	DrawGUI();
+#elif 0
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, GUILayer.framebuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, GUILayer.dimensions.width, GUILayer.dimensions.height, 0, 0, 512, 288, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+#if 0
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, GUILayer.colorMap);
+	PostProcess(UNIFORM_FLAG_BLIT_RENDER);
+	glDisable(GL_BLEND);
+#endif
 }
 
 HEX_END

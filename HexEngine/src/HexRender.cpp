@@ -90,11 +90,12 @@ void HexRender::destroy()
 	if (this->framebuffer != 0) glDeleteFramebuffers(1, &this->framebuffer);
 }
 
-void HexRender::setClearColor(float r, float g, float b)
+void HexRender::setClearColor(float r, float g, float b, float a)
 {
 	this->clear.r = r;
 	this->clear.g = g;
 	this->clear.b = b;
+	this->clear.a = a;
 	this->load();
 	this->unload();
 }

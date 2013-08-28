@@ -9,6 +9,9 @@ extern HexRender DeferredPositions;
 extern HexRender DeferredNormals;
 extern HexRender AmbientOcclusion;
 extern HexRender AmbientOcclusionBilateral;
+extern HexRender LeftEye;
+extern HexRender RightEye;
+extern HexRender GUILayer;
 	
 HEX_API extern bool InitializeDraw();
 HEX_API extern bool UninitializeDraw();
@@ -21,6 +24,7 @@ extern void RenderLuminance();
 extern void RenderDeferredPositions();
 extern void RenderDeferredNormals();
 extern void RenderAmbientOcclusion();
+extern void RenderGUILayer();
 
 extern void FinalRender();
 	

@@ -29,7 +29,9 @@ uniform int numOfPointLights;
 
 uniform vec2 uv_repeat;
 uniform vec2 uv_offset;
-uniform bool isBillboard;
+
+uniform vec2 gui_scale;
+uniform vec2 gui_position;
 
 uniform int flag;
 
@@ -38,7 +40,7 @@ void main()
 	if (flag > 10)
 	{
 		tex_coord = (vertex.xy * uv_repeat) + uv_offset;
-		gl_Position = vec4((tex_coord * 2.) - 1., 0., 1.);
+		gl_Position = vec4((((vertex.xy * gui_scale) + gui_position) * 2.) - 1., 0., 1.);
 		return;
 	}
 	

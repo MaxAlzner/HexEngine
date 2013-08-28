@@ -108,6 +108,7 @@ HEX_API void OnFrameDraw()
 	RenderLuminance();
 	if (EnableAmbientOcclusion) RenderDeferredNormals();
 	RenderAmbientOcclusion();
+	RenderGUILayer();
 	
 	FinalRender();
 	

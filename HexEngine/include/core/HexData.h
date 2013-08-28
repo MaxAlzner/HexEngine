@@ -52,8 +52,10 @@ extern uint ShaderProgram;
 
 extern uint ScreenVAO;
 extern uint ScreenBuffer;
+
 extern uint GUIVAO;
 extern uint GUIBuffer;
+extern uint FontTexture;
 
 HEX_API extern void InitializeData();
 HEX_API extern void UninitializeData();
