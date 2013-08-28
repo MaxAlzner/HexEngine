@@ -135,6 +135,9 @@ HEX_API bool StartDrawing()
 	MALib::LOG_Message("START BUILDING MATERIALS");
 	MALib::LOG_Out1i("NUM OF MATERIALS", Materials.length());
 	for (uint i = 0; i < Materials.length(); i++) Materials[i]->build();
+	
+	MALib::LOG_Message("START BUILDING GUI");
+	StartGUI();
 
 	return true;
 }
@@ -255,7 +258,6 @@ void RenderAmbientOcclusion()
 }
 void RenderGUILayer()
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ResetUniforms();
 	GUILayer.load();
 	
@@ -277,22 +279,10 @@ void FinalRender()
 #else
 	MainRender.blit();
 #endif
-#if 0
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, ShadowCaster->framebuffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, ShadowRect.width, ShadowRect.height, 0, 0, 240, 240, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-#elif 0
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, GUILayer.framebuffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, GUILayer.dimensions.width, GUILayer.dimensions.height, 0, 0, 512, 288, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-#endif
-#if 0
+
+#if 1
 	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, GUILayer.colorMap);
 	PostProcess(UNIFORM_FLAG_BLIT_RENDER);
 	glDisable(GL_BLEND);

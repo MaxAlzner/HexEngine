@@ -49,7 +49,7 @@ HEX_API uint AddGUIText(const MALib::RECT& rect, const string text)
 	gui->rect = rect;
 	gui->color = MALib::COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	gui->text = text;
-	gui->colorMap = FontTexture;
+	gui->texture = FontTexture;
 
 	ActiveGUI.add(gui);
 	return ActiveGUI.length();
@@ -118,7 +118,15 @@ HEX_API void InitializeGUI()
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), NULL);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
+}
+HEX_API void UninitializeGUI()
+{
+	if (GUIBuffer != 0) glDeleteBuffers(1, &GUIBuffer);
+	if (GUIVAO != 0) glDeleteVertexArrays(1, &GUIVAO);
+}
 
+void StartGUI()
+{
 	for (uint i = 0; i < ActiveGUI.length(); i++)
 	{
 		GUI* gui = ActiveGUI[i];
@@ -127,12 +135,6 @@ HEX_API void InitializeGUI()
 		MaterialNode::BuildTexture(&gui->colorMap, GetTexture(gui->texture));
 	}
 }
-HEX_API void UninitializeGUI()
-{
-	if (GUIBuffer != 0) glDeleteBuffers(1, &GUIBuffer);
-	if (GUIVAO != 0) glDeleteVertexArrays(1, &GUIVAO);
-}
-
 void DrawGUI(GUI* gui)
 {
 	if (gui == 0 || gui->hidden) return;

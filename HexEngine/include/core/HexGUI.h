@@ -23,6 +23,7 @@ HEX_API extern void AnimateGUI(uint gui, const MALib::RECT& rect, float delta);
 HEX_API extern void InitializeGUI();
 HEX_API extern void UninitializeGUI();
 
+extern void StartGUI();
 extern void DrawGUI(GUI* gui);
 
 HEX_END
