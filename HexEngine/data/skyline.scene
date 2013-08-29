@@ -55,13 +55,13 @@ prefab Platform
 	static true
 
 	parent BasePlatform
-	parent Catwalk
-	translate -x 2.5
-	parent LandingStraight
-	translate -x 2.5
-	parent LandingStraight
-	translate -x 8.331
-	rotate -y 180
+	//parent Catwalk
+	//translate -x 2.5
+	//parent LandingStraight
+	//translate -x 2.5
+	//parent LandingStraight
+	//translate -x 8.331
+	//rotate -y 180
 	parent Catwalk
 	translate -x -2.5
 	rotate -y 180
@@ -84,16 +84,17 @@ diffuse "data/NightSkyBox.bmp"
 skybox
 
 load
-translate 8 3.2 0
-rotate -y 90
+translate 8 3.2 4
+rotate -y 80
+rotate -x -15
 camera 45 0.01 256
-controller firstperson
-30 3.2
+//controller firstperson 30 3.2
+controller pan -0.2 2
 
 load
 light directional 0.9
 translate -y 8
-rotate -80 60 0
+rotate -70 60 0
 
 load
 translate 0 3.2 4
@@ -107,6 +108,26 @@ light -color 0.0 1.0 0.2
 light -falloff 0.7 0.25 0.01
 
 load Platform
+
+load
+mesh "data/dragon_statue.vmp"
+diffuse "data/dragon_statue_dif.bmp"
+normal "data/dragon_statue_normal.bmp"
+specular "data/dragon_statue_spec.bmp"
+scale 0.01333 0.01333 0.01333
+controller turntable 8
+
+highlight 0.2 0.8 1
+roughness 0.9
+refindex 2.4
+
+load
+mesh "data/dragon_statue_base.vmp"
+diffuse "data/dragon_statue_base_dif.bmp"
+normal "data/dragon_statue_base_normal.bmp"
+specular "data/dragon_statue_base_spec.bmp"
+scale 0.01333 0.01333 0.01333
+controller turntable 8
 
 load BasePlatform
 translate -y 8

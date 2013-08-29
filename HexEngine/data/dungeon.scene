@@ -25,6 +25,10 @@ prefab Wall
 	diffuse "data/brickwall_stone_root_dif.bmp"
 	normal "data/brickwall_stone_root_normal.bmp"
 	specular "data/brickwall_stone_root_spec.bmp"
+
+	highlight 0.2 0.8 1
+	roughness 0.25
+	refindex 0.1
 	
 	static true
 }
@@ -34,6 +38,10 @@ prefab Pillar
 	diffuse "data/brick_pillar_dif.bmp"
 	normal "data/brick_pillar_normal.bmp"
 	specular "data/brick_pillar_spec.bmp"
+
+	highlight 0.2 0.8 1
+	roughness 0.25
+	refindex 0.1
 	
 	static true
 }
@@ -77,7 +85,7 @@ prefab Cove
 
 prefab CameraDolly
 {
-	controller 30 0.8
+	controller swivel 0.1
 	camera 45 0.01 24
 }
 
@@ -85,27 +93,27 @@ load CameraDolly
 translate 0 1.25 -2
 
 load Cove
-translate 0 0 2
-load Cove
-rotate -y 90
-translate 2 0 0
-load Cove
-rotate -y 270
-translate -2 0 0
-load Cove
-rotate -y 180
-translate 0 0 -2
+//translate 0 0 2
+//load Cove
+//rotate -y 90
+//translate 2 0 0
+//load Cove
+//rotate -y 270
+//translate -2 0 0
+//load Cove
+//rotate -y 180
+//translate 0 0 -2
 
-load BaseFloor
-load BaseCeiling
-load Pillar
-translate 1 0 1
-load Pillar
-translate 1 0 -1
-load Pillar
-translate -1 0 1
-load Pillar
-translate -1 0 -1
+//load BaseFloor
+//load BaseCeiling
+//load Pillar
+//translate 1 0 1
+//load Pillar
+//translate -1 0 1
+//load Pillar
+//translate 1 0 -1
+//load Pillar
+//translate -1 0 -1
 
 load DragonStatue
 translate 0 0 2
