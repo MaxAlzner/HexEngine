@@ -115,11 +115,14 @@
     <ClInclude Include="include\nodes\LightNode.h" />
     <ClInclude Include="include\nodes\MaterialNode.h" />
     <ClInclude Include="include\nodes\NodeBase.h" />
+    <ClInclude Include="include\nodes\PanNode.h" />
     <ClInclude Include="include\nodes\ShapeNode.h" />
     <ClInclude Include="include\nodes\SkyboxNode.h" />
+    <ClInclude Include="include\nodes\SwivelNode.h" />
     <ClInclude Include="include\nodes\ThirdPersonNode.h" />
     <ClInclude Include="include\nodes\TransformNode.h" />
     <ClInclude Include="include\nodes\TurnTableNode.h" />
+    <ClInclude Include="include\nodes\ZoomNode.h" />
     <ClInclude Include="libraries\glm\core\func_common.hpp" />
     <ClInclude Include="libraries\glm\core\func_exponential.hpp" />
     <ClInclude Include="libraries\glm\core\func_geometric.hpp" />
@@ -262,11 +265,14 @@
     <ClCompile Include="src\LightNode.cpp" />
     <ClCompile Include="src\MaterialNode.cpp" />
     <ClCompile Include="src\NodeBase.cpp" />
+    <ClCompile Include="src\PanNode.cpp" />
     <ClCompile Include="src\ShapeNode.cpp" />
     <ClCompile Include="src\SkyboxNode.cpp" />
+    <ClCompile Include="src\SwivelNode.cpp" />
     <ClCompile Include="src\ThirdPersonNode.cpp" />
     <ClCompile Include="src\TransformNode.cpp" />
     <ClCompile Include="src\TurnTableNode.cpp" />
+    <ClCompile Include="src\ZoomNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\glm\core\func_common.inl" />

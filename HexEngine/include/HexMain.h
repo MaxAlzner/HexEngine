@@ -38,6 +38,9 @@
 #include "nodes\ThirdPersonNode.h"
 
 #include "nodes\TurnTableNode.h"
+#include "nodes\SwivelNode.h"
+#include "nodes\PanNode.h"
+#include "nodes\ZoomNode.h"
 
 #include "core\HexEntity.h"
 #include "core\HexNode.h"

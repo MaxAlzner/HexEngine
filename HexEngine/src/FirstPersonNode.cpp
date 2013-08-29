@@ -34,9 +34,6 @@ void FirstPersonNode::onStart()
 }
 void FirstPersonNode::onFrameUpdate()
 {
-}
-void FirstPersonNode::onFixedUpdate()
-{
 	glm::vec3 f;
 	glm::vec3 r;
 
@@ -78,6 +75,9 @@ void FirstPersonNode::onFixedUpdate()
 
 	this->root->transform->translate(f.x + r.x, 0.0f, f.z + r.z);
 	this->root->transform->rotation = glm::vec3(-this->rotation.y, this->rotation.x, 0.0f);
+}
+void FirstPersonNode::onFixedUpdate()
+{
 }
 	
 HEX_END

@@ -39,8 +39,12 @@ HEX_BEGIN
 #define COMMAND_PARAMETER_CONTROLLERTYPE_FIRSTPERSON "firstperson"
 #define COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON "thirdperson"
 #define COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE "turntable"
+#define COMMAND_PARAMETER_CONTROLLERTYPE_PAN "pan"
+#define COMMAND_PARAMETER_CONTROLLERTYPE_ZOOM "zoom"
 #define COMMAND_PARAMETER_CONTROLLER_SENSITIVITY "-sensitivity"
+#define COMMAND_PARAMETER_CONTROLLER_RANGE "-range"
 #define COMMAND_PARAMETER_CONTROLLER_MOVESPEED "-movespeed"
+#define COMMAND_PARAMETER_CONTROLLER_TURNSPEED "-turnspeed"
 	
 #define COMMAND_MESH "mesh"
 #define COMMAND_DIFFUSE "diffuse"
@@ -606,8 +610,8 @@ bool ParseControllerCommand(string str)
 		FirstPersonNode* controller = AddComponent<FirstPersonNode>();
 		controller->sensitivity.x = sensitivity;
 		controller->sensitivity.y = sensitivity;
-		controller->moveSpeed.x = moveSpeed;
-		controller->moveSpeed.y = moveSpeed;
+		controller->moveSpeed.x = moveSpeed * UnitSize;
+		controller->moveSpeed.y = moveSpeed * UnitSize;
 	}
 	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON) == 0)
 	{
@@ -619,8 +623,8 @@ bool ParseControllerCommand(string str)
 		ThirdPersonNode* controller = AddComponent<ThirdPersonNode>();
 		controller->sensitivity.x = sensitivity;
 		controller->sensitivity.y = sensitivity;
-		controller->moveSpeed.x = moveSpeed;
-		controller->moveSpeed.y = moveSpeed;
+		controller->moveSpeed.x = moveSpeed * UnitSize;
+		controller->moveSpeed.y = moveSpeed * UnitSize;
 	}
 	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE) == 0)
 	{
@@ -630,6 +634,26 @@ bool ParseControllerCommand(string str)
 		if (!ParseValue(str, &turnSpeed)) return false;
 		TurnTableNode* controller = AddComponent<TurnTableNode>();
 		controller->turnSpeed = turnSpeed;
+	}
+	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_PAN) == 0)
+	{
+		str += strlen(COMMAND_PARAMETER_CONTROLLERTYPE_PAN) + 1;
+		
+		float moveSpeed = 0.0f;
+		float range = 0.0f;
+		if (!ParseVector(str, &moveSpeed, &range)) return false;
+		PanNode* controller = AddComponent<PanNode>();
+		controller->moveSpeed = moveSpeed * UnitSize;
+		controller->range = glm::vec2(-range * UnitSize, range * UnitSize);
+	}
+	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_ZOOM) == 0)
+	{
+		str += strlen(COMMAND_PARAMETER_CONTROLLERTYPE_ZOOM) + 1;
+		
+		float moveSpeed = 0.0f;
+		if (!ParseValue(str, &moveSpeed)) return false;
+		ZoomNode* controller = AddComponent<ZoomNode>();
+		controller->moveSpeed = moveSpeed * UnitSize;
 	}
 
 	return true;

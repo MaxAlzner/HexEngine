@@ -17,6 +17,9 @@ HEX_API typedef enum COMPONENT
 	COMPONENT_FIRSTPERSON                                      = 0x00000100, 
 	COMPONENT_THIRDPERSON                                      = 0x00000200, 
 	COMPONENT_TURNTABLE                                        = 0x00000300, 
+	COMPONENT_SWIVEL                                           = 0x00000400, 
+	COMPONENT_PAN                                              = 0x00000500, 
+	COMPONENT_ZOOM                                             = 0x00000600, 
 };
 
 HEX_API extern void GenEntities(uint size, uint* entities);
@@ -42,6 +45,8 @@ template <> extern SkyboxNode*      AddComponent<>();
 template <> extern FirstPersonNode* AddComponent<>();
 template <> extern ThirdPersonNode* AddComponent<>();
 template <> extern TurnTableNode*   AddComponent<>();
+template <> extern PanNode*         AddComponent<>();
+template <> extern ZoomNode*        AddComponent<>();
 
 template <> extern CameraNode*      GetComponent<>();
 template <> extern LightNode*       GetComponent<>();
@@ -49,6 +54,8 @@ template <> extern SkyboxNode*      GetComponent<>();
 template <> extern FirstPersonNode* GetComponent<>();
 template <> extern ThirdPersonNode* GetComponent<>();
 template <> extern TurnTableNode*   GetComponent<>();
+template <> extern PanNode*         GetComponent<>();
+template <> extern ZoomNode*        GetComponent<>();
 	
 HEX_END
 #endif

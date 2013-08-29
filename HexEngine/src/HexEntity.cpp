@@ -21,6 +21,7 @@ HexEntity::~HexEntity()
 
 void HexEntity::start()
 {
+	if (this->transform != NULL) this->transform->recalculate();
 	for (unsigned i = 0; i < this->components.length(); i++)
 	{
 		ComponentNode* component = this->components[i];
@@ -29,7 +30,6 @@ void HexEntity::start()
 			component->onStart();
 		}
 	}
-	if (this->transform != NULL) this->transform->recalculate();
 }
 void HexEntity::frameUpdate()
 {

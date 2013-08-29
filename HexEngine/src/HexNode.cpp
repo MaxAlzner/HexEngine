@@ -145,6 +145,22 @@ template <> TurnTableNode* AddComponent<>()
 	Nodes.add(node);
 	return node;
 }
+template <> PanNode* AddComponent<>()
+{
+	if (BoundEntity == NULL) return NULL;
+	PanNode* node = new PanNode;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+	return node;
+}
+template <> ZoomNode* AddComponent<>()
+{
+	if (BoundEntity == NULL) return NULL;
+	ZoomNode* node = new ZoomNode;
+	BoundEntity->addComponent(node);
+	Nodes.add(node);
+	return node;
+}
 
 template <> CameraNode* GetComponent<>()
 {
@@ -209,6 +225,28 @@ template <> TurnTableNode* GetComponent<>()
 		NodeBase* node = Nodes[i];
 		if (node == 0) continue;
 		if (node->root == BoundEntity && node->type == COMPONENT_TURNTABLE) return (TurnTableNode*)node;
+	}
+	return 0;
+}
+template <> PanNode* GetComponent<>()
+{
+	if (BoundEntity == 0) return 0;
+	for (uint i = 0; i < Nodes.length(); i++)
+	{
+		NodeBase* node = Nodes[i];
+		if (node == 0) continue;
+		if (node->root == BoundEntity && node->type == COMPONENT_PAN) return (PanNode*)node;
+	}
+	return 0;
+}
+template <> ZoomNode* GetComponent<>()
+{
+	if (BoundEntity == 0) return 0;
+	for (uint i = 0; i < Nodes.length(); i++)
+	{
+		NodeBase* node = Nodes[i];
+		if (node == 0) continue;
+		if (node->root == BoundEntity && node->type == COMPONENT_ZOOM) return (ZoomNode*)node;
 	}
 	return 0;
 }

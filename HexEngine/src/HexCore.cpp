@@ -103,7 +103,7 @@ HEX_API void OnFrameDraw()
 	
 	Cameras[0]->load();
 	
-	if (EnableShadow) RenderShadowMap();
+	RenderShadowMap();
 	RenderMain();
 	RenderLuminance();
 	if (EnableAmbientOcclusion) RenderDeferredNormals();

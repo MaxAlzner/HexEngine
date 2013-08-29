@@ -91,10 +91,12 @@ HEX_API bool InitializeDraw()
 	AmbientOcclusion.setClearColor(1.0f, 1.0f, 1.0f);
 	AmbientOcclusionBilateral.build(RenderRect.width, RenderRect.height, true, false);
 	AmbientOcclusionBilateral.setClearColor(1.0f, 1.0f, 1.0f);
+#if 0
 	LeftEye.build(RenderRect.width, RenderRect.height, true, true);
 	LeftEye.setClearColor(0.3f, 0.3f, 0.3f);
 	RightEye.build(RenderRect.width, RenderRect.height, true, true);
 	RightEye.setClearColor(0.3f, 0.3f, 0.3f);
+#endif
 	GUILayer.build(RenderRect.width, RenderRect.height, true, false);
 	GUILayer.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -151,7 +153,7 @@ void RenderMain()
 	SetTextureSlot(UNIFORM_TEXTURE_SHADOW_MAP, ShadowCaster->shadowMap);
 	
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->load();
-	MainSkybox->root->render();
+	if (MainSkybox != NULL) MainSkybox->root->render();
 	for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 	for (unsigned i = 0; i < Lights.length(); i++) Lights[i]->unload();
 
@@ -159,17 +161,21 @@ void RenderMain()
 }
 void RenderShadowMap()
 {
+	if (!EnableShadow)
+	{
+		return;
+	}
 	ResetUniforms();
 
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
 
-	ShadowCaster->load();
+	if (ShadowCaster != NULL) ShadowCaster->load();
 #if 1
 	if (EnableShadow) for (unsigned i = 0; i < Casters.length(); i++) Casters[i]->render();
 #else
 	if (EnableShadow) for (unsigned i = 0; i < Renderable.length(); i++) Renderable[i]->render();
 #endif
-	ShadowCaster->unload();
+	if (ShadowCaster != NULL) ShadowCaster->unload();
 }
 void RenderLuminance()
 {
@@ -280,7 +286,7 @@ void FinalRender()
 	MainRender.blit();
 #endif
 
-#if 1
+#if 0
 	glEnable(GL_BLEND);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, GUILayer.colorMap);
