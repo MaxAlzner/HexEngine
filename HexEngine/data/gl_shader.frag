@@ -454,7 +454,7 @@ void main()
 		return;
 		case 2:
 		case 41:
-		outColor = texture(color_map, tex_coord) * vec4(overlay.rgb, 1.);
+		outColor = texture(color_map, tex_coord) * overlay;
 		return;
 
 		case 4:

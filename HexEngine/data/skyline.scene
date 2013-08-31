@@ -84,7 +84,7 @@ diffuse "data/NightSkyBox.bmp"
 skybox
 
 load
-translate 8 3.2 4
+translate 8 3.2 2
 rotate -y 80
 rotate -x -15
 camera 45 0.01 256

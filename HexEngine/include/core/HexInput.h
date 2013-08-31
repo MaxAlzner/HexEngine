@@ -15,10 +15,10 @@ namespace Input
 	HEX_API extern ControllerInput controller;
 
 	HEX_API extern float GetAxis(uint axis, float deadzone = 0.4f);
+	HEX_API extern float GetTrigger(uint trigger, float deadzone = 0.4f);
 	HEX_API extern bool GetButton(uint button, bool latch = false);
 	HEX_API extern bool IsButtonDown(uint button);
 	HEX_API extern bool IsButtonUp(uint button);
-	HEX_API extern float GetTrigger(uint trigger, float deadzone = 0.4f);
 	HEX_API extern bool GetKey(KeyCode code, bool latch = false);
 	HEX_API extern bool GetKey(uchar code, bool latch = false);
 	HEX_API extern bool IsKeyDown(KeyCode code);
