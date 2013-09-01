@@ -421,12 +421,7 @@ vec4 main_render()
 
 	directionalLight_albedo(diffuse, specular, n, v);
 
-#if 1
-	if (numOfPointLights > 0) pointLight_albedo(diffuse, specular, n, v, 0);
-	if (numOfPointLights > 1) pointLight_albedo(diffuse, specular, n, v, 1);
-	if (numOfPointLights > 2) pointLight_albedo(diffuse, specular, n, v, 2);
-	if (numOfPointLights > 3) pointLight_albedo(diffuse, specular, n, v, 3);
-#endif
+	for (int i = 0; i < numOfPointLights; i++) pointLight_albedo(diffuse, specular, n, v, i);
 	
 	float shadow = 1.;
 #if 1
@@ -439,7 +434,18 @@ vec4 main_render()
 }
 vec4 final_render()
 {
+#if 0
 	vec4 luminance = texture(luminance_map, tex_coord);// + coord);
+#else
+	vec4 luminance = vec4(0.);
+	vec2 incr = vec2(1. / 128.);
+	for (int i = 0; i < random_filter.length(); i++)
+	{
+		luminance += texture(luminance_map, tex_coord + (random_filter[i] * incr));
+	}
+	luminance /= float(random_filter.length());
+#endif
+	
 	vec4 ao = texture(ao_map, tex_coord);
 	vec4 base = texture(color_map, tex_coord);
 	return (base * ao) + luminance;
