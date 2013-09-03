@@ -32,7 +32,7 @@ prefab BasePlatform
 
 	highlight 0.8 1 0.1
 	roughness 0.25
-	refindex 0.1
+	refindex 0.8
 	
 	static true
 }
@@ -88,8 +88,8 @@ translate 8 3.2 2
 rotate -y 80
 rotate -x -15
 camera 45 0.01 256
-//controller firstperson 30 3.2
-controller pan -0.2 2
+controller firstperson 30 2.4
+//controller pan -0.2 2
 
 load
 light directional 0.9
@@ -119,7 +119,7 @@ controller turntable 8
 
 highlight 0.2 0.8 1
 roughness 0.9
-refindex 2.4
+refindex 1.4
 
 load
 mesh "data/dragon_statue_base.vmp"
@@ -129,11 +129,15 @@ specular "data/dragon_statue_base_spec.bmp"
 scale 0.01333 0.01333 0.01333
 controller turntable 8
 
-load BasePlatform
-translate -y 8
-rotate -y 90
-rotate -x 15
-scale 0.5 0.5 0.5
-controller turntable 24
-caster true
-static false
+highlight 0.2 0.8 1
+roughness 0.9
+refindex 1.4
+
+//load BasePlatform
+//translate -y 8
+//rotate -y 90
+//rotate -x 15
+//scale 0.5 0.5 0.5
+//controller turntable 24
+//caster true
+//static false

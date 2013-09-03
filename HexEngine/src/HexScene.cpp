@@ -610,8 +610,8 @@ bool ParseControllerCommand(string str)
 		FirstPersonNode* controller = AddComponent<FirstPersonNode>();
 		controller->sensitivity.x = sensitivity;
 		controller->sensitivity.y = sensitivity;
-		controller->moveSpeed.x = moveSpeed * UnitSize;
-		controller->moveSpeed.y = moveSpeed * UnitSize;
+		controller->moveSpeed.x = moveSpeed;// * UnitSize;
+		controller->moveSpeed.y = moveSpeed;// * UnitSize;
 	}
 	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_THIRDPERSON) == 0)
 	{
@@ -623,8 +623,8 @@ bool ParseControllerCommand(string str)
 		ThirdPersonNode* controller = AddComponent<ThirdPersonNode>();
 		controller->sensitivity.x = sensitivity;
 		controller->sensitivity.y = sensitivity;
-		controller->moveSpeed.x = moveSpeed * UnitSize;
-		controller->moveSpeed.y = moveSpeed * UnitSize;
+		controller->moveSpeed.x = moveSpeed;// * UnitSize;
+		controller->moveSpeed.y = moveSpeed;// * UnitSize;
 	}
 	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_TURNTABLE) == 0)
 	{
@@ -643,8 +643,8 @@ bool ParseControllerCommand(string str)
 		float range = 0.0f;
 		if (!ParseVector(str, &moveSpeed, &range)) return false;
 		PanNode* controller = AddComponent<PanNode>();
-		controller->moveSpeed = moveSpeed * UnitSize;
-		controller->range = glm::vec2(-range * UnitSize, range * UnitSize);
+		controller->moveSpeed = moveSpeed;// * UnitSize;
+		controller->range = glm::vec2(-range/* * UnitSize*/, range/* * UnitSize*/);
 	}
 	else if (strcmp(type, COMMAND_PARAMETER_CONTROLLERTYPE_ZOOM) == 0)
 	{
@@ -653,7 +653,7 @@ bool ParseControllerCommand(string str)
 		float moveSpeed = 0.0f;
 		if (!ParseValue(str, &moveSpeed)) return false;
 		ZoomNode* controller = AddComponent<ZoomNode>();
-		controller->moveSpeed = moveSpeed * UnitSize;
+		controller->moveSpeed = moveSpeed;// * UnitSize;
 	}
 
 	return true;
@@ -768,7 +768,7 @@ bool ParseCommand(string str)
 		float y = 0.0f;
 		float z = 0.0f;
 		if (!ParseTransformation(check, &x, &y, &z)) return false;
-		BoundEntity->transform->translate(x * UnitSize, y * UnitSize, z * UnitSize);
+		BoundEntity->transform->translate(x/* * UnitSize*/, y/* * UnitSize*/, z/* * UnitSize*/);
 		return true;
 	}
 	check = 0;
@@ -792,7 +792,7 @@ bool ParseCommand(string str)
 		float y = 0.0f;
 		float z = 0.0f;
 		if (!ParseTransformation(check, &x, &y, &z)) return false;
-		BoundEntity->transform->scale(x * UnitSize, y * UnitSize, z * UnitSize);
+		BoundEntity->transform->scale(x/* * UnitSize*/, y/* * UnitSize*/, z/* * UnitSize*/);
 		return true;
 	}
 	check = 0;
@@ -910,6 +910,8 @@ bool BuildPrefab(Prefab* prefab, uint* outEntity)
 	uint entity = 0;
 	GenEntities(1, &entity);
 	BindEntity(entity);
+
+	BoundEntity->transform->scale(1.0f / UnitSize, 1.0f / UnitSize, 1.0f / UnitSize);
 
 	ParseMesh(prefab->filepaths.mesh, &prefab->data.mesh);
 	ParseTexture(prefab->filepaths.diffuse, &prefab->data.diffuse);

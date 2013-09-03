@@ -57,6 +57,10 @@ HEX_API bool Input::GetKey(KeyCode code, bool latch)
 {
 	bool* value = Input::key.pressed + code;
 	bool* latched = Input::key.latched + code;
+	if (!latch)
+	{
+		return *value;
+	}
 	if (*latched)
 	{
 		if (!(*value))

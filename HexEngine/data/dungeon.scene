@@ -83,37 +83,33 @@ prefab Cove
 	translate -1 0 1
 }
 
-prefab CameraDolly
-{
-	controller swivel 0.1
-	camera 45 0.01 24
-}
-
-load CameraDolly
+load
+camera 45 0.01 24
+controller zoom 0.1
 translate 0 1.25 -2
 
 load Cove
-//translate 0 0 2
-//load Cove
-//rotate -y 90
-//translate 2 0 0
-//load Cove
-//rotate -y 270
-//translate -2 0 0
-//load Cove
-//rotate -y 180
-//translate 0 0 -2
+translate 0 0 2
+load Cove
+rotate -y 90
+translate 2 0 0
+load Cove
+rotate -y 270
+translate -2 0 0
+load Cove
+rotate -y 180
+translate 0 0 -2
 
-//load BaseFloor
-//load BaseCeiling
-//load Pillar
-//translate 1 0 1
-//load Pillar
-//translate -1 0 1
-//load Pillar
-//translate 1 0 -1
-//load Pillar
-//translate -1 0 -1
+load BaseFloor
+load BaseCeiling
+load Pillar
+translate 1 0 1
+load Pillar
+translate -1 0 1
+load Pillar
+translate 1 0 -1
+load Pillar
+translate -1 0 -1
 
 load DragonStatue
 translate 0 0 2

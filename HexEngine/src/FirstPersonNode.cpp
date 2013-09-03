@@ -29,7 +29,7 @@ void FirstPersonNode::destroy()
 void FirstPersonNode::onStart()
 {
 	this->rotation.x = this->root->transform->rotation.y;
-	this->rotation.y = this->root->transform->rotation.x;
+	//this->rotation.y = this->root->transform->rotation.x;
 	SDL_ShowCursor(0);
 }
 void FirstPersonNode::onFrameUpdate()

@@ -9,6 +9,7 @@ void UpdateDeltaTime()
 	uint NewPing = SDL_GetTicks();
 	if (Ping == 0) Ping = NewPing;
 	DeltaTime = float((NewPing - Ping) % 1000) / 1000.0f;
+	//MALib::LOG_Out1f("DELTA TIME", DeltaTime);
 	Ping = NewPing;
 }
 void UpdateFrameCount()
@@ -20,7 +21,7 @@ void UpdateFrameCount()
 	if (SecondCount != CurrentTime)
 	{
 		SecondCount = CurrentTime;
-		MALib::LOG_Out1i("FRAME COUNT", FrameCount);
+		MALib::LOG_Out1i("FRAME RATE", FrameCount);
 		FrameCount = 0;
 	}
 }
@@ -52,21 +53,21 @@ int FixedUpdateThread(void* data)
 }
 int FrameUpdateThread(void* data)
 {
-	Uint32 StartFrame = ~0;
+	//Uint32 StartFrame = ~0;
 	while (AppRunning)
 	{
 		PollEvents();
 
-		Uint32 Current = SDL_GetTicks();
-		if (Current - StartFrame >= 16)
-		{
-			StartFrame = SDL_GetTicks();
+	//	Uint32 Current = SDL_GetTicks();
+	//	if (Current - StartFrame >= 16)
+	//	{
+	//		StartFrame = SDL_GetTicks();
 			SDL_LockMutex(Lock);
 			OnFrameUpdate();
 			OnFrameDraw();
 			SDL_UnlockMutex(Lock);
 			UpdateFrameCount();
-		}
+	//	}
 	}
 	return 0;
 }

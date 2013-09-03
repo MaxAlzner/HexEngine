@@ -404,7 +404,7 @@ void pointLight_albedo(inout vec3 diffuse, inout vec3 specular, in vec3 n, in ve
 	float lambert = max(n_dot_l, 0.);
 
 	diffuse += (light_color.rgb * overlay.rgb) * lambert * atten * light_color.a;
-	specular += (light_color.rgb * highlight.rgb) * brdf * lambert * light_color.a;
+	specular += (highlight.rgb) * brdf * lambert * light_color.a;
 }
 
 vec4 main_render()
@@ -424,7 +424,7 @@ vec4 main_render()
 	for (int i = 0; i < numOfPointLights; i++) pointLight_albedo(diffuse, specular, n, v, i);
 	
 	float shadow = 1.;
-#if 1
+#if 0
 	shadow = max(shadow_intensity(), 0.2);
 #endif
 
@@ -434,7 +434,7 @@ vec4 main_render()
 }
 vec4 final_render()
 {
-#if 0
+#if 1
 	vec4 luminance = texture(luminance_map, tex_coord);// + coord);
 #else
 	vec4 luminance = vec4(0.);
