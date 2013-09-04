@@ -286,9 +286,10 @@ void FinalRender()
 	MainRender.blit();
 #endif
 
-#if 0
+#if 1
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, GUILayer.colorMap);
 	PostProcess(UNIFORM_FLAG_BLIT_RENDER);
 	glDisable(GL_BLEND);

@@ -455,48 +455,48 @@ void main()
 {
 	switch (flag)
 	{
-		case 1:// rendering shadow map
-		outColor = vec4(0., 0., 0., 1.);
-		return;
-		case 2:
-		case 41:
-		outColor = texture(color_map, tex_coord) * overlay;
-		return;
+	case 1:// rendering shadow map
+	outColor = vec4(0., 0., 0., 1.);
+	return;
+	case 2:
+	case 41:
+	outColor = texture(color_map, tex_coord) * overlay;
+	return;
 
-		case 4:
-		outColor = vec4(vertex_def.x, vertex_def.y, vertex_def.z, length(vertex_def) / (farZ - nearZ));
-		return;
-		case 5:
-		outColor = vec4((normal_def.x * .5) + .5, (normal_def.y * .5) + .5, normal_def.z, 1.);
-		return;
+	case 4:
+	outColor = vec4(vertex_def.x, vertex_def.y, vertex_def.z, length(vertex_def) / (farZ - nearZ));
+	return;
+	case 5:
+	outColor = vec4((normal_def.x * .5) + .5, (normal_def.y * .5) + .5, normal_def.z, 1.);
+	return;
 
-		case 11:
-		outColor = gaussian_blur();
-		return;
-		case 12:
-		outColor = gaussian_blur_large();
-		return;
-		case 13:
-		outColor = bilateral_gaussian_blur();
-		return;
+	case 11:
+	outColor = gaussian_blur();
+	return;
+	case 12:
+	outColor = gaussian_blur_large();
+	return;
+	case 13:
+	outColor = bilateral_gaussian_blur();
+	return;
 
-		case 21:
-		outColor = ambient_occlusion();
-		return;
-		case 22:
-		outColor = bright_pass();
-		return;
+	case 21:
+	outColor = ambient_occlusion();
+	return;
+	case 22:
+	outColor = bright_pass();
+	return;
 
-		case 31:
-		outColor = anaglyphic_3d();
-		return;
+	case 31:
+	outColor = anaglyphic_3d();
+	return;
 
-		case 51:
-		outColor = final_render();
-		return;
+	case 51:
+	outColor = final_render();
+	return;
 
-		default:
-		outColor = main_render();
-		return;
+	default:
+	outColor = main_render();
+	return;
 	}
 }

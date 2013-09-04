@@ -88,7 +88,7 @@ translate 8 3.2 2
 rotate -y 80
 rotate -x -15
 camera 45 0.01 256
-controller firstperson 30 2.4
+//controller firstperson 30 2.4
 //controller pan -0.2 2
 
 load

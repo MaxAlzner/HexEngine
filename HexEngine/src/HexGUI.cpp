@@ -143,6 +143,9 @@ void DrawGUI(GUI* gui)
 	static float offset[2] = {float(gui->rect.x0) / float(ScreenRect.width), float(gui->rect.y0) / float(ScreenRect.height)};
 	static float dimensions[2] = {float(gui->rect.width) / float(ScreenRect.width), float(gui->rect.height) / float(ScreenRect.height)};
 
+	gui->color.b = 0.2f;
+	gui->color.g = 0.4f;
+
 	SetUniform(UNIFORM_GUI_POSITION, offset);
 	SetUniform(UNIFORM_GUI_SCALE, dimensions);
 	SetUniform(UNIFORM_OVERLAY_COLOR, &gui->color);
