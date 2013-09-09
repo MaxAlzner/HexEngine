@@ -24,7 +24,7 @@ struct UniformLocations
 	int roughness;
 	int ref_index;
 	int screen_size;
-	int shadow_size;
+	int map_size;
 	int random_filter;
 	int filter_radius;
 	int gamma;
@@ -38,6 +38,7 @@ struct UniformLocations
 	int position_map;
 	int ao_map;
 	int shadow_map;
+	int gui_map;
 	int leftEye_map;
 	int rightEye_map;
 	int flag;
@@ -83,7 +84,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.gui_scale = glGetUniformLocation(ShaderProgram, "gui_scale");
 	Uniforms.gui_position = glGetUniformLocation(ShaderProgram, "gui_position");
 	Uniforms.screen_size = glGetUniformLocation(ShaderProgram, "screen_size");
-	Uniforms.shadow_size = glGetUniformLocation(ShaderProgram, "shadow_size");
+	Uniforms.map_size = glGetUniformLocation(ShaderProgram, "map_size");
 	Uniforms.random_filter = glGetUniformLocation(ShaderProgram, "random_filter");
 	Uniforms.filter_radius = glGetUniformLocation(ShaderProgram, "filter_radius");
 	Uniforms.gamma = glGetUniformLocation(ShaderProgram, "gamma");
@@ -97,6 +98,7 @@ HEX_API void InitializeUniforms()
 	Uniforms.position_map = glGetUniformLocation(ShaderProgram, "position_map");
 	Uniforms.ao_map = glGetUniformLocation(ShaderProgram, "ao_map");
 	Uniforms.shadow_map = glGetUniformLocation(ShaderProgram, "shadow_map");
+	Uniforms.gui_map = glGetUniformLocation(ShaderProgram, "gui_map");
 	Uniforms.leftEye_map = glGetUniformLocation(ShaderProgram, "leftEye_map");
 	Uniforms.rightEye_map = glGetUniformLocation(ShaderProgram, "rightEye_map");
 	Uniforms.flag = glGetUniformLocation(ShaderProgram, "flag");
@@ -106,12 +108,13 @@ HEX_API void InitializeUniforms()
 	float* randoms = new float[filter_size];
 	for (unsigned i = 0; i < filter_size; i += 2)
 	{
-		float theta = MALib::RANDOM_Scalar() * 3.14f;
+		float theta = MALib::RANDOM_Scalar() * float(M_PI) * 2.0f;
 		float r = MALib::RANDOM_Scalar();
 		float x = cos(theta) * r;
 		float y = sin(theta) * r;
 		randoms[i + 0] = x;
 		randoms[i + 1] = y;
+		//MALib::LOG_Out2f("RANDOM COORD", x, y);
 	}
 	SetUniform(UNIFORM_RANDOM_FILTER, filter_size / 2, randoms);
 	delete [] randoms;
@@ -229,6 +232,9 @@ HEX_API void SetUniform(UNIFORM uniform, void* data)
 	case UNIFORM_SCREEN_SIZE:
 		glUniform2fv(Uniforms.screen_size, 1, (const GLfloat*)data);
 		break;
+	case UNIFORM_MAP_SIZE:
+		glUniform2fv(Uniforms.map_size, 1, (const GLfloat*)data);
+		break;
 		
 	case UNIFORM_LEFT_EYE_COLOR:
 		glUniform4fv(Uniforms.leftEye_color, 1, (const GLfloat*)data);
@@ -264,10 +270,6 @@ HEX_API void SetUniform(UNIFORM uniform, float value)
 		break;
 	case UNIFORM_REFRACTION_INDEX:
 		glUniform1f(Uniforms.ref_index, (const GLfloat)value);
-		break;
-
-	case UNIFORM_SHADOW_MAP_SIZE:
-		glUniform1f(Uniforms.shadow_size, (const GLfloat)value);
 		break;
 
 	case UNIFORM_FILTER_RADIUS:
@@ -343,6 +345,11 @@ HEX_API void SetUniform(UNIFORM uniform)
 		glUniform1i(Uniforms.flag, 13);
 		LastFlag = CurrentFlag;
 		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_BILATERAL_GUASSIAN;
+		break;
+	case UNIFORM_FLAG_POSTPROCESS_RANDOM_GUASSIAN:
+		glUniform1i(Uniforms.flag, 14);
+		LastFlag = CurrentFlag;
+		CurrentFlag = UNIFORM_FLAG_POSTPROCESS_RANDOM_GUASSIAN;
 		break;
 
 	case UNIFORM_FLAG_POSTPROCESS_AMBIENTOCCLUSION:
@@ -421,6 +428,11 @@ HEX_API void SetTextureSlot(UNIFORM uniform, GLuint texture)
 	case UNIFORM_TEXTURE_SHADOW_MAP:
 		glUniform1i(Uniforms.shadow_map, 5);
 		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		break;
+	case UNIFORM_TEXTURE_GUI_LAYER_MAP:
+		glUniform1i(Uniforms.gui_map, 6);
+		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		break;
 

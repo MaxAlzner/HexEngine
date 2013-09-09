@@ -17,6 +17,7 @@ void OutputDefaultPreferences()
 	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_LUMINANCESIZE, LuminanceRect.width);
 	fprintf(PrefrencesFile, "%s = %d\n", HEX_PREFERENCE_SHADOWMAPSIZE, ShadowRect.width);
 	fprintf(PrefrencesFile, "\n");
+	fprintf(PrefrencesFile, "%s = %f\n", HEX_PREFERENCE_BLOOMFILTERRADIUS, BloomFilterRadius);
 	fprintf(PrefrencesFile, "%s = %f\n", HEX_PREFERENCE_AOFILTERRADIUS, AOFilterRadius);
 	fprintf(PrefrencesFile, "%s = %f\n", HEX_PREFERENCE_EYEBRIDGEWIDTH, EyeBridgeWidth);
 	fprintf(PrefrencesFile, "%s = %f\n", HEX_PREFERENCE_GAMMA, Gamma);
@@ -105,6 +106,7 @@ HEX_API bool InitializePreferences()
 	uint renderHeight = RenderRect.height;
 	uint luminanceSize = LuminanceRect.width;
 	uint shadowSize = ShadowRect.width;
+	float bloomFilterRadius = BloomFilterRadius;
 	float aoFilterRadius = AOFilterRadius;
 	float eyeBridgeWidth = EyeBridgeWidth;
 	float gamma = Gamma;
@@ -158,6 +160,11 @@ HEX_API bool InitializePreferences()
 			string check = strpbrk(line, "0123456789");
 			sscanf(check, "%d", &shadowSize);
 		}
+		else if (strstr(line, HEX_PREFERENCE_BLOOMFILTERRADIUS) != 0)
+		{
+			string check = strpbrk(line, ".0123456789");
+			sscanf(check, "%f", &bloomFilterRadius);
+		}
 		else if (strstr(line, HEX_PREFERENCE_AOFILTERRADIUS) != 0)
 		{
 			string check = strpbrk(line, ".0123456789");
@@ -205,6 +212,7 @@ HEX_API bool InitializePreferences()
 	RenderRect = MALib::RECT(renderWidth, renderHeight);
 	LuminanceRect = MALib::RECT(luminanceSize, luminanceSize);
 	ShadowRect = MALib::RECT(shadowSize, shadowSize);
+	BloomFilterRadius = bloomFilterRadius;
 	AOFilterRadius = aoFilterRadius;
 	EyeBridgeWidth = eyeBridgeWidth;
 	Gamma = gamma;
@@ -258,6 +266,7 @@ HEX_API bool InitializeLoadOrder()
 		MALib::ExportTextFile(HEX_LOADORDER_FILEPATH, load);
 	}
 
+	ClearGame();
 	for (uint i = 0; i < load->lines.length(); i++)
 	{
 		Scene* scene = LoadScene(load->lines[i]);

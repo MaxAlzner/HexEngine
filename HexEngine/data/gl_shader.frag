@@ -22,6 +22,7 @@ uniform sampler2D depth_map;
 uniform sampler2D position_map;
 uniform sampler2D ao_map;
 uniform sampler2D shadow_map;
+uniform sampler2D gui_map;
 
 uniform sampler2D leftEye_map;
 uniform sampler2D rightEye_map;
@@ -37,7 +38,7 @@ uniform float roughness;
 uniform float ref_index;
 
 uniform vec2 screen_size;
-uniform float shadow_size;
+uniform vec2 map_size;
 uniform vec2[%RandomFilterSize%] random_filter;
 uniform float filter_radius;
 uniform float gamma;
@@ -348,11 +349,21 @@ vec4 bilateral_gaussian_blur()
 	BILATERAL_GAUSSIAN( 2,  2, 24);
 	return g / k;
 }
+vec4 random_gaussian_blur()
+{
+	vec4 g = vec4(0.);
+	vec2 incr = filter_radius / map_size;
+	for (int i = 0; i < random_filter.length(); i++)
+	{
+		g += texture(color_map, tex_coord + (random_filter[i] * incr));
+	}
+	return g / float(random_filter.length());
+}
 
 float shadow_intensity()
 {
 	vec3 coord = vec3(vertex_ls.xyz / vertex_ls.w);
-	vec2 incr = vec2(r / shadow_size, r / shadow_size);
+	vec2 incr = r / map_size;
 	float sum = 0.;
 	for (int i = 0; i < random_filter.length(); i++)
 	{
@@ -434,21 +445,16 @@ vec4 main_render()
 }
 vec4 final_render()
 {
-#if 1
-	vec4 luminance = texture(luminance_map, tex_coord);// + coord);
-#else
-	vec4 luminance = vec4(0.);
-	vec2 incr = vec2(1. / 128.);
-	for (int i = 0; i < random_filter.length(); i++)
-	{
-		luminance += texture(luminance_map, tex_coord + (random_filter[i] * incr));
-	}
-	luminance /= float(random_filter.length());
-#endif
+	vec4 gui_layer = texture(gui_map, tex_coord);
+	float gui_alpha = gui_layer.a;
+	gui_layer.a = 1.;
 	
 	vec4 ao = texture(ao_map, tex_coord);
+	vec4 luminance = texture(luminance_map, tex_coord);
 	vec4 base = texture(color_map, tex_coord);
-	return (base * ao) + luminance;
+	vec4 final = (base * ao) + luminance;
+
+	return (gui_alpha * gui_layer) + ((1. - gui_alpha) * final);
 }
 
 void main()
@@ -478,6 +484,9 @@ void main()
 	return;
 	case 13:
 	outColor = bilateral_gaussian_blur();
+	return;
+	case 14:
+	outColor = random_gaussian_blur();
 	return;
 
 	case 21:

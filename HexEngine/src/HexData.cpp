@@ -10,14 +10,16 @@ bool EnableLuminance = true;
 bool EnableAmbientOcclusion = false;
 float DeltaTime = 0.0f;
 float AspectRatio = 4.0f / 3.0f;
+float Theta = 0.0f;
 float Gamma = 2.2f;
+float BloomFilterRadius = 8.0f;
 float AOFilterRadius = 24.0f;
 float EyeBridgeWidth = 8.0f;
 uint RandomFilterSize = 64;
 uint MaxPointLights = 4;
 MALib::RECT RenderRect(1280, 720);
 MALib::RECT ScreenRect(1280, 720);
-MALib::RECT LuminanceRect(128, 128);
+MALib::RECT LuminanceRect(512, 512);
 MALib::RECT ShadowRect(1024, 1024);
 SDL_Surface* RenderSurface = NULL;
 

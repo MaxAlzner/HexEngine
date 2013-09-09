@@ -3,6 +3,8 @@
 #ifdef _HEX_CORE_H_
 HEX_BEGIN
 
+uint FrameRateGUI = 0;
+
 void UpdateDeltaTime()
 {
 	static uint Ping = 0;
@@ -22,6 +24,10 @@ void UpdateFrameCount()
 	{
 		SecondCount = CurrentTime;
 		MALib::LOG_Out1i("FRAME RATE", FrameCount);
+		static char rate[8];
+		memset(rate, 0, sizeof(char) * 8);
+		sprintf_s(rate, "%d", FrameCount);
+		EditGUI(FrameRateGUI, rate);
 		FrameCount = 0;
 	}
 }
@@ -131,7 +137,6 @@ HEX_API void OnFrameUpdate()
 		Entities[i]->frameUpdate();
 	}
 	
-	SetUniform(UNIFORM_SHADOW_MAP_SIZE, float(ShadowRect.width));
 	SetUniform(UNIFORM_GAMMA, Gamma);
 	static float screenSize[2] = {float(ScreenRect.width), float(ScreenRect.height)};
 	SetUniform(UNIFORM_SCREEN_SIZE, screenSize);
@@ -154,8 +159,11 @@ HEX_API void OnFixedUpdate()
 	
 	if (Input::GetKey(KEY_7, true)) ToggleBlitShadow = !ToggleBlitShadow;
 
-	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.01f;
-	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.01f;
+	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.1f;
+	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.1f;
+
+	Theta += DeltaTime;
+	if (DeltaTime >= float(M_PI) * 2.0f) Theta = 0.0f;
 
 	if (Input::IsKeyDown(KEY_ESCAPE) || Input::IsButtonDown(XBOX_BACK)) ToggleRunning();
 	if (Input::GetKey(KEY_SPACE, true)) Paused = !Paused;
@@ -214,11 +222,15 @@ HEX_API bool Initialize(uint argc, string* argv)
 		return false;
 	MALib::LOG_Message("END DRAW INITIALIZATION");
 	
+	HEX::SetFontSheet("data/fontsheet.bmp", 16, 16);
+	FrameRateGUI = HEX::AddGUIText(MALib::RECT(24, 24, 88, 48), "0");
+	
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;
 }
 HEX_API bool Uninitialize()
 {
+	SDL_DestroyMutex(Lock);
 	UninitializeDraw();
 	UninitializeLoadOrder();
 	UninitializePreferences();

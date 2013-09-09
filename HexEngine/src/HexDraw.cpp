@@ -28,6 +28,8 @@ HEX_API bool InitializeDraw()
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_WM_SetCaption("HexDemo", "HexDemo");
 	
 	MALib::LOG_Message("START RESHAPE");
@@ -48,6 +50,7 @@ HEX_API bool InitializeDraw()
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_MULTISAMPLE);
 	glDisable(GL_BLEND);
 	
 	MALib::LOG_Message("START SHADER");
@@ -166,7 +169,9 @@ void RenderShadowMap()
 		return;
 	}
 	ResetUniforms();
-
+	
+	float mapSize[2] = {float(ShadowRect.width), float(ShadowRect.height)};
+	SetUniform(UNIFORM_MAP_SIZE, mapSize);
 	SetUniform(UNIFORM_FLAG_SHADOW_RENDER);
 
 	if (ShadowCaster != NULL) ShadowCaster->load();
@@ -187,8 +192,12 @@ void RenderLuminance()
 		Luminance.unload();
 		return;
 	}
+	ResetUniforms();
 	BrightPass.load();
 	
+	float mapSize[2] = {float(LuminanceRect.width), float(LuminanceRect.height)};
+	SetUniform(UNIFORM_MAP_SIZE, mapSize);
+	SetUniform(UNIFORM_FILTER_RADIUS, MALib::Interp((sin(Theta) * 0.5f) + 0.5f, 0.5f, 1.0f) * BloomFilterRadius);
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_BRIGHTPASS);
 
@@ -196,20 +205,20 @@ void RenderLuminance()
 	Luminance.load();
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_RANDOM_GUASSIAN);
 
 	Luminance.unload();
 #if 1
 	BrightPass.load();
 	
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, Luminance.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_RANDOM_GUASSIAN);
 
 	BrightPass.unload();
 	Luminance.load();
 
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, BrightPass.colorMap);
-	PostProcess(UNIFORM_FLAG_POSTPROCESS_GUASSIAN_LARGE);
+	PostProcess(UNIFORM_FLAG_POSTPROCESS_RANDOM_GUASSIAN);
 
 	Luminance.unload();
 #endif
@@ -280,19 +289,11 @@ void FinalRender()
 #if 1
 	SetTextureSlot(UNIFORM_TEXTURE_LUMINANCE_MAP, Luminance.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_AMBIENTOCCLUSION_MAP, AmbientOcclusionBilateral.colorMap);
+	SetTextureSlot(UNIFORM_TEXTURE_GUI_LAYER_MAP, GUILayer.colorMap);
 	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, MainRender.colorMap);
 	PostProcess(UNIFORM_FLAG_POSTPROCESS_FINAL_RENDER);
 #else
 	MainRender.blit();
-#endif
-
-#if 1
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	SetTextureSlot(UNIFORM_TEXTURE_COLOR_MAP, GUILayer.colorMap);
-	PostProcess(UNIFORM_FLAG_BLIT_RENDER);
-	glDisable(GL_BLEND);
 #endif
 }
 
