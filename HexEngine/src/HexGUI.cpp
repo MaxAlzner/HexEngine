@@ -147,6 +147,17 @@ HEX_API void InitializeGUI()
 		1.0f, 0.0f, 0.0f, 1.0f, 
 	};
 
+	UninitializeGUI();
+	
+	MaterialNode::BuildTexture(&FontMap, GetTexture(FontTexture));
+
+	glBindTexture(GL_TEXTURE_2D, FontMap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	glGenVertexArrays(1, &GUIVAO);
 	glBindVertexArray(GUIVAO);
 	glGenBuffers(1, &GUIBuffer);
@@ -166,15 +177,6 @@ HEX_API void UninitializeGUI()
 
 void StartGUI()
 {
-	MaterialNode::BuildTexture(&FontMap, GetTexture(FontTexture));
-
-	glBindTexture(GL_TEXTURE_2D, FontMap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 	for (uint i = 0; i < ActiveGUI.length(); i++)
 	{
 		GUI* gui = ActiveGUI[i];

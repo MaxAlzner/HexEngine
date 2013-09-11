@@ -3,6 +3,8 @@
 #ifdef _HEX_CORE_H_
 HEX_BEGIN
 
+#define LARGE_SURFACE_RENDER 1
+
 uint FrameRateGUI = 0;
 
 void UpdateDeltaTime()
@@ -23,7 +25,7 @@ void UpdateFrameCount()
 	if (SecondCount != CurrentTime)
 	{
 		SecondCount = CurrentTime;
-		MALib::LOG_Out1i("FRAME RATE", FrameCount);
+		//MALib::LOG_Out1i("FRAME RATE", FrameCount);
 		static char rate[8];
 		memset(rate, 0, sizeof(char) * 8);
 		sprintf_s(rate, "%d", FrameCount);
@@ -71,6 +73,11 @@ int FrameUpdateThread(void* data)
 			SDL_LockMutex(Lock);
 			OnFrameUpdate();
 			OnFrameDraw();
+
+			if (Input::GetKey(KEY_R, true))
+			{
+				OnStart();
+			}
 			SDL_UnlockMutex(Lock);
 			UpdateFrameCount();
 	//	}
@@ -81,8 +88,29 @@ int FrameUpdateThread(void* data)
 HEX_API void OnStart()
 {
 	if (!AppRunning) return;
-	MALib::LOG_Message("START SCENE");
 
+	MALib::LOG_Message("START PREFERENCES");
+	if (!InitializePreferences())
+	{
+		ToggleRunning();
+		return;
+	}
+	MALib::LOG_Message("START LOAD ORDER");
+	if (!InitializeLoadOrder())
+	{
+		ToggleRunning();
+		return;
+	}
+	
+	HEX::SetFontSheet("data/fontsheet.bmp", 16, 16);
+	FrameRateGUI = HEX::AddGUIText(MALib::RECT(24, 24, 88, 48), "0");
+	
+#if LARGE_SURFACE_RENDER
+	RenderRect.resize(10200, 6600);
+	LuminanceRect.resize(1024, 1024);
+#endif
+
+	MALib::LOG_Message("START SCENE");
 	if (!StartDrawing())
 	{
 		ToggleRunning();
@@ -109,6 +137,11 @@ HEX_API void OnFrameDraw()
 	if (Cameras.length() < 1) return;
 	
 	Cameras[0]->load();
+
+#if LARGE_SURFACE_RENDER
+	HexRender screen;
+	screen.build(RenderRect.width, RenderRect.height, true, false);
+#endif
 	
 	RenderShadowMap();
 	RenderMain();
@@ -117,7 +150,13 @@ HEX_API void OnFrameDraw()
 	RenderAmbientOcclusion();
 	RenderGUILayer();
 	
+#if LARGE_SURFACE_RENDER
+	screen.load();
+#endif
 	FinalRender();
+#if LARGE_SURFACE_RENDER
+	screen.unload();
+#endif
 	
 	if (ToggleBlitBrightPass) BrightPass.blit();
 	if (ToggleBlitLuminance) Luminance.blit();
@@ -125,6 +164,16 @@ HEX_API void OnFrameDraw()
 	if (ToggleBlitDeferredNormals) DeferredNormals.blit();
 
 	Cameras[0]->unload();
+	
+#if LARGE_SURFACE_RENDER
+	MainRender.save("HexDemo_ScreenShot_01_Main.bmp");
+	Luminance.save("HexDemo_ScreenShot_02_Luminace.bmp");
+	DeferredPositions.save("HexDemo_ScreenShot_03_DeferredPositions.bmp");
+	DeferredNormals.save("HexDemo_ScreenShot_04_DeferredNormals.bmp");
+	AmbientOcclusionBilateral.save("HexDemo_ScreenShot_05_AmbientOcclusion.bmp");
+	screen.save("HexDemo_ScreenShot_06_Final.bmp");
+	AppRunning = false;
+#endif
 
 	SDL_GL_SwapBuffers();
 }
@@ -161,6 +210,14 @@ HEX_API void OnFixedUpdate()
 
 	if (Input::GetKey(KEY_NUMPAD_7)) Gamma += 0.1f;
 	if (Input::GetKey(KEY_NUMPAD_4)) Gamma -= 0.1f;
+	
+	if (Input::GetKey(KEY_G, true)) EnableGUI = !EnableGUI;
+
+	if (Input::GetKey(KEY_C, true))
+	{
+		MALib::LOG_Out3f("CAMERA TRANSLATION", Cameras[0]->root->transform->translation.x, Cameras[0]->root->transform->translation.y, Cameras[0]->root->transform->translation.z);
+		MALib::LOG_Out3f("CAMERA ROTATION", Cameras[0]->root->transform->rotation.x, Cameras[0]->root->transform->rotation.y, Cameras[0]->root->transform->rotation.z);
+	}
 
 	Theta += DeltaTime;
 	if (DeltaTime >= float(M_PI) * 2.0f) Theta = 0.0f;
@@ -210,20 +267,10 @@ HEX_API bool Initialize(uint argc, string* argv)
 	MALib::LOG_Message("START DATA");
 	InitializeData();
 
-	MALib::LOG_Message("START PREFERENCES");
-	if (!InitializePreferences()) 
-		return false;
-	MALib::LOG_Message("START LOAD ORDER");
-	if (!InitializeLoadOrder()) 
-		return false;
-
 	MALib::LOG_Message("START DRAW INITIALIZING");
 	if (!InitializeDraw()) 
 		return false;
 	MALib::LOG_Message("END DRAW INITIALIZATION");
-	
-	HEX::SetFontSheet("data/fontsheet.bmp", 16, 16);
-	FrameRateGUI = HEX::AddGUIText(MALib::RECT(24, 24, 88, 48), "0");
 	
 	MALib::LOG_Message("END INITIALIZATION");
 	return true;

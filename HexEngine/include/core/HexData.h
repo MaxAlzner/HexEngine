@@ -7,6 +7,7 @@ extern bool Paused;
 extern bool EnableShadow;
 extern bool EnableLuminance;
 extern bool EnableAmbientOcclusion;
+extern bool EnableGUI;
 extern float DeltaTime;
 extern float AspectRatio;
 extern float Theta;

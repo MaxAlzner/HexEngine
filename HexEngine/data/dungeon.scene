@@ -9,6 +9,9 @@ prefab BaseFloor
 	specular "data/dungeon_floor_spec.bmp"
 	
 	static true
+	
+	roughness 1.2
+	refindex 0.4
 }
 prefab BaseCeiling
 {
@@ -18,6 +21,10 @@ prefab BaseCeiling
 	specular "data/dungeon_ceiling_spec.bmp"
 	
 	static true
+	
+	roughness 1.2
+	refindex 1.4
+	highlight 0.2 0.2 0.2
 }
 prefab Wall
 {
@@ -25,12 +32,11 @@ prefab Wall
 	diffuse "data/brickwall_stone_root_dif.bmp"
 	normal "data/brickwall_stone_root_normal.bmp"
 	specular "data/brickwall_stone_root_spec.bmp"
-
-	highlight 0.2 0.8 1
-	roughness 0.25
-	refindex 0.1
 	
 	static true
+	
+	roughness 0.9
+	refindex 0.7
 }
 prefab Pillar
 {
@@ -38,10 +44,6 @@ prefab Pillar
 	diffuse "data/brick_pillar_dif.bmp"
 	normal "data/brick_pillar_normal.bmp"
 	specular "data/brick_pillar_spec.bmp"
-
-	highlight 0.2 0.8 1
-	roughness 0.25
-	refindex 0.1
 	
 	static true
 }
@@ -56,12 +58,21 @@ prefab DragonStatue
 	normal "data/dragon_statue_normal.bmp"
 	specular "data/dragon_statue_spec.bmp"
 	static true
+	
+	highlight 0.8 1 0.9
+	roughness 0.25
+	refindex 0.8
+	
 	parent
 	mesh "data/dragon_statue_base.vmp"
 	diffuse "data/dragon_statue_base_dif.bmp"
 	normal "data/dragon_statue_base_normal.bmp"
 	specular "data/dragon_statue_base_spec.bmp"
 	static true
+	
+	highlight 0.8 1 0.9
+	roughness 0.25
+	refindex 0.8
 }
 prefab Cove
 {
@@ -84,9 +95,13 @@ prefab Cove
 }
 
 load
+//translate 0 1.25 -2.25
+//rotate -x -4
+translate -0.475887 1.250000 -1.647660
+rotate -4.800001 -10.200003 0.000000
 camera 45 0.01 24
-controller zoom 0.1
-translate 0 1.25 -2
+//controller zoom 0.05
+//controller firstperson 32 1
 
 load Cove
 translate 0 0 2
@@ -96,20 +111,20 @@ translate 2 0 0
 load Cove
 rotate -y 270
 translate -2 0 0
-load Cove
-rotate -y 180
-translate 0 0 -2
+//load Cove
+//rotate -y 180
+//translate 0 0 -2
 
 load BaseFloor
 load BaseCeiling
 load Pillar
 translate 1 0 1
+//load Pillar
+//translate 1 0 -1
 load Pillar
 translate -1 0 1
-load Pillar
-translate 1 0 -1
-load Pillar
-translate -1 0 -1
+//load Pillar
+//translate -1 0 -1
 
 load DragonStatue
 translate 0 0 2
@@ -121,5 +136,11 @@ rotate -60 15 0
 load
 light point 1
 light -color 0.25 0.6 1.0
-light -falloff 8 24 64
-translate 2 2 0
+light -falloff 0.01 0.25 0.8
+translate 0 1.25 2
+
+load
+light point 0.4
+light -color 1 0.2 0.1
+light -falloff 0.08 0.8 1.7
+translate 0.4 0.8 0

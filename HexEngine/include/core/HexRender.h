@@ -20,6 +20,8 @@ public:
 
 	void blit(HexRender* dest = NULL);
 
+	void save(const string filename);
+
 	MALib::RECT dimensions;
 	MALib::RECT view;
 	uint framebuffer;

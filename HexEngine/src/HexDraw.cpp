@@ -53,18 +53,6 @@ HEX_API bool InitializeDraw()
 	glEnable(GL_MULTISAMPLE);
 	glDisable(GL_BLEND);
 	
-	MALib::LOG_Message("START SHADER");
-	if (!BuildProgram())
-	{
-		MALib::LOG_Message("Could not build shaders.");
-		return false;
-	}
-	
-	MALib::LOG_Message("START ATTRIBUTES");
-	InitializeAttributes();
-	MALib::LOG_Message("START UNIFORMS");
-	InitializeUniforms();
-
 #if 1
 	MALib::LOG_Message("GL VENDOR                  ", (char*)glGetString(GL_VENDOR));
 	MALib::LOG_Message("GL RENDERER                ", (char*)glGetString(GL_RENDERER));
@@ -74,34 +62,6 @@ HEX_API bool InitializeDraw()
 	MALib::LOG_Outvi("UNIFORMS", (int*)&Uniforms, NumOfUniforms);
 	MALib::LOG_Outvi("ATTRIBUTES", Attributes.pointer(), Attributes.length());
 #endif
-
-	MALib::LOG_Message("START FRAMEBUFFERS");
-	InitializePostProcess();
-	MALib::LOG_Message("START GUI");
-	InitializeGUI();
-	
-	MainRender.build(RenderRect.width, RenderRect.height, true, true);
-	MainRender.setClearColor(0.3f, 0.3f, 0.3f);
-	BrightPass.build(LuminanceRect.width, LuminanceRect.height, true, false);
-	BrightPass.setClearColor(0.0f, 0.0f, 0.0f);
-	Luminance.build(LuminanceRect.width, LuminanceRect.height, true, false);
-	Luminance.setClearColor(0.0f, 0.0f, 0.0f);
-	DeferredPositions.build(RenderRect.width, RenderRect.height, true, true);
-	DeferredPositions.setClearColor(0.5f, 0.5f, 0.5f);
-	DeferredNormals.build(RenderRect.width, RenderRect.height, true, true);
-	DeferredNormals.setClearColor(0.5f, 0.5f, 1.0f);
-	AmbientOcclusion.build(RenderRect.width, RenderRect.height, true, false);
-	AmbientOcclusion.setClearColor(1.0f, 1.0f, 1.0f);
-	AmbientOcclusionBilateral.build(RenderRect.width, RenderRect.height, true, false);
-	AmbientOcclusionBilateral.setClearColor(1.0f, 1.0f, 1.0f);
-#if 0
-	LeftEye.build(RenderRect.width, RenderRect.height, true, true);
-	LeftEye.setClearColor(0.3f, 0.3f, 0.3f);
-	RightEye.build(RenderRect.width, RenderRect.height, true, true);
-	RightEye.setClearColor(0.3f, 0.3f, 0.3f);
-#endif
-	GUILayer.build(RenderRect.width, RenderRect.height, true, false);
-	GUILayer.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	return true;
 }
@@ -132,6 +92,46 @@ HEX_API bool StartDrawing()
 		MALib::LOG_Message("COULD NOT FIND ANY MATERIALS OR SHAPES");
 		return false;
 	}
+	
+	MALib::LOG_Message("START SHADER");
+	if (!BuildProgram())
+	{
+		MALib::LOG_Message("Could not build shaders.");
+		return false;
+	}
+	
+	MALib::LOG_Message("START ATTRIBUTES");
+	InitializeAttributes();
+	MALib::LOG_Message("START UNIFORMS");
+	InitializeUniforms();
+	MALib::LOG_Message("START FRAMEBUFFERS");
+	InitializePostProcess();
+	MALib::LOG_Message("START GUI");
+	InitializeGUI();
+
+	MALib::LOG_Message("START BUILDING RENDERS");
+	MainRender.build(RenderRect.width, RenderRect.height, true, true);
+	MainRender.setClearColor(0.3f, 0.3f, 0.3f);
+	BrightPass.build(LuminanceRect.width, LuminanceRect.height, true, false);
+	BrightPass.setClearColor(0.0f, 0.0f, 0.0f);
+	Luminance.build(LuminanceRect.width, LuminanceRect.height, true, false);
+	Luminance.setClearColor(0.0f, 0.0f, 0.0f);
+	DeferredPositions.build(RenderRect.width, RenderRect.height, true, true);
+	DeferredPositions.setClearColor(0.5f, 0.5f, 0.5f);
+	DeferredNormals.build(RenderRect.width, RenderRect.height, true, true);
+	DeferredNormals.setClearColor(0.5f, 0.5f, 1.0f);
+	AmbientOcclusion.build(RenderRect.width, RenderRect.height, true, false);
+	AmbientOcclusion.setClearColor(1.0f, 1.0f, 1.0f);
+	AmbientOcclusionBilateral.build(RenderRect.width, RenderRect.height, true, false);
+	AmbientOcclusionBilateral.setClearColor(1.0f, 1.0f, 1.0f);
+#if 0
+	LeftEye.build(RenderRect.width, RenderRect.height, true, true);
+	LeftEye.setClearColor(0.3f, 0.3f, 0.3f);
+	RightEye.build(RenderRect.width, RenderRect.height, true, true);
+	RightEye.setClearColor(0.3f, 0.3f, 0.3f);
+#endif
+	GUILayer.build(RenderRect.width, RenderRect.height, true, false);
+	GUILayer.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	MALib::LOG_Message("START BUILDING SHAPES");
 	MALib::LOG_Out1i("NUM OF SHAPES", Shapes.length());
@@ -273,6 +273,12 @@ void RenderAmbientOcclusion()
 }
 void RenderGUILayer()
 {
+	if (!EnableGUI)
+	{
+		GUILayer.load();
+		GUILayer.unload();
+		return;
+	}
 	ResetUniforms();
 	GUILayer.load();
 	

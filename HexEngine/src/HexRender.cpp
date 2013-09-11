@@ -126,6 +126,57 @@ void HexRender::blit(HexRender* dest)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
+void HexRender::save(const string filename)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+	glViewport(this->dimensions.x0, this->dimensions.y0, this->dimensions.width, this->dimensions.height);
+
+	uchar* data = new uchar[this->dimensions.width * this->dimensions.height * MALib::ByteCount(MALib::PIXELFORMAT_BGRA)];
+	//uchar* data = (uchar*)malloc(this->dimensions.width * this->dimensions.height * MALib::ByteCount(MALib::PIXELFORMAT_BGRA) * sizeof(uchar));
+
+	glReadPixels(this->dimensions.x0, this->dimensions.y0, this->dimensions.width / 4, this->dimensions.height / 4, GL_BGRA, GL_UNSIGNED_BYTE, data);
+
+#if 0
+	MALib::SURFACE* shot = 0;
+	MALib::CreateSurface(&shot, filename, this->dimensions.width, this->dimensions.height, MALib::PIXELFORMAT_BGRA, data);
+	if (!MALib::ExportBMPFile(filename, shot)) MALib::LOG_Message("SCREENSHOT FAILED");
+	MALib::FreeSurface(&shot);
+#else
+	if (data != 0)
+	{
+		FILE* file = 0;
+
+		static uchar info[54];
+		memset(info, 0, sizeof(uchar) * 54);
+	
+		fopen_s(&file, filename, "wb");
+		if (file == 0) return;
+	
+		uint bufferSize = this->dimensions.width * this->dimensions.height * 4;
+	
+		info[0] = 'B';
+		info[1] = 'M';
+		*(int*)(&info[2]) = 54 + bufferSize;// file size
+		*(int*)(&info[10]) = 54;
+		*(int*)(&info[14]) = 40;
+		*(int*)(&info[18]) = this->dimensions.width;
+		*(int*)(&info[22]) = this->dimensions.height;
+		*(int*)(&info[26]) = 1;
+		*(int*)(&info[28]) = 4 * 8;
+		*(int*)(&info[34]) = bufferSize;
+
+		fwrite(info, sizeof(uchar), 54, file);
+		fwrite(data, sizeof(uchar), bufferSize, file);
+		fclose(file);
+	}
+#endif
+
+	free(data);
+
+	glViewport(ScreenRect.x0, ScreenRect.y0, ScreenRect.width, ScreenRect.height);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void InitializePostProcess()
 {
 	static float ScreenPlane[24] = 
@@ -137,6 +188,8 @@ void InitializePostProcess()
 		0.0f, 0.0f, 0.0f, 1.0f, 
 		1.0f, 0.0f, 0.0f, 1.0f, 
 	};
+
+	UninitializePostProcess();
 
 	glGenVertexArrays(1, &ScreenVAO);
 	glBindVertexArray(ScreenVAO);

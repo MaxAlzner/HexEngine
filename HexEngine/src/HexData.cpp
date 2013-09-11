@@ -8,6 +8,7 @@ bool Paused = false;
 bool EnableShadow = false;
 bool EnableLuminance = true;
 bool EnableAmbientOcclusion = false;
+bool EnableGUI = true;
 float DeltaTime = 0.0f;
 float AspectRatio = 4.0f / 3.0f;
 float Theta = 0.0f;

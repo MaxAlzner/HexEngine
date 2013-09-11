@@ -226,27 +226,13 @@ HEX_API bool InitializePreferences()
 	{
 		VertexShaderSource = new char[VertexShader->size];
 		memset(VertexShaderSource, 0, sizeof(char) * VertexShader->size);
-#if 0
-		memcpy(VertexShaderSource, VertexShader->data, sizeof(char) * VertexShader->size);
-#else
 		if (!FormatShader(&VertexShader->data, &VertexShaderSource)) return false;
-#endif
-
-		//MALib::LOG_Message(VertexShader->data);
-		//MALib::LOG_Message(VertexShaderSource);
 	}
 	if (FragmentShader != NULL)
 	{
 		FragmentShaderSource = new char[FragmentShader->size];
 		memset(FragmentShaderSource, 0, sizeof(char) * FragmentShader->size);
-#if 0
-		memcpy(FragmentShaderSource, FragmentShader->data, sizeof(char) * FragmentShader->size);
-#else
 		if (!FormatShader(&FragmentShader->data, &FragmentShaderSource)) return false;
-#endif
-
-		//MALib::LOG_Message(FragmentShader->data);
-		//MALib::LOG_Message(FragmentShaderSource);
 	}
 
 	return true;
