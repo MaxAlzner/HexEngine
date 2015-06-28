@@ -3,8 +3,6 @@
 #ifdef _HEX_CORE_H_
 HEX_BEGIN
 
-#define LARGE_SURFACE_RENDER 1
-
 uint FrameRateGUI = 0;
 
 void UpdateDeltaTime()
@@ -61,15 +59,15 @@ int FixedUpdateThread(void* data)
 }
 int FrameUpdateThread(void* data)
 {
-	//Uint32 StartFrame = ~0;
+	Uint32 StartFrame = ~0;
 	while (AppRunning)
 	{
 		PollEvents();
 
-	//	Uint32 Current = SDL_GetTicks();
-	//	if (Current - StartFrame >= 16)
-	//	{
-	//		StartFrame = SDL_GetTicks();
+		Uint32 Current = SDL_GetTicks();
+		if (Current - StartFrame >= 16)
+		{
+			StartFrame = SDL_GetTicks();
 			SDL_LockMutex(Lock);
 			OnFrameUpdate();
 			OnFrameDraw();
@@ -80,7 +78,7 @@ int FrameUpdateThread(void* data)
 			}
 			SDL_UnlockMutex(Lock);
 			UpdateFrameCount();
-	//	}
+		}
 	}
 	return 0;
 }
@@ -102,14 +100,9 @@ HEX_API void OnStart()
 		return;
 	}
 	
-	HEX::SetFontSheet("data/fontsheet.bmp", 16, 16);
-	FrameRateGUI = HEX::AddGUIText(MALib::RECT(24, 24, 88, 48), "0");
+	SetFontSheet("data/fontsheet.bmp", 16, 16);
+	FrameRateGUI = AddGUIText(MALib::RECT(24, 24, 88, 48), "0");
 	
-#if LARGE_SURFACE_RENDER
-	RenderRect.resize(10200, 6600);
-	LuminanceRect.resize(1024, 1024);
-#endif
-
 	MALib::LOG_Message("START SCENE");
 	if (!StartDrawing())
 	{
@@ -137,11 +130,6 @@ HEX_API void OnFrameDraw()
 	if (Cameras.length() < 1) return;
 	
 	Cameras[0]->load();
-
-#if LARGE_SURFACE_RENDER
-	HexRender screen;
-	screen.build(RenderRect.width, RenderRect.height, true, false);
-#endif
 	
 	RenderShadowMap();
 	RenderMain();
@@ -149,14 +137,7 @@ HEX_API void OnFrameDraw()
 	if (EnableAmbientOcclusion) RenderDeferredNormals();
 	RenderAmbientOcclusion();
 	RenderGUILayer();
-	
-#if LARGE_SURFACE_RENDER
-	screen.load();
-#endif
 	FinalRender();
-#if LARGE_SURFACE_RENDER
-	screen.unload();
-#endif
 	
 	if (ToggleBlitBrightPass) BrightPass.blit();
 	if (ToggleBlitLuminance) Luminance.blit();
@@ -165,16 +146,6 @@ HEX_API void OnFrameDraw()
 
 	Cameras[0]->unload();
 	
-#if LARGE_SURFACE_RENDER
-	MainRender.save("HexDemo_ScreenShot_01_Main.bmp");
-	Luminance.save("HexDemo_ScreenShot_02_Luminace.bmp");
-	DeferredPositions.save("HexDemo_ScreenShot_03_DeferredPositions.bmp");
-	DeferredNormals.save("HexDemo_ScreenShot_04_DeferredNormals.bmp");
-	AmbientOcclusionBilateral.save("HexDemo_ScreenShot_05_AmbientOcclusion.bmp");
-	screen.save("HexDemo_ScreenShot_06_Final.bmp");
-	AppRunning = false;
-#endif
-
 	SDL_GL_SwapBuffers();
 }
 HEX_API void OnFrameUpdate()
